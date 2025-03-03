@@ -1,0 +1,38 @@
+"use client";
+
+import {
+  useOrganization,
+  useSession,
+  useSessionList,
+  useSignIn,
+} from "@clerk/nextjs";
+import CustomMenu from "../app/Components/CustomMenu";
+
+const Index2 : React.FC = () => {
+  const useSign = useSignIn();
+  console.log('use useSignIn() hook:= ', useSign );
+
+  const sessionInfo = useSession();
+  console.log("Session Info. : ", sessionInfo);
+
+  const sessionList = useSessionList();
+  console.log("Session List", sessionList);
+
+  const orgnazation = useOrganization({
+    invitations: {
+        pageSize: 20,
+        initialPage: 2, 
+      },
+  });
+  console.log("org:= ", orgnazation);
+
+  return (
+    <div>
+          <CustomMenu />
+      {/* Lorem ipsum dolor sit, amet consectetur adipisicing elit. Asperiores magni
+      totam voluptatum sequi accusamus excepturi sed laborum illum ipsa. */}
+    </div>
+  );
+};
+
+export default Index2;

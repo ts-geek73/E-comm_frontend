@@ -1,0 +1,65 @@
+'use client'
+import { SignIn } from "@clerk/nextjs";
+// import { auth, currentUser } from "@clerk/nextjs/server";
+import { useEffect, useState } from "react";
+
+
+interface UserData {
+  userId: string;
+  firstName: string;
+}
+
+export default  function Page() {
+  //   const authVar = await auth();
+  //   console.log("Auth Fun:= ", authVar);
+
+  //   if (await auth.protect()) {
+  //     console.log("protect", await auth.protect());
+  //   }
+
+  //   if (!authVar.userId) return authVar.redirectToSignIn();
+
+  // const user = await currentUser();
+  // console.log("User:= ", user);
+
+
+//   const [userData, setUserData] = useState<UserData | null>(null);
+//   const [loading, setLoading] = useState<boolean>(true);
+
+//   // useEffect hook to fetch data after the component mounts
+//   useEffect(() => {
+//     // Define the async function to fetch user data
+//     const fetchUserData = async () => {
+      
+//       try {
+//         const response = await fetch("/api/auth");
+//         if (!response.ok) {
+//           throw new Error("Failed to fetch user data");
+//         }
+//         const data = await response.json();
+//         setUserData(data); 
+//       } catch (error) {
+//         console.error("Error fetching user data:", error);
+//       } finally {
+//         setLoading(false);  
+//       }
+//     };
+
+//     fetchUserData();  
+//   }, []); 
+
+
+  return (
+    <>
+      {/* <h1>Hello, {authVar.userId}</h1> */}
+      {/* <h1>Hello, {user?.firstName}</h1>
+      {user?.emailAddresses[0].emailAddress} */}
+      {/* <h1>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Nisi, facilis!</h1> */}
+
+      {/* <h1>{userData?.firstName}</h1> */}
+
+      <h1>usydgfiu</h1>
+      {/* <SignIn />       */}
+    </>
+  );
+}
