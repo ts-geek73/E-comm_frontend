@@ -10,8 +10,8 @@ export async function POST(request: Request) {
     // everything went well
     return Response.json({ message: 'Received' })
   } catch (e) {
-    // something went wrong
-    // no changes were made to the database
+    console.log(e);
+    
     return Response.error()
   }
 }

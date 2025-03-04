@@ -1,5 +1,5 @@
 'use client'
-import { useSignUp } from '@clerk/nextjs';
+import { SignUp, useSignUp } from '@clerk/nextjs';
 
 export default function Page() {
   const { isLoaded, signUp } = useSignUp()
@@ -8,8 +8,8 @@ export default function Page() {
 
   return (
     <>
-    <h2>GUIghfkJUYf</h2>
-    {/* {signUp} */}
+    {/* <h2>GUIghfkJUYf</h2> */}
+     <SignUp />
     </>
   )
 }

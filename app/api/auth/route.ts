@@ -3,13 +3,9 @@ import { auth, currentUser } from '@clerk/nextjs/server';
 
 export async function GET() {
 
-  //   await auth.protect();
-
-  //   const { userId } = await auth();
-  //   const msg = "Successful";
-
-  //   return NextResponse.json({ user ,userId, msg });
   const user = await currentUser();
+  console.log("User:= ",user);
+  
   if (!user) {
     return NextResponse.json({ error: 'User not found' });
   }
