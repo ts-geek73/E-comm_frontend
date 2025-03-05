@@ -15,13 +15,17 @@ interface IProduct {
 interface ProductCardProps {
   data: IProduct;
   isLoading: boolean;
+  onClick: () => void; // Add onClick prop
 }
 
-const ProductCard = ({ data, isLoading }: ProductCardProps) => {
-  const { imageUrl, name, price, category, description } = data;
+const ProductCard = ({ data, isLoading, onClick }: ProductCardProps) => {
+  const { imageUrl, name, price, category, description, stock } = data;
 
   return (
-    <Card className="p-6 space-y-6 rounded-lg border shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out">
+    <Card
+      className="relative rounded-lg border shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out cursor-pointer" // Add cursor-pointer
+      onClick={onClick} // Attach onClick handler
+    >
       <CardHeader>
         <div className="relative h-52 aspect-square">
           {isLoading ? (
@@ -37,7 +41,7 @@ const ProductCard = ({ data, isLoading }: ProductCardProps) => {
           )}
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="flex flex-col min-h-[200px] justify-between">
         {isLoading ? (
           <>
             <Skeleton className="h-6 w-3/4 mb-2" />
@@ -48,16 +52,18 @@ const ProductCard = ({ data, isLoading }: ProductCardProps) => {
           </>
         ) : (
           <>
-            <CardTitle className="text-2xl font-semibold text-gray-800">{name}</CardTitle>
-            <p className="text-sm text-gray-500">{category}</p>
-            <p className="text-sm text-gray-700 mt-2">{description}</p>
-            <div className="flex items-center justify-between mt-4">
-              <h3 className="font-bold text-xl text-gray-900">{`${price} Rs.`}</h3>
-              {data.stock > 0 ? (
-                <span className="text-sm text-green-600">In Stock</span>
-              ) : (
-                <span className="text-sm text-red-600">Out of Stock</span>
-              )}
+            <div>
+              <CardTitle className="text-2xl font-semibold text-gray-800">{name}</CardTitle>
+              <p className="text-sm text-gray-500">{category}</p>
+              {/* {description && <p className="text-sm text-gray-700 mt-2 flex-grow">{description}</p>} */}
+              <div className="flex items-center justify-between mt-4">
+                <h3 className="font-bold text-xl text-gray-900">{`${price} Rs.`}</h3>
+                {stock > 0 ? (
+                  <span className="text-sm text-green-600">In Stock</span>
+                ) : (
+                  <span className="text-sm text-red-600">Out of Stock</span>
+                )}
+              </div>
             </div>
             <Button className="w-full mt-4 py-2 bg-blue-600 text-white hover:bg-blue-700 transition-colors duration-300">
               Add to Cart

@@ -1,19 +1,25 @@
 'use client'
 
 import React, { useState } from 'react'
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion"
 
 const HelpPage = () => {
   const [searchTerm, setSearchTerm] = useState('')
   const [activeTab, setActiveTab] = useState('faq')
 
-  const faqData = [  
-    { question: 'How do I sign up?', answer: 'To sign up, click on the "Sign Up" button and fill in your details.' },  
+  const faqData = [
+    { question: 'How do I sign up?', answer: 'To sign up, click on the "Sign Up" button and fill in your details.' },
     // { question: 'How can I reset my password?', answer: 'You can reset your password by clicking on "Forgot Password" during login.' },  
-    { question: 'Where can I view my profile?', answer: 'Go to your dashboard and click on your avatar to view your profile.' },  
+    { question: 'Where can I view my profile?', answer: 'Go to your dashboard and click on your avatar to view your profile.' },
     // { question: 'What payment methods do you accept?', answer: 'We accept Visa, MasterCard, American Express, and PayPal.' },  
-    { question: 'How do I contact customer support?', answer: 'You can contact customer support by clicking on the "Contact Us" button at the bottom of the page or by emailing support@example.com.' },  
-    { question: 'Can I cancel my subscription?', answer: 'Yes, you can cancel your subscription at any time from your account settings.' },  
-  ]  
+    { question: 'How do I contact customer support?', answer: 'You can contact customer support by clicking on the "Contact Us" button at the bottom of the page or by emailing support@example.com.' },
+    { question: 'Can I cancel my subscription?', answer: 'Yes, you can cancel your subscription at any time from your account settings.' },
+  ]
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value)
   }
@@ -21,13 +27,12 @@ const HelpPage = () => {
   return (
     <div className="bg-blue-200 min-h-screen py-8 px-4 sm:px-8">
       <div className="max-w-7xl mx-auto">
-        {/* Hero Section */}
+
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-800">Help Center</h1>
           <p className="mt-2 text-lg text-gray-600">Find answers to your questions or contact support.</p>
         </div>
 
-        {/* Search Bar */}
         <div className="flex justify-center mb-8">
           <input
             type="text"
@@ -38,7 +43,6 @@ const HelpPage = () => {
           />
         </div>
 
-        {/* Tabs: FAQ & Contact Support */}
         <div className="flex justify-center space-x-8 mb-8">
           <button
             onClick={() => setActiveTab('faq')}
@@ -53,18 +57,6 @@ const HelpPage = () => {
             Contact Support
           </button>
         </div>
-
-
-        {activeTab === 'faq' && (
-          <div className="space-y-6">
-            {faqData.map((faq, index) => (
-              <div key={index} className="bg-white shadow-md rounded-lg p-6">
-                <h3 className="text-xl font-semibold text-gray-800">{faq.question}</h3>
-                <p className="mt-2 text-gray-600">{faq.answer}</p>
-              </div>
-            ))}
-          </div>
-        )}
 
         {activeTab === 'contact' && (
           <div className="bg-white shadow-md rounded-lg p-6">
@@ -95,6 +87,25 @@ const HelpPage = () => {
             </form>
           </div>
         )}
+
+        {activeTab === 'faq' && (
+          <>
+              <Accordion type="single" collapsible className="flex flex-col items-center">
+            {faqData.map((faq, index) => (
+                <AccordionItem key={index} value={`item-${index}`} className='w-1/2'>
+                  <AccordionTrigger className='text-xl '>{faq.question}</AccordionTrigger>
+                  <AccordionContent className='text-lg'>
+                    {faq.answer}
+                  </AccordionContent>
+                </AccordionItem>
+            ))}
+            </Accordion>
+          </>
+
+        )}
+
+
+
       </div>
     </div>
   )

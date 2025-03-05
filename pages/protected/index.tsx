@@ -46,7 +46,7 @@ export default function ProtectedPage() {
           setAuthenticate(true);
           toast.success("Authorized, redirect to Admin Page")
           setTimeout(()=>{
-            router.push("admin/product-crud")
+            router.push("admin/product")
           }, 3000)
         } else {
           setAuthenticate(false);

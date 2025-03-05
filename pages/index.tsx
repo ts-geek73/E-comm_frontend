@@ -1,14 +1,12 @@
 'use client'
-import { useState, useEffect } from 'react';
-import { useAuth, useUser, useSession, useClerk } from '@clerk/nextjs';
+import { useAuth, useClerk, useSession, useUser } from '@clerk/nextjs';
+import { useEffect, useState } from 'react';
 
-import axios from 'axios';
-import { ToastContainer } from 'react-toastify';
-import api from '../utils/axoins'; 
-import logo from '../public/e-co logo.png'
-import Image from 'next/image'
-import HeaderComp from '../app/Components/Header/page';
 import ProductList from '@/app/Components/Product/ProductList';
+import { ToastContainer } from 'react-toastify';
+import Carousel from '../app/Components/Header/Carousel';
+import HeaderComp from '../app/Components/Header/Headbar';
+import api from '../utils/axoins';
 
 interface UserData {
   jwtToken: string;
@@ -128,7 +126,7 @@ const IndexPage = () => {
     <>
       <div className="bg-blue-200">
         <HeaderComp />
-        
+        <Carousel />
         <ProductList />
         <ToastContainer />
       </div>
