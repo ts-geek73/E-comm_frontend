@@ -18,8 +18,8 @@ interface PaginationProps {
 }
 
 const PaginationComp: React.FC<PaginationProps> = ({ length, currentPage, setCurrentPage }) => {
-  const [items, setItems] = useState<number []>([]);
-  const totalPages = Math.ceil(length / 9);
+  const [items, setItems] = useState<number[]>([]);
+  const totalPages = Math.ceil(length / 12);
 
   useEffect(() => {
     const generateItems = () => {
@@ -32,7 +32,7 @@ const PaginationComp: React.FC<PaginationProps> = ({ length, currentPage, setCur
       }
 
       const start = Math.max(2, currentPage - 1); // Start at least from 2
-      const end = Math.min(totalPages - 1, currentPage + 1); 
+      const end = Math.min(totalPages - 1, currentPage + 1);
 
       for (let i = start; i <= end; i++) {
         if (!itemSet.includes(i)) {
@@ -53,17 +53,26 @@ const PaginationComp: React.FC<PaginationProps> = ({ length, currentPage, setCur
     };
 
     generateItems();
-  }, [currentPage, totalPages]); 
+  }, [currentPage, totalPages]);
 
   return (
     <div className="flex justify-center p-6">
       <Pagination>
         <PaginationContent>
-          <PaginationPrevious
+          {currentPage === 1 ? <PaginationPrevious
+            className='opacity-50 cursor-pointer'
             onClick={() => currentPage > 1 && setCurrentPage(currentPage - 1)}
           >
-            Previous
+            per
           </PaginationPrevious>
+            :
+            <PaginationPrevious
+              className='cursor-pointer'
+              onClick={() => currentPage > 1 && setCurrentPage(currentPage - 1)}
+            >
+              Previous
+            </PaginationPrevious>
+          }
 
           {items.map((item, idx) => {
             if (item === -1) {
@@ -82,11 +91,21 @@ const PaginationComp: React.FC<PaginationProps> = ({ length, currentPage, setCur
             );
           })}
 
-          <PaginationNext
-            onClick={() => currentPage < totalPages && setCurrentPage(currentPage + 1)}
-          >
-            Next
-          </PaginationNext>
+          {currentPage == totalPages ?
+
+            <PaginationNext
+            className='opacity-50'
+              onClick={() => currentPage < totalPages && setCurrentPage(currentPage + 1)}
+            >
+              Next
+            </PaginationNext>
+            :
+            <PaginationNext
+              onClick={() => currentPage < totalPages && setCurrentPage(currentPage + 1)}
+            >
+              Next
+            </PaginationNext>
+          }
         </PaginationContent>
       </Pagination>
     </div>

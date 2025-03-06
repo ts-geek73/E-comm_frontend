@@ -10,16 +10,25 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
+import { getCategories } from '@/utils/categoryService';
 
 interface IProduct {
+  _id: string;
+  category_id: string;
   name: string;
   description: string;
   price: number;
   stock: number;
-  category: string;
   imageUrl: string;
+  features: string[],
+  brand: string
+  rating: number
+}
+
+interface ICategory {
+  _id: string;
+  name: string;
 }
 
 const ProductList = () => {
@@ -27,10 +36,25 @@ const ProductList = () => {
   const [error, setError] = useState<string | null>(null);
   const [dataLength, setLength] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState(1);
-  const [productPerPage] = useState(9);
+  const [productPerPage] = useState(12);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedProduct, setSelectedProduct] = useState<IProduct | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [categories, setCategories] = useState<ICategory[]>([]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const fetchedCategories = await getCategories();
+        setCategories(fetchedCategories);
+      } catch (err: any) {
+        console.error('Error fetching categories:', err);
+        setError('Failed to fetch categories.');
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   useEffect(() => {
     const productFetch = async () => {
@@ -58,6 +82,11 @@ const ProductList = () => {
     productFetch();
   }, [currentPage, productPerPage]);
 
+  const getCategoryName = (categoryId: string): string => {
+    const category = categories.find((cat) => cat._id === categoryId);
+    return category ? category.name : 'Unknown Category';
+  };
+
   if (error) {
     return (
       <div className="text-center py-8 text-red-500 font-semibold">
@@ -81,67 +110,97 @@ const ProductList = () => {
   };
 
   return (
-    <div className="p-6 container m-auto space-y-4">
+    <div className="p-6 container mx-auto space-y-8">
       <h1 className="text-3xl font-bold text-center text-gray-900 mb-8">
         Our Products
       </h1>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid justify-center grid-cols-4 gap-6">
         {products?.map((ele) => (
           <ProductCard
-            key={ele.name}
+            key={ele._id}
             data={ele}
-            isLoading={false}
             onClick={() => handleProductClick(ele)}
+            categories={categories}
           />
         ))}
       </div>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-2xl bg-white p-6 rounded-lg shadow-xl transition-all duration-300">
-          <DialogHeader className="mb-4">
-            <DialogTitle className="text-3xl font-semibold text-gray-800">
-              {selectedProduct?.name}
-            </DialogTitle>
-            <DialogDescription className="text-gray-600 text-lg mt-2">
-              {selectedProduct?.description}
-            </DialogDescription>
-          </DialogHeader>
+        <DialogContent className="max-w-4xl bg-white p-8 rounded-2xl shadow-xl transition-all duration-300">
+          <div className="flex flex-col md:flex-row">
+            {/* Image Section */}
+            <div className="md:w-1/2 mb-6 md:mb-0 md:pr-6">
+              {selectedProduct && (
+                <img
+                  src={selectedProduct.imageUrl}
+                  alt={selectedProduct.name}
+                  className="h-full aspect-square rounded-xl shadow-lg object-cover"
+                />
+              )}
+            </div>
 
-          <div className="space-y-4">
-            {selectedProduct && (
-              <>
-                <div className="flex justify-between items-center">
-                  <p className="text-xl font-bold text-gray-900">{`${selectedProduct.price} Rs.`}</p>
-                  <span
-                    className={`text-sm font-semibold ${
-                      selectedProduct.stock > 0 ? 'text-green-600' : 'text-red-600'
-                    }`}
-                  >
-                    {selectedProduct.stock > 0 ? 'In Stock' : 'Out of Stock'}
-                  </span>
-                </div>
+            {/* Product Details Section */}
+            <div className="md:w-1/2 overflow-y-auto px-4 max-h-[450px] scrollbar-hide"> 
+              <DialogHeader className="mb-6">
+                <DialogTitle className="text-4xl font-semibold text-gray-900">
+                  {selectedProduct?.name}
+                </DialogTitle>
+                <DialogDescription className="text-gray-600 text-xl mt-3">
+                  {selectedProduct?.description}
+                </DialogDescription>
+              </DialogHeader>
 
-                <p className="text-lg text-gray-700 mt-2">Category: {selectedProduct.category}</p>
+              <div className="space-y-6">
+                {selectedProduct && (
+                  <>
+                    {/* Price & Stock Status */}
+                    <div className="flex justify-between items-center">
+                      <div className="flex items-center">
+                        <p className="text-2xl font-bold text-gray-900 mr-2">
+                          {`${selectedProduct.price}`}
+                        </p>
+                        <p className="text-xl text-gray-600 line-through">
+                          {`${(selectedProduct.price * 1.7).toFixed(2)}`} 
+                        </p>
+                      </div>
+                      <span
+                        className={`text-lg font-semibold ${selectedProduct.stock > 0 ? 'text-green-600' : 'text-red-600'
+                          }`}
+                      >
+                        {selectedProduct.stock > 0 ? 'In Stock' : 'Out of Stock'}
+                      </span>
+                    </div>
 
-                <div className="mt-4">
-                  <img
-                    src={selectedProduct.imageUrl}
-                    alt={selectedProduct.name}
-                    className="w-full h-64 object-cover rounded-lg shadow-lg"
-                  />
-                </div>
-              </>
-            )}
-          </div>
+                    {/* Category */}
+                    <p className="text-lg text-gray-700 mt-3">
+                      <span className="font-semibold text-gray-800">Category:</span> {getCategoryName(selectedProduct.category_id)}
+                    </p>
 
-          <div className="mt-6">
-            <button
-              onClick={() => setIsDialogOpen(false)}
-              className="w-full py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-300"
-            >
-              Close
-            </button>
+                    {/* Features Section */}
+                    <div className="mt-4">
+                      <h3 className="text-xl font-semibold text-gray-800">Features:</h3>
+                      <ul className="list-decimal list-inside text-gray-700">
+                        {selectedProduct.features &&
+                          selectedProduct.features.map((feature, index) => (
+                            <li key={index}>{feature}</li>
+                          ))}
+                      </ul>
+                    </div>
+
+                    {/* Brand */}
+                    <p className="text-lg text-gray-700">
+                      <span className="font-semibold text-gray-800">Brand:</span> {selectedProduct.brand}
+                    </p>
+
+                    {/* Rating */}
+                    <p className="text-lg text-gray-700">
+                      <span className="font-semibold text-gray-800">Rating:</span> {selectedProduct.rating}
+                    </p>
+                  </>
+                )}
+              </div>
+            </div>
           </div>
         </DialogContent>
       </Dialog>

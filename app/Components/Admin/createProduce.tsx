@@ -1,9 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useForm } from 'react-hook-form';
-import { toast, ToastContainer } from 'react-toastify';
+import { Button } from '@/components/ui/button';
 import {
     Form,
     FormControl,
@@ -13,8 +10,6 @@ import {
     FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
 import {
     Select,
     SelectContent,
@@ -22,40 +17,79 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { useRouter } from 'next/navigation';
+import React, { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { toast, ToastContainer } from 'react-toastify';
 import api from '../../../utils/axoins';
 
-const createProduceComp: React.FC = () => {
+interface ICategory {
+    _id: string
+    name: string
+    parentCategory_id: string
+}
+
+const CreateProduceComp: React.FC = () => {
     const router = useRouter();
     const [isLoading, setIsLoading] = useState(false);
+    const [categories, setCategories] = useState<ICategory[]>([]);
 
     const form = useForm({
         defaultValues: {
             name: '',
             description: '',
-            price: 0,
-            category: '',
+            brand: '',
+            features: '',
+            category_id: '',
+            parentCategory_id: '',
             imageUrl: '',
+            price: 0,
+            rating: 0,
             stock: 0,
         },
         mode: 'onSubmit',
     });
 
+
+
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const { data } = await api.get('category');
+                setCategories(data as ICategory[]);
+            } catch (error) {
+                console.error('Error fetching categories:', error);
+                toast.error('Failed to fetch categories.');
+            }
+        };
+        fetchCategories();
+    }, []);
+
     const onSubmit = async (values: any) => {
         setIsLoading(true);
         try {
-            const response = await api.post('/product/create', values);
+            const featuresArray = values.features.split(',').map((feature: string) => feature.trim());
+
+            const productData = {
+                ...values,
+                features: featuresArray,
+            };
+
+            const response = await api.post<{ message: string }>('/product/create', productData);
 
             if (response.status === 200) {
-                toast.success('Product created successfully!');
-                toast('Rediect to Product List !');
+                toast.success(response.data.message);
+                toast('Redirecting to Product List...');
                 setTimeout(() => {
                     router.push('/');
                 }, 3000);
             } else {
-                toast.success('Error ,Fail submit!');
+                toast.error('Failed to create product. Please try again.');
             }
         } catch (error: any) {
-
+            console.error('Error creating product:', error);
+            toast.error('An unexpected error occurred. Please try again.');
         } finally {
             setIsLoading(false);
         }
@@ -63,11 +97,12 @@ const createProduceComp: React.FC = () => {
 
     return (
         <>
-            <div className=" max-w-2xl m-auto bg-white border-2 p-4">
+            <div className="max-w-2xl m-auto bg-white border-2 p-4">
                 <h1 className="text-2xl font-bold mb-6">Create Product</h1>
 
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                        {/* Name */}
                         <FormField
                             control={form.control}
                             name="name"
@@ -83,6 +118,7 @@ const createProduceComp: React.FC = () => {
                             )}
                         />
 
+                        {/* Description */}
                         <FormField
                             control={form.control}
                             name="description"
@@ -97,7 +133,9 @@ const createProduceComp: React.FC = () => {
                                 </FormItem>
                             )}
                         />
-                        <div className="flex gap-5 ">
+
+                        {/* Price */}
+                        <div className="flex gap-5">
                             <FormField
                                 control={form.control}
                                 name="price"
@@ -109,15 +147,15 @@ const createProduceComp: React.FC = () => {
                                     },
                                 }}
                                 render={({ field }) => (
-                                    <FormItem>
+                                    <FormItem className="w-1/2">
                                         <FormLabel>Price</FormLabel>
-                                        <div className="flex items-center w-3/4 space-x-2">
+                                        <div className="flex items-center space-x-2">
                                             <Button
                                                 variant="outline"
                                                 size="icon"
                                                 type="button"
                                                 onClick={() => {
-                                                    if (field.value - 50 >= 0) {
+                                                    if (field.value - 1000 >= 0) {
                                                         field.onChange(field.value - 1000);
                                                     }
                                                 }}
@@ -146,20 +184,22 @@ const createProduceComp: React.FC = () => {
                                 )}
                             />
 
+                            {/* Stock */}
                             <FormField
                                 control={form.control}
                                 name="stock"
                                 rules={{
-                                    required: 'Price is required',
+                                    required: 'Stock is required',
                                     min: {
                                         value: 0,
-                                        message: 'Price must be greater than 0',
+                                        message: 'Stock must be greater than 0',
                                     },
+
                                 }}
                                 render={({ field }) => (
-                                    <FormItem>
+                                    <FormItem className="w-1/2">
                                         <FormLabel>Stock</FormLabel>
-                                        <div className="flex items-center w-3/4  space-x-2">
+                                        <div className="flex items-center space-x-2">
                                             <Button
                                                 variant="outline"
                                                 size="icon"
@@ -175,7 +215,7 @@ const createProduceComp: React.FC = () => {
                                             <FormControl>
                                                 <Input
                                                     type="number"
-                                                    placeholder="0.00"
+                                                    placeholder="0"
                                                     {...field}
                                                     step="50"
                                                 />
@@ -194,17 +234,80 @@ const createProduceComp: React.FC = () => {
                                 )}
                             />
 
+                            {/* Rating */}
+                            <FormField
+                                control={form.control}
+                                name="rating"
+                                rules={{
+                                    required: 'Rating is required',
+                                    min: {
+                                        value: 0,
+                                        message: 'Rating must be greater than or equal to 0',
+                                    },
+                                    max: {
+                                        value: 5,
+                                        message: 'Rating must be less than or equal to 5',
+                                    }
+                                }}
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Rating</FormLabel>
+                                        <FormControl>
+                                            <Input type="number" placeholder="0 to 5" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
                         </div>
 
+                        {/* Brands */}
                         <FormField
                             control={form.control}
-                            name="category"
+                            name="brand"
+                            rules={{ required: 'Brand is required' }}
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Brand</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder="Product brand" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
+                        {/* Feartures */}
+                        <FormField
+                            control={form.control}
+                            name="features"
+                            rules={{ required: 'Features are required' }}
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Features </FormLabel>
+                                    <FormControl>
+                                        <Input placeholder="Feature 1, Feature 2, Feature 3" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
+                        {/* Category */}
+                        <FormField
+                            control={form.control}
+                            name="category_id"
                             rules={{ required: 'Category is required' }}
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Category</FormLabel>
                                     <Select
-                                        onValueChange={field.onChange}
+                                        onValueChange={(value) => {
+                                            const selectedCategory = categories.find(cat => cat._id === value);
+                                            form.setValue('category_id', selectedCategory?._id || '');
+                                            form.setValue('parentCategory_id', selectedCategory?.parentCategory_id || '');
+                                            field.onChange(value);
+                                        }}
                                         defaultValue={field.value}
                                     >
                                         <FormControl>
@@ -213,12 +316,11 @@ const createProduceComp: React.FC = () => {
                                             </SelectTrigger>
                                         </FormControl>
                                         <SelectContent>
-                                            <SelectItem value="electronics">Electronics</SelectItem>
-                                            <SelectItem value="clothing">Clothing</SelectItem>
-                                            <SelectItem value="gaming">Gaming</SelectItem>
-                                            <SelectItem value="accessories">Accessories</SelectItem>
-                                            <SelectItem value="sports">Sports & Outdoors</SelectItem>
-                                            <SelectItem value="home">Home & Kitchen</SelectItem>
+                                            {categories.map((category) => (
+                                                <SelectItem key={category._id} value={category._id}>
+                                                    {category.name}
+                                                </SelectItem>
+                                            ))}
                                         </SelectContent>
                                     </Select>
                                     <FormMessage />
@@ -226,6 +328,9 @@ const createProduceComp: React.FC = () => {
                             )}
                         />
 
+
+
+                        {/* Image Url */}
                         <FormField
                             control={form.control}
                             name="imageUrl"
@@ -240,8 +345,6 @@ const createProduceComp: React.FC = () => {
                             )}
                         />
 
-
-
                         <div className="flex justify-center">
                             <Button type="submit" disabled={isLoading} className="w-full">
                                 {isLoading ? 'Creating...' : 'Create Product'}
@@ -253,6 +356,6 @@ const createProduceComp: React.FC = () => {
             <ToastContainer />
         </>
     );
-}
+};
 
-export default createProduceComp;
+export default CreateProduceComp;

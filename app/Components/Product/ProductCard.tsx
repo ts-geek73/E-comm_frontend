@@ -2,30 +2,52 @@ import { Card, CardHeader, CardContent, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import Image from 'next/image';
+import { useEffect, useState } from 'react';
 
 interface IProduct {
+  _id: string;
   name: string;
   description: string;
   price: number;
   stock: number;
-  category: string;
+  category_id: string;
   imageUrl: string;
+}
+
+interface ICategory {
+  _id: string;
+  name: string;
 }
 
 interface ProductCardProps {
   data: IProduct;
-  isLoading: boolean;
-  onClick: () => void; // Add onClick prop
+  onClick: (product: IProduct) => void;
+  categories: ICategory[];
 }
 
-const ProductCard = ({ data, isLoading, onClick }: ProductCardProps) => {
-  const { imageUrl, name, price, category, description, stock } = data;
+const ProductCard = ({ data, onClick, categories }: ProductCardProps) => {
+  const { imageUrl, name, price, stock, category_id } = data;
+  const [isLoading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 500); 
+
+    return () => clearTimeout(timer); 
+  }, [data]);
+
+  const getCategoryName = (categoryId: string): string => {
+    const category = categories.find((cat) => cat._id === categoryId);
+    return category ? category.name : 'Unknown Category';
+  };
 
   return (
     <Card
-      className="relative rounded-lg border shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out cursor-pointer" // Add cursor-pointer
-      onClick={onClick} // Attach onClick handler
-    >
+      className="relative rounded-lg border shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out cursor-pointer"
+      onClick={() => onClick(data)}
+      >
+        
       <CardHeader>
         <div className="relative h-52 aspect-square">
           {isLoading ? (
@@ -54,8 +76,7 @@ const ProductCard = ({ data, isLoading, onClick }: ProductCardProps) => {
           <>
             <div>
               <CardTitle className="text-2xl font-semibold text-gray-800">{name}</CardTitle>
-              <p className="text-sm text-gray-500">{category}</p>
-              {/* {description && <p className="text-sm text-gray-700 mt-2 flex-grow">{description}</p>} */}
+              <p className="text-sm text-gray-500">{getCategoryName(category_id)}</p>
               <div className="flex items-center justify-between mt-4">
                 <h3 className="font-bold text-xl text-gray-900">{`${price} Rs.`}</h3>
                 {stock > 0 ? (
