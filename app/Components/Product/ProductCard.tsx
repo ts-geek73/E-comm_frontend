@@ -11,7 +11,7 @@ interface IProduct {
   price: number;
   stock: number;
   category_id: string;
-  imageUrl: string;
+  imageUrl: {url:string};
 }
 
 interface ICategory {
@@ -54,7 +54,7 @@ const ProductCard = ({ data, onClick, categories }: ProductCardProps) => {
             <Skeleton className="h-full w-full rounded-lg" />
           ) : (
             <Image
-              src={imageUrl}
+            src={imageUrl && imageUrl.url  ? imageUrl.url : "/no-product.png"}
               alt={`${name} Image`}
               layout="fill"
               objectFit="cover"

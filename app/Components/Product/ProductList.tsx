@@ -20,7 +20,9 @@ interface IProduct {
   description: string;
   price: number;
   stock: number;
-  imageUrl: string;
+  imageUrl: {
+    url: string;
+  };
   features: string[],
   brand: string
   rating: number
@@ -133,7 +135,7 @@ const ProductList = () => {
             <div className="md:w-1/2 mb-6 md:mb-0 md:pr-6">
               {selectedProduct && (
                 <img
-                  src={selectedProduct.imageUrl}
+                  src={selectedProduct.imageUrl.url}
                   alt={selectedProduct.name}
                   className="h-full aspect-square rounded-xl shadow-lg object-cover"
                 />

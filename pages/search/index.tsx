@@ -13,7 +13,7 @@ interface IProduct {
   description: string;
   price: number;
   stock: number;
-  imageUrl: string;
+  imageUrl: { url: string };
 }
 
 interface IResponse {
@@ -57,13 +57,24 @@ const Index = () => {
 
       try {
         const response = await api.get(`product/search?search=${search}`);
-        console.log('Search response:', response.data);
-        setProductList(response.data as IResponse);
-      } catch (error: any) {
-        if (error.status == 400) {
-          setError("Not Found");
+        const responseData = response.data as IResponse;
+        console.log('Search response:', responseData);
+
+
+        if (responseData.data && responseData.data.length === 0) {
+          setProductList({
+            msg: 'No products found.',
+            related: (response.data as IResponse).related, 
+          });
+        } else {
+          setProductList(response.data as IResponse);
         }
-        setError('Failed to fetch products. Please try again.');
+      } catch (error: any) {
+        if (error.response?.status === 404) {
+          setError('No products found for this search.');
+        } else {
+          setError('Failed to fetch products. Please try again.');
+        }
         console.error('Error fetching products:', error);
       } finally {
         setLoading(false);
@@ -76,7 +87,6 @@ const Index = () => {
   }, [search]);
 
   const handleProductClick = (product: IProduct) => {
-   
     console.log('Product clicked:', product);
   };
 
@@ -92,17 +102,17 @@ const Index = () => {
         <div className="text-center text-lg text-red-600">{error}</div>
       ) : productList?.data?.length === 0 ? (
         <>
-          <div className="text-center text-lg text-gray-600">No products found.</div>
+          <div className="text-center text-lg text-gray-600">{productList?.msg}</div>
           <h2 className="text-2xl font-semibold text-center text-gray-900 mt-12">
             Other Products
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {productList?.related?.slice(0, 6).map((relatedProduct) => (
               <ProductCard
-                key={relatedProduct._id} 
+                key={relatedProduct._id}
                 data={relatedProduct}
-                categories={categories} 
-                onClick={handleProductClick} 
+                categories={categories}
+                onClick={handleProductClick}
               />
             ))}
           </div>
@@ -112,10 +122,10 @@ const Index = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {productList?.data?.map((product) => (
               <ProductCard
-                key={product._id} 
+                key={product._id}
                 data={product}
-                categories={categories} 
-                onClick={handleProductClick} 
+                categories={categories}
+                onClick={handleProductClick}
               />
             ))}
           </div>
@@ -125,10 +135,10 @@ const Index = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {productList?.related?.slice(0, 9).map((relatedProduct) => (
               <ProductCard
-                key={relatedProduct._id} // Use _id as key
+                key={relatedProduct._id}
                 data={relatedProduct}
-                categories={categories} // Pass categories
-                onClick={handleProductClick} // Use handleProductClick
+                categories={categories}
+                onClick={handleProductClick}
               />
             ))}
           </div>
