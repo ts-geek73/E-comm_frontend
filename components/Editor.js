@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { Editor } from "@tinymce/tinymce-react";
 
 // interface MyEditorProps {

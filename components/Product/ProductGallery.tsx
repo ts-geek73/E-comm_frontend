@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import type { IImageUrl } from '@/types/product'; 
 
-export const ProductImageGallery: React.FC<{ images: IImageUrl[];}> = ({  images, }) => {
+export const ProductImageGallery: React.FC<{ images: IImageUrl[];}> = ({ images }) => {
   
   const [selectedImage, setSelectedImage] = useState(0);
 

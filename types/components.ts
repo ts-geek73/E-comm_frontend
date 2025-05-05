@@ -1,5 +1,5 @@
 import type { UserResource } from '@clerk/types';
-import { IProductData , IBrand, ICategory } from './product';
+import { IProductData } from './product';
 
 export interface CustomMenuHook {
   isLoaded: boolean;
@@ -26,7 +26,7 @@ export interface ProductListProps {
 
 export const defaultFilters: FilterValues = {
   brand: '',
-  category: '',
+  category: [],
   pricemin: 0,
   pricemax: 50000,
   sort: '',
@@ -40,7 +40,7 @@ export interface ReviewProductProps {
 
 export interface FilterValues {
   brand: string;
-  category: string;
+  category: string[];
   pricemin: number;
   pricemax: number;
   sort: string;

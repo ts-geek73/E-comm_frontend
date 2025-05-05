@@ -9,7 +9,7 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from '@/app/_components/ui/pagination';
+} from '@/components/ui/pagination';
 import { PaginationProps } from '@/types/components';
 
 const PaginationComp: React.FC<PaginationProps> = ({ length, currentPage, setCurrentPage }) => {

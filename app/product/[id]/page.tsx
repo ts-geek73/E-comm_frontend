@@ -9,6 +9,7 @@ import { useParams, useRouter } from "next/navigation";
 import ProductCard from "@/components/Product/ProductCard";
 import { ProductImageGallery } from "@/components/Product/ProductGallery";
 import { useProductDetail } from "@/hooks/useProductDetails";
+import MultiReviewProduct from "@/components/Review/MainReview";
 
 
 const ProductDetails: React.FC = () => {
@@ -39,7 +40,8 @@ const ProductDetails: React.FC = () => {
                     <div className="grid md:grid-cols-2 gap-0">
                         
                         {/* Image Gallery */}
-                        <ProductImageGallery images={product.images} />
+
+                        <ProductImageGallery images={product.images || []} />
                         
                         
                         <div className="p-6 md:p-8 flex flex-col">
@@ -171,7 +173,7 @@ const ProductDetails: React.FC = () => {
                                 <ProductCard
                                     key={relatedProduct._id}
                                     data={relatedProduct}
-                                    onClick={() => router.push(`/product/relatedProduct.id`)}
+                                    onClick={() => router.push(`/product/${relatedProduct._id}`)}
                                     />
                             ))}
                         </div>
@@ -179,7 +181,12 @@ const ProductDetails: React.FC = () => {
                 )}
 
                 {/* Review Section */}
-                {/* <ReviewProduct productId={id} /> */}
+                <MultiReviewProduct 
+                    productId={id} 
+                    showAllReviews={true} 
+                    maxReviews={5}
+                    />
+
             </div>
         </div>
     );

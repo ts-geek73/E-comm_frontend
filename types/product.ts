@@ -7,7 +7,7 @@ export interface IProductData {
     long_description: string;
     price: number;
     image?: IImageUrl
-    images: IImageUrl[];
+    images?: IImageUrl[];
     brands: IBrand[];
     categories: ICategory[];
   }
@@ -33,7 +33,6 @@ export interface IImageUrl {
     _id?: string;
     url: string;
     name: string;
-    lenght?: number;
 }
 
 export interface Filters {
@@ -42,6 +41,7 @@ export interface Filters {
   pricemin?: number;
   pricemax?: number;
   sort?: string;
+  search?: string;
 }
 
 export interface FormValues {

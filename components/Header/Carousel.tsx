@@ -1,13 +1,13 @@
 "use client";
 
-import { Card, CardContent, CardDescription, CardTitle } from "@/app/_components/ui/card";
+import { Card, CardContent, CardDescription, CardTitle } from "@/components/ui/card";
 import {
     Carousel,
     CarouselContent,
     CarouselItem,
     CarouselNext,
     CarouselPrevious,
-} from "@/app/_components/ui/carousel";
+} from "@/components/ui/carousel";
 import useProductFetch from "@/hooks/useProductFetch";
 import { IProductData } from "@/types/product";
 import Image from "next/image";
@@ -35,8 +35,7 @@ export default function EcommerceCarousel({ products }: { products?: IProductDat
                                         <div className="md:w-1/2 p-4 flex justify-center items-center">
 
                                             <Image
-                                                src={product.image?.url! }
-                                                // src={product.image?.url! && "no-product.png"}
+                                                src={product.image?.url ?? " "}
                                                 alt={product.name}
                                                 width={250}
                                                 height={250}

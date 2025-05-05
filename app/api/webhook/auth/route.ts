@@ -1,8 +1,7 @@
-import type { WebhookEvent } from "@clerk/backend"; 
+import { prisma } from '@/lib/prisma';
+import { UserData } from "@/types/user";
+import type { WebhookEvent } from "@clerk/backend";
 import { Webhook } from "svix";
-import { PrismaClient } from '@prisma/client';
-import { UserData } from "./types";
-import { prisma } from '@/lib/prisma'; 
 
 
 function handleError(message: string, status: number) {
@@ -30,7 +29,7 @@ export async function POST(req: Request) {
   const webHook = new Webhook(webHook_key);
 
   try {
-    let events = webHook.verify(body, {
+    const events = webHook.verify(body, {
       "svix-id": svix_id,
       "svix-timestamp": timeStramp,
       "svix-signature": signature,
@@ -52,13 +51,6 @@ export async function POST(req: Request) {
             return handleError("No primary email found in user created event", 400);
           }
 
-          let provider: UserData['provider'] = 'normal';
-          if (email_addresses[0]?.verification?.strategy?.includes('google')) {
-            provider = 'google';
-          } else if (email_addresses[0]?.verification?.strategy?.includes('github')) {
-            provider = 'github';
-          }
-
           const clerkId = unsafe_metadata?.clerkId || ''; 
 
           if (typeof clerkId !== 'string') {
@@ -70,10 +62,10 @@ export async function POST(req: Request) {
           const userData: UserData = {
 
             email: primaryEmail.email_address,
-            provider: provider,
             name: username || "",
             userId: id,
             clerkId: clerkId,  
+            sessionId : ""
           };
 
           const emailExist = await prisma.users.findFirst({
@@ -90,14 +82,20 @@ export async function POST(req: Request) {
             return new Response('User ID already exists', { status: 409 });
           }
 
-          const newUser = await prisma.users.create( {data:userData});
+          await prisma.users.create( {data:userData});
 
           console.log(`New user created with email: ${primaryEmail.email_address}`);
           return new Response("User created successfully", { status: 201 });
-        } catch (dbError : any) {
+        } catch (dbError: unknown) {
           console.error('Database error:', dbError);
-          return new Response(`Database error : ${dbError.message}`, { status: 500 });
+        
+          if (dbError instanceof Error) {
+            return new Response(`Database error: ${dbError.message}`, { status: 500 });
+          }
+        
+          return new Response('An unknown error occurred during database operation.', { status: 500 });
         }
+        
         break;
 
       case "user.deleted":
@@ -122,10 +120,16 @@ export async function POST(req: Request) {
 
           console.log(`User with user ID ${id} deleted.`);
           return new Response("User deleted successfully", { status: 200 });
-        } catch (dbError: any) {
+        } catch (dbError: unknown) {
           console.error('Database error during user deletion:', dbError);
-          return new Response(`Database error during user deletion: ${dbError.message}`, { status: 500 });
+        
+          if (dbError instanceof Error) {
+            return new Response(`Database error during user deletion: ${dbError.message}`, { status: 500 });
+          }
+        
+          return new Response('An unknown error occurred during user deletion.', { status: 500 });
         }
+        
         break;
 
 

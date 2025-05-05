@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import apiServer from '@/lib/axoins'; // Adjust this import to your actual API instance
 import { IProductData as IProduct } from '@/types/product'; 
-import { IResponse as ProductResponse } from '@/types/responcs'; 
+import { IResponse as ProductResponse } from '@/types/response'; 
+import { AxiosError } from 'axios';
 
 export const useProductDetail = (id: string | undefined) => {
   const [product, setProduct] = useState<IProduct | null>(null);
@@ -15,14 +16,21 @@ export const useProductDetail = (id: string | undefined) => {
     const fetchProduct = async () => {
       setLoading(true);
       try {
-        const response = await apiServer.get<ProductResponse>(`/product/${id}`);
-        const { product, relatedProducts } = response.data;
+        const response = await apiServer.get(`/product/${id}`);
+        const { product, relatedProducts } = response.data.data as ProductResponse;
         setProduct(product!);
         setRelatedProducts(relatedProducts!);
         setError(null);
-      } catch (err: any) {
-        console.error('Error fetching product:', err);
-        setError(err?.message || 'Something went wrong');
+      } catch (error: unknown) {
+        if (error instanceof AxiosError) {
+          console.error('Error saving review:', error);
+          setError(error?.message || 'Something went wrong');
+        } else {
+          console.error('Unexpected error:', error);
+
+        }
+            
+        
       } finally {
         setLoading(false);
       }

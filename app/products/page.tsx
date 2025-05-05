@@ -8,7 +8,7 @@ import { useState } from 'react';
 const AllProductPage = () => {
   const [filters, setFilters] = useState<FilterValues>({
     brand: '',
-    category: '',
+    category: [],
     pricemin: 0,
     pricemax: 50000,
     sort: 'name',

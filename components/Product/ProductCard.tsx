@@ -1,10 +1,9 @@
-import { Button } from '@/app/_components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/app/_components/ui/card';
-import { Skeleton } from '@/app/_components/ui/skeleton';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
+import { ProductCardProps } from '@/types/components';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
-import { IProductData as IProduct } from '@/types/product';
-import { ProductCardProps } from '@/types/components';
 
 const ProductCard = ({ data, onClick }: ProductCardProps) => {
   const { image, name, price, categories, brands } = data;

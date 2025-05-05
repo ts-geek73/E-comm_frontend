@@ -4,13 +4,14 @@ import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import CustomMenu from '../CustomMenu/page'
+import Link from 'next/link'
 
 
 const HeaderComp = () => {
-  let [search, setSearch] = useState<string>("")
+  const [search, setSearch] = useState<string>("")
   const router = useRouter()
 
-  let [searchBox, setSearchBox] = useState<boolean>(false)
+  const [searchBox, setSearchBox] = useState<boolean>(false)
 
 
 
@@ -19,9 +20,9 @@ const HeaderComp = () => {
       <div className="flex container items-center justify-between p-6 sm:p-8 mx-auto">
 
         <div className="flex gap-4 items-center">
-          <a href="/" className="flex items-center">
+        <Link href="/" className="flex items-center">
           <Image src={"/e-co logo.png"} alt="logo" height={50} width={50} className="object-contain" />
-          </a>
+          </Link>
           <h1 className="text-2xl font-bold text-blue-700">Shop_Cart.com</h1>
         </div>
 

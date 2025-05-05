@@ -3,9 +3,10 @@ import { useAuth, useClerk, useSession, useUser } from '@clerk/nextjs';
 import { useEffect, useState } from 'react';
 import api from '@/lib/axoins';
 import { UserData } from '@/types/user';
+import { AxiosError } from 'axios';
 
 export default function useSyncUser() {
-  const { user, isLoaded, isSignedIn } = useUser();
+  const { user, isSignedIn } = useUser();
   const { getToken } = useAuth();
   const { session } = useSession();
   const clerk = useClerk();
@@ -31,9 +32,9 @@ export default function useSyncUser() {
           sessionId: session.id,
           userId: user.id,
           clerkId,
-          name: user.firstName,
-          email: user.primaryEmailAddress.emailAddress,
-          reoles_id: user.publicMetadata?.roles_id,
+          name: user.firstName ?? user.username ?? " ",
+          email: user.primaryEmailAddress?.emailAddress ?? " ",
+          // reoles_id: user.publicMetadata?.roles_id,
         };
 
         console.log('Syncing user data:', data);
@@ -41,13 +42,16 @@ export default function useSyncUser() {
 
         const response = await api.put('/create', data);
         console.log('User synced successfully:', response.status);
-      } catch (error: any) {
+      } catch (error: unknown) {
+        if (error instanceof AxiosError) {
+      
         if (error.response) {
           console.error('Sync error:', error.response.data.message);
         } else {
           console.error('Unexpected sync error:', error.message);
         }
       }
+    }
     };
 
     processUser();

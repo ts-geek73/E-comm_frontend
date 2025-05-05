@@ -2,6 +2,7 @@
 
 import api from "@/lib/axoins";
 import { Filters, IProductData } from "@/types/product";
+import { AxiosError } from "axios";
 import { useEffect, useState } from "react";
 
 const useProductFetch = (
@@ -27,20 +28,20 @@ const useProductFetch = (
       setError(null); // Reset error state before new fetch
       
       try {
-        // console.log(`Fetching products from: /product/custome with start=${start}, length=${productPerPage}`);
+        console.log(`Fetching products from: /product/custome with start=${start}&length=${productPerPage}&brand=${filters.brand}&category=${filters.category}&pricemin=${filters.pricemin}&pricemax=${filters.pricemax}&sort=${filters.sort}&search=${filters.search}`);
         
         const response = await api.get(
-          `/product/custome?start=${start}&length=${productPerPage}&brand=${filters.brand}&category=${filters.category}&pricemin=${filters.pricemin}&pricemax=${filters.pricemax}&sort=${filters.sort}`
+          `/product?start=${start}&length=${productPerPage}&brand=${filters.brand}&category=${filters.category}&pricemin=${filters.pricemin}&pricemax=${filters.pricemax}&sort=${filters.sort}&search=${filters.search}`
         );
         
-        // console.log("API Response:", response.data);
 
-        // Check if response data has the expected structure
-        const data = response.data;
+        const data = response.data.data;
+        
+        console.log("Use Fetchn ", data);
         
         
-        if (data && Array.isArray(data.datas)) {
-          setProducts(data.datas);
+        if (data && Array.isArray(data.data)) {
+          setProducts(data.data);
           setTotalLength(data.length || 0);
           // console.log(`Loaded ${data.datas.length} products, total: ${data.length}`);
         } else {
@@ -49,21 +50,22 @@ const useProductFetch = (
           setProducts([]);
           setTotalLength(0);
         }
-      } catch (err: any) {
-        console.error("Error fetching products:", err);
-        setError(err.message || "Failed to fetch products.");
+      } catch (error: unknown) {
+        if (error instanceof AxiosError) {
+      
+        console.error("Error fetching products:", error);
+        setError(error.message || "Failed to fetch products.");
         setProducts([]);
         setTotalLength(0);
+        }
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchProducts();
-    
-    // Optional cleanup if needed
+
     return () => {
-      // Any cleanup here
     };
   }, [
     currentPage,

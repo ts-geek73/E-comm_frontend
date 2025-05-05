@@ -1,5 +1,5 @@
 'use client'
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/app/_components/ui/alert-dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import PaginationComp from "@/components/Product/PaginationComp";
 import useProductFetch from "@/hooks/useProductFetch";
 import { Filters, IImageUrl, IProductData } from "@/types/product";
@@ -16,7 +16,7 @@ import ProductForm from "../AdminProductFom";
 
 
 const ProductTable: React.FC = () => {
-    const [productArras, setProducts] = useState<IProductData[] | any[]>([]);
+    const [productArras, setProducts] = useState<IProductData[] >([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [err, setError] = useState<string | null>(null);
     const [currentPage, setCurrentPage] = useState(1);
@@ -73,19 +73,21 @@ const ProductTable: React.FC = () => {
                         url: editingProduct.image.url
                     });
                 }
-
-                // Add additional images if they exist
-                if (editingProduct.images && Array.isArray(editingProduct.images) && editingProduct.images.length! > 0) {
-                    editingProduct.images.forEach((img: IImageUrl) => {
-                        // Avoid duplicating the main image
-                        if (!editingProduct.image || img.url !== editingProduct.image.url) {
-                            initialImages.push({
-                                name: img.name || "Product Image",
-                                url: img.url
-                            });
-                        }
+                if (
+                    editingProduct.images &&
+                    Array.isArray(editingProduct.images) &&
+                    (editingProduct.images as IImageUrl[]).length > 0
+                  ) {
+                    (editingProduct.images as IImageUrl[]).forEach((img: IImageUrl) => {
+                      if (!editingProduct.image || img.url !== editingProduct.image.url) {
+                        initialImages.push({
+                          name: img.name || "Product Image",
+                          url: img.url
+                        });
+                      }
                     });
-                }
+                  }
+                  
 
                 setEditingProduct((prev) => prev ? {
                     ...prev,
@@ -93,7 +95,7 @@ const ProductTable: React.FC = () => {
                 } : null);
             }
         }
-    }, [editingProduct?._id]);
+    }, [editingProduct]);
 
     return (
         <div className="w-full max-h-screen overflow-auto space-y-8">

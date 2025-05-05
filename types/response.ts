@@ -1,13 +1,13 @@
 import { IProductData } from './product';
 
 export interface IResponse {
+    products: IProductData[];
+    error: string | null;
     message?: string;
     length?: number;
-    datas?: IProductData[];
-    products: IProductData[];
+    data?: IProductData[];
     totalLength?: number;
     isLoading?: boolean;
-    error: string | null;
     product?: IProductData;
     relatedProducts?: IProductData[];
 

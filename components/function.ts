@@ -1,6 +1,7 @@
 import { toast } from "react-toastify";
 import api from "@/lib/axoins";
 import { BrandCategory, IProductData } from "@/types/product";
+import { AxiosError } from "axios";
 
 export const handleEditClick = (
   product: IProductData,
@@ -21,9 +22,13 @@ export const deleteProductById = async (
       setProducts((prev) => prev.filter((product) => product._id !== productId));
       setTotalProducts((prev) => prev - 1);
     }
-  } catch (err: any) {
-    console.error("Error deleting product:", err);
+  } catch (err: unknown) {
+    console.error('Error in file upload:', err);
+
+    // Optional: Narrow the error if it's an AxiosError
+    if (err instanceof AxiosError) {
     toast.error(err.message || "Failed to delete product");
+    }
   }
 };
 
@@ -31,12 +36,16 @@ export const getBrandsandCategories = async () => {
   try {
     const response = await api.get(`/product/combos`);
     if (response.status === 200) {
-      const { brands, categories } = response.data as BrandCategory;
+      const { brands, categories } = response.data.data as BrandCategory;
       return { brands, categories };
     }
-  } catch (err: any) {
+  } catch (err: unknown) {
+    console.error('Error in file upload:', err);
+
+    if (err instanceof AxiosError) {
     console.error("Error deleting product:", err);
     toast.error(err.message || "Failed to delete product");
+    }
   }
 };
 

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
+import { AxiosError } from 'axios';
 
 export async function POST(req: NextRequest) {
     try {
@@ -22,8 +23,11 @@ export async function POST(req: NextRequest) {
             url: `/product-image/${file.name}`,
             name: file.name,  
         });
-    } catch (err : any) {
+    } catch (err : unknown) {
         console.error('Error in file upload:', err);
-        return NextResponse.json({ status: 'fail', error: err.message }, { status: 500 });
+            if (err instanceof AxiosError) {
+            return NextResponse.json({ status: 'fail', error: err.message }, { status: 500 });
+        }
+
     }
 }

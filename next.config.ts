@@ -16,6 +16,7 @@ const nextConfig: NextConfig = {
       "plus.unsplash.com",
       'www.lenovo.com',
       'www.hp.com',
+      "store.storeimages.cdn-apple.com",
       'www.dell.com',
       'www.asus.com',
       'www.apple.com',

@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '@/app/_components/ui/button';
+import { Button } from '@/components/ui/button';
 import {
     Form,
     FormControl,
@@ -8,37 +8,37 @@ import {
     FormItem,
     FormLabel,
     FormMessage,
-} from '@/app/_components/ui/form';
-import { Switch } from "@/app/_components/ui/switch"
-import { Input } from '@/app/_components/ui/input';
-import { Check, ChevronsUpDown, Trash2, Plus,  Image as ImageIcon, CircleX } from "lucide-react";
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
 import {
     Popover,
-    PopoverTrigger,
     PopoverContent,
-} from "@/app/_components/ui/popover";
+    PopoverTrigger,
+} from "@/components/ui/popover";
+import { Switch } from "@/components/ui/switch";
+import { Check, ChevronsUpDown, Image as ImageIcon, Plus, Trash2 } from "lucide-react";
 
 import {
     Command,
-    CommandInput,
-    CommandList,
-    CommandItem,
-    CommandGroup,
     CommandEmpty,
-} from "@/app/_components/ui/command";
+    CommandGroup,
+    CommandInput,
+    CommandItem,
+    CommandList,
+} from "@/components/ui/command";
 
 import { cn } from "@/lib/utils";
 
-import { Textarea } from '@/app/_components/ui/textarea';
-import { useRouter } from 'next/navigation';
+import MyEditor from "@/components/Editor";
+import { Textarea } from '@/components/ui/textarea';
+import { FormValues, IBrand, ICategory, IImageUrl, IProductData } from "@/types/product";
+import { FileUploadResponse, IResponse } from "@/types/response";
+import { AxiosError } from 'axios';
+import Image from 'next/image';
 import React, { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import MyEditor from "@/components/Editor"
 import { toast, ToastContainer } from 'react-toastify';
 import api from '../../lib/axoins';
-import { IProductData , IBrand, ICategory, IImageUrl } from "@/types/product"
-import { IResponse, FileUploadResponse } from "@/types/responcs"
-import { FormValues } from '@/types/product';
 
 
 
@@ -61,7 +61,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
     purpose = "Create",
     isEdit = false
 }) => {
-    const router = useRouter();
+    
     const [isLoading, setIsLoading] = useState(false);
     const [categories, setCategories] = useState<ICategory[]>([]);
     const [brands, setBrands] = useState<IBrand[]>([]);
@@ -83,8 +83,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
         mode: 'onSubmit',
     });
 
-    const { control, setValue, reset, watch } = form;
-    // const watchedImageUrls = watch('imageUrls');
+    const { control, setValue, reset, } = form;
 
     useEffect(() => {
         const fetchCategoryAndBrand = async () => {
@@ -100,7 +99,6 @@ const ProductForm: React.FC<ProductFormProps> = ({
         fetchCategoryAndBrand();
     }, []);
 
-    // Set preview images if product has existing images
     useEffect(() => {
         if (productData?.images?.length) {
             const existingImages = productData.images.map(img => ({
@@ -176,9 +174,8 @@ const ProductForm: React.FC<ProductFormProps> = ({
         } else {
 
             const currentImageUrls = form.getValues('imageUrls');
-            const updatedImageUrls = currentImageUrls.filter((_, i) =>
-                index !== currentImageUrls.findIndex(img => img.url === removedImage.url)
-            );
+            const updatedImageUrls = currentImageUrls.filter(() =>
+                index !== currentImageUrls.findIndex(img => img.url === removedImage.url));
             form.setValue("imageUrls", updatedImageUrls);
         }
     };
@@ -188,7 +185,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
         try {
             
 
-            const formData: any = {
+            const formData = {
                 name: values.name,
                 short_description: values.short_description,
                 long_description: values.long_description,
@@ -294,9 +291,12 @@ const ProductForm: React.FC<ProductFormProps> = ({
             } else {
                 toast.error(`Failed to ${isEdit ? 'update' : 'create'} product. Please try again.`);
             }
-        } catch (error: any) {
-            toast.error(error.response?.data?.message || 'An unexpected error occurred. Please try again.');
-            console.error(`Error ${isEdit ? 'updating' : 'creating'} product:`, error);
+        } catch (error: unknown) {
+            if(error instanceof AxiosError){
+
+                toast.error(error.response?.data?.message || 'An unexpected error occurred. Please try again.');
+                console.error(`Error ${isEdit ? 'updating' : 'creating'} product:`, error);
+            }
         } finally {
             setIsLoading(false);
         }
@@ -607,11 +607,13 @@ const ProductForm: React.FC<ProductFormProps> = ({
                                             {previewImages.map((img, index) => (
                                                 <div key={index} className="group relative rounded-lg overflow-hidden border border-gray-200">
                                                     <div className="aspect-square w-full overflow-hidden bg-gray-100">
-                                                        <img
+         
+
+                                                        <Image 
                                                             src={img.url}
                                                             alt={`Product image ${index + 1}`}
                                                             className="h-full w-full object-cover transition-all hover:scale-105"
-                                                        />
+                                                            />
                                                     </div>
                                                     <button
                                                         type="button"
