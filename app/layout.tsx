@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
+import HeadBar from "@/components/Header/Headbar";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import {
+  ClerkProvider
+} from '@clerk/nextjs'
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,12 +27,24 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
-      </body>
-    </html>
+    <ClerkProvider 
+    data-new-gr-c-s-check-loaded="14.1223.0"
+    data-gr-ext-installed="">
+     <html lang="en" suppressHydrationWarning>
+       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+           <HeadBar />
+         <header className="flex justify-end items-center">
+           {/* <SignedOut>
+             <SignInButton />
+             <SignUpButton />
+           </SignedOut>
+           <SignedIn>
+             <UserButton />
+           </SignedIn> */}
+         </header >
+         {children}
+       </body>
+     </html>
+   </ClerkProvider>
   );
 }
