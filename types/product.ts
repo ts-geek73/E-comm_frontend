@@ -35,6 +35,11 @@ export interface IImageUrl {
     name: string;
 }
 
+export interface IImageUrlWithFile extends IImageUrl {
+  file: File;
+}
+
+
 export interface Filters {
   brand?: string;
   category?: string;

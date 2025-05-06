@@ -51,18 +51,7 @@ const ProductDetails: React.FC = () => {
                                         {product.categories.map((cat) => cat.name).join(", ")}
                                     </span>
                                     <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mt-2 mb-1">{product.name}</h1>
-                                    <div className="flex items-center mb-1">
-                                        {/* <span className="flex items-center text-amber-500">
-
-                                                <Star 
-                                                    
-                                                    size={16} 
-                                                    fill={ "currentColor"} 
-
-                                                />
-                                        </span> */}
-                                        {/* <span className="text-sm text-gray-500 ml-2">{product.rating || 4.5} ({product.rating ? Math.round(product.rating * 2.3)  : 0} reviews)</span> */}
-                                    </div>
+                                    
                                     <p className="text-gray-500 text-sm mb-2">Brand: 
                                         <span className="font-medium text-gray-700">{product.brands.map((brand)=> brand.name) ?? "unknown"}
                                         </span></p>

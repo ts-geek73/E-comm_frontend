@@ -31,29 +31,19 @@ import { cn } from "@/lib/utils";
 
 import MyEditor from "@/components/Editor";
 import { Textarea } from '@/components/ui/textarea';
-import { FormValues, IBrand, ICategory, IImageUrl, IProductData } from "@/types/product";
-import { FileUploadResponse, IResponse } from "@/types/response";
-import { AxiosError } from 'axios';
+import { AdminFormProps, ProductFormProps } from "@/types/components";
+import { BrandCategory, FormValues, IBrand, ICategory } from "@/types/product";
 import Image from 'next/image';
 import React, { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast, ToastContainer } from 'react-toastify';
-import api from '../../lib/axoins';
+import apiServer from '../../lib/axios';
+import { getBrandsandCategories } from '../function';
 
 
 
 
-
-interface ProductFormProps {
-    productData?: IProductData;
-    onSuccess?: (message: string) => void;
-    formTitle?: string;
-    formSubtitle?: string;
-    purpose?: string;
-    isEdit?: boolean;
-}
-
-const ProductForm: React.FC<ProductFormProps> = ({
+const ProductForm: React.FC<AdminFormProps> = ({
     productData,
     onSuccess,
     formTitle = "Create Product",
@@ -85,19 +75,22 @@ const ProductForm: React.FC<ProductFormProps> = ({
 
     const { control, setValue, reset, } = form;
 
-    useEffect(() => {
-        const fetchCategoryAndBrand = async () => {
-            try {
-                const { data } = await api.get<{ categories: ICategory[], brands: IBrand[] }>('product/combos');
-                setCategories(data.categories);
-                setBrands(data.brands);
-            } catch (error) {
-                console.error('Error fetching categories:', error);
-            }
-        };
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const { brands, categories } = await getBrandsandCategories() as BrandCategory;
+        setCategories(categories)
+        setBrands(brands)
+      } catch (error) {
+        console.error("Failed to fetch brands and categories", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-        fetchCategoryAndBrand();
-    }, []);
+    fetchData();
+  }, []);
+
 
     useEffect(() => {
         if (productData?.images?.length) {
@@ -183,87 +176,46 @@ const ProductForm: React.FC<ProductFormProps> = ({
     const onSubmit = async (values: FormValues) => {
         setIsLoading(true);
         try {
-            
+            const formData = new FormData();
+            formData.append('name', values.name);
+            formData.append('short_description', values.short_description);
+            formData.append('long_description', values.long_description);
+            formData.append('price', values.price.toString());
+            formData.append('status', values.status ? 'true' : 'false');
+            formData.append('brands', JSON.stringify([{ 
+                name: brands.find((b) => b._id === values.brand)?.name || values.brand, 
+                _id: values.brand 
+            }]));
+            formData.append('categories', JSON.stringify(values.category_id));
 
-            const formData = {
-                name: values.name,
-                short_description: values.short_description,
-                long_description: values.long_description,
-                price: values.price,
-                status: values.status ?? false,
-                brands: [
-                    {
-                        name: brands.find((b) => b._id === values.brand)?.name || values.brand,
-                        _id: values.brand
-                    },
-                ],
-                categories: values.category_id.map(id => ({ _id: id })),
-                imageUrls: [] as IImageUrl[],
-            };
-
-            // Keep existing images that weren't removed
-            const existingImages = previewImages
-                .filter(img => !img.isNew)
-                .map(img => {
-                    const originalImg = productData?.images?.find(original => original.url === img.url);
-                    return {
-                        url: img.url,
-                        name: originalImg?.name || 'Product Image'
-                    };
+            if (values.imageFiles) {
+                values.imageFiles.forEach((file) => {
+                    formData.append('imageFiles', file);
                 });
+            }
 
-            // Handle new image file uploads
-            const newImageFiles = values.imageFiles;
-            if (newImageFiles && newImageFiles.length > 0) {
-                const uploadedImages: IImageUrl[] = [];
-
-                for (const file of newImageFiles) {
-                    const uploadFormData = new FormData();
-                    uploadFormData.append("imagefile", file);
-
-                    const response = await fetch("/api/file-upload", {
-                        method: "POST",
-                        body: uploadFormData,
-                    });
-
-                    const result: FileUploadResponse = await response.json();
-
-                    if (result.status === 'success') {
-                        uploadedImages.push({
-                            url: result.url,
-                            name: result.name,
-                        });
-                    } else {
-                        toast.error(`Failed to upload image: ${file.name}`);
+            // console.log(formData.);
+            
+    
+            const apiUrl = isEdit && productData?._id
+                ? `/product/update/${productData._id}`  
+                : `/product/create`;  
+    
+            const response = isEdit && productData?._id
+                ? await apiServer.put(apiUrl, formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',  // Important for file uploads
                     }
-                }
-
-                formData.imageUrls = [...existingImages, ...uploadedImages];
-            } else {
-                formData.imageUrls = existingImages;
-            }
-
-            // If no images at all, provide a warning
-            if (formData.imageUrls.length === 0) {
-                toast.warning('No product images selected. Adding product without images.');
-            }
-
-            let apiResponse;
-            if (isEdit && productData?._id) {
-                // Update existing product
-                apiResponse = await api.put<IResponse>(`/product/update/${productData._id}`, formData);
-            } else {
-                // Create new product
-                apiResponse = await api.post<IResponse>('/product/create', formData);
-            }
-
-            if (apiResponse.status === 200) {
-                const successMessage = isEdit
-                    ? 'Product updated successfully!'
-                    : 'Product created successfully!';
-
-                toast.success(apiResponse.data?.message || successMessage);
-
+                })
+                : await apiServer.post(apiUrl, formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',  // Important for file uploads
+                    }
+                });
+    
+            if (response.status === 200) {
+                const successMessage = isEdit ? 'Product updated successfully!' : 'Product created successfully!';
+                toast.success(response.data?.message || successMessage);
                 if (onSuccess) {
                     onSuccess(successMessage);
                 } else {
@@ -280,7 +232,6 @@ const ProductForm: React.FC<ProductFormProps> = ({
                             short_description: '',
                             long_description: '',
                             brand: '',
-                            features: '',
                             category_id: [],
                             imageUrls: [],
                             imageFiles: [],
@@ -289,19 +240,16 @@ const ProductForm: React.FC<ProductFormProps> = ({
                     }
                 }
             } else {
-                toast.error(`Failed to ${isEdit ? 'update' : 'create'} product. Please try again.`);
+                toast.error('Failed to upload product');
             }
-        } catch (error: unknown) {
-            if(error instanceof AxiosError){
-
-                toast.error(error.response?.data?.message || 'An unexpected error occurred. Please try again.');
-                console.error(`Error ${isEdit ? 'updating' : 'creating'} product:`, error);
-            }
+        } catch (error) {
+            console.error('Error submitting product:', error);
+            toast.error('An unexpected error occurred');
         } finally {
             setIsLoading(false);
         }
     };
-
+    
     return (
         <>
             <div className="pt-10 px-10 w-full flex justify-center">
@@ -421,22 +369,6 @@ const ProductForm: React.FC<ProductFormProps> = ({
                                                 +
                                             </Button>
                                         </div>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-
-                            {/* Features */}
-                            <FormField
-                                control={form.control}
-                                name="features"
-                                rules={{ required: 'Features are required' }}
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Features</FormLabel>
-                                        <FormControl>
-                                            <Input placeholder="Feature 1, Feature 2" {...field} />
-                                        </FormControl>
                                         <FormMessage />
                                     </FormItem>
                                 )}
@@ -612,6 +544,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
                                                         <Image 
                                                             src={img.url}
                                                             alt={`Product image ${index + 1}`}
+                                                            fill
                                                             className="h-full w-full object-cover transition-all hover:scale-105"
                                                             />
                                                     </div>

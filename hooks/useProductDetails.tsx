@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import apiServer from '@/lib/axoins'; // Adjust this import to your actual API instance
+import apiServer from '@/lib/axios'; // Adjust this import to your actual API instance
 import { IProductData as IProduct } from '@/types/product'; 
 import { IResponse as ProductResponse } from '@/types/response'; 
 import { AxiosError } from 'axios';

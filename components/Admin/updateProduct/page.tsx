@@ -1,5 +1,5 @@
 'use client'
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import ConfirmDelete from "@/components/Header/ConfirmDelete";
 import PaginationComp from "@/components/Product/PaginationComp";
 import useProductFetch from "@/hooks/useProductFetch";
 import { Filters, IImageUrl, IProductData } from "@/types/product";
@@ -16,7 +16,7 @@ import ProductForm from "../AdminProductFom";
 
 
 const ProductTable: React.FC = () => {
-    const [productArras, setProducts] = useState<IProductData[] >([]);
+    const [productArras, setProducts] = useState<IProductData[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [err, setError] = useState<string | null>(null);
     const [currentPage, setCurrentPage] = useState(1);
@@ -43,7 +43,7 @@ const ProductTable: React.FC = () => {
             error
         });
     }, [products, totalLength, isLoading, error]);
-    
+
     useEffect(() => {
         if (products) {
             setProducts(products);
@@ -77,17 +77,17 @@ const ProductTable: React.FC = () => {
                     editingProduct.images &&
                     Array.isArray(editingProduct.images) &&
                     (editingProduct.images as IImageUrl[]).length > 0
-                  ) {
+                ) {
                     (editingProduct.images as IImageUrl[]).forEach((img: IImageUrl) => {
-                      if (!editingProduct.image || img.url !== editingProduct.image.url) {
-                        initialImages.push({
-                          name: img.name || "Product Image",
-                          url: img.url
-                        });
-                      }
+                        if (!editingProduct.image || img.url !== editingProduct.image.url) {
+                            initialImages.push({
+                                name: img.name || "Product Image",
+                                url: img.url
+                            });
+                        }
                     });
-                  }
-                  
+                }
+
 
                 setEditingProduct((prev) => prev ? {
                     ...prev,
@@ -137,30 +137,17 @@ const ProductTable: React.FC = () => {
                                             <LiaEdit size={20} />
                                         </button>
 
-
-                                        <AlertDialog>
-                                            <AlertDialogTrigger>
+                                        <ConfirmDelete
+                                            title="Confirm Deletion"
+                                            description="Are you sure you want to delete this product? This action cannot be undone."
+                                            onConfirm={() => handleDelete(product._id, setProducts, setTotalProducts)}
+                                            trigger={
                                                 <button className="text-red-600 hover:text-red-800 transition duration-200 ease-in-out transform hover:scale-105">
                                                     <MdDeleteOutline size={20} />
                                                 </button>
-                                            </AlertDialogTrigger>
-                                            <AlertDialogContent>
-                                                <AlertDialogHeader>
-                                                    <AlertDialogTitle>Confirm Deletion</AlertDialogTitle>
-                                                </AlertDialogHeader>
-                                                <AlertDialogDescription>
-                                                    Are you sure you want to delete this product? This action cannot be undone.
-                                                </AlertDialogDescription>
-                                                <AlertDialogFooter>
-                                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                                    <AlertDialogAction onClick={() => handleDelete(product._id, setProducts, setTotalProducts)}>
-                                                
-                                                        Continue
-                                                    </AlertDialogAction>
+                                            }
 
-                                                </AlertDialogFooter>
-                                            </AlertDialogContent>
-                                        </AlertDialog>
+                                        />
                                     </td>
                                 </tr>
                             ))
@@ -172,7 +159,7 @@ const ProductTable: React.FC = () => {
             {/* Edit Product Dialog */}
             {editingProduct && (
                 <ProductForm
-                onSuccess={(msg) => handleSuccessFunction(msg, editingProduct, setProducts, setEditingProduct)}
+                    onSuccess={(msg) => handleSuccessFunction(msg, editingProduct, setProducts, setEditingProduct)}
 
                     productData={editingProduct}
                     formTitle="Update Product"

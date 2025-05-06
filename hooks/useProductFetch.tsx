@@ -1,6 +1,6 @@
 "use client";
 
-import api from "@/lib/axoins";
+import api from "@/lib/axios";
 import { Filters, IProductData } from "@/types/product";
 import { AxiosError } from "axios";
 import { useEffect, useState } from "react";

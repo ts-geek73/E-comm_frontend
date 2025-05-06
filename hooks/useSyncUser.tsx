@@ -1,7 +1,7 @@
 'use client';
 import { useAuth, useClerk, useSession, useUser } from '@clerk/nextjs';
 import { useEffect, useState } from 'react';
-import api from '@/lib/axoins';
+import api from '@/lib/axios';
 import { UserData } from '@/types/user';
 import { AxiosError } from 'axios';
 
