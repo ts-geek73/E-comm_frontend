@@ -2,18 +2,23 @@
 
 import Carousel from "@/components/Header/Carousel";
 import ProductList from "@/components/Product/ProductList";
-import useSyncUser from '@/hooks/useSyncUser';
-import { ToastContainer } from "react-toastify";
+import { useSyncUser } from '@/hooks';
 
 export default function Home() {
-  useSyncUser(); 
+  try {
+    
+    useSyncUser(); 
+  } catch (error) {
+    console.log(error);
+    
+  }
   return (
 <>
-<div className="bg-blue-200">
+<div className="bg-blue-200 min-h-screen">
         {/* <HeaderComp /> */}
         <Carousel />
         <ProductList  />
-        <ToastContainer />
+        {/* <ToastContainer /> */}
       </div>
 </>
   );

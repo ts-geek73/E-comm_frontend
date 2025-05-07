@@ -30,12 +30,12 @@ const ProductCard = ({ data, onClick }: ProductCardProps) => {
     );
   };
 
-  const brandName = brands?.[0]?.name || 'Unknown Brand';
+  const brandName = brands?.[0]?.name || 'Unknown';
   const categoryName = categories?.[0]?.name || 'Uncategorized';
 
   return (
     <Card
-      className="relative w-[350px] rounded-lg border shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out cursor-pointer"
+      className="relative rounded-lg border shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out cursor-pointer"
       onClick={() => onClick(data)}
     >
       <CardHeader>

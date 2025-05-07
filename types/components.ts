@@ -22,7 +22,7 @@ export interface ProductCardProps {
 
 export interface ProductListProps {
   filters?: FilterValues;
-  dataIndex?: string;
+  dataIndex?: number;
 }
 
 export const defaultFilters: FilterValues = {
@@ -46,7 +46,6 @@ export interface ReviewCardProps {
 
 export interface ProductFormProps {
   productId: string;
-  userId: string;
   selectedReview: any; // Ideally, define a proper Review type
   setSelectedReview: (review: any) => void;
   setIsEditing: (isEditing: boolean) => void;
@@ -55,7 +54,7 @@ export interface ProductFormProps {
 
 export interface AdminFormProps {
   productData?: IProductData;
-  onSuccess: ({}) => void;
+  onSuccess: (msg : string) => void;
   formTitle?: string; 
   formSubtitle?: string; 
   purpose?: 'Create' | 'Update'; 
@@ -73,7 +72,7 @@ export interface ReviewsListProps {
   reviews: Review[];
   onEditReview: (review: Review) => void;
   onDeleteReview: (args: { id: string; user_id: string })  => void;
-  showActions : boolean
+  showActions ?: boolean
   emptyStateMessage : string
 }
 

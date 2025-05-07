@@ -42,7 +42,7 @@ export interface IImageUrlWithFile extends IImageUrl {
 
 export interface Filters {
   brand?: string;
-  category?: string;
+  category?: string[];
   pricemin?: number;
   pricemax?: number;
   sort?: string;
@@ -71,4 +71,30 @@ export interface IProductPayload {
   brands: IBrand[];
   categories: ICategory[];
   imageUrls: IImageUrl[];
+}
+
+export interface ICartProduct{
+  product_id : string
+  qty : number,
+  notes ?: string
+}
+export interface ICart{
+  products : ICartProduct[]
+  totalItems ?: number
+  totalAmount ?: number
+}
+
+export interface ICArtProductPayLoad{
+  _id: string
+  name: string,
+  price: number,
+  image:{ url: string}
+  qty: number,
+  notes:string
+}
+
+export interface ICartresponce{
+  cart : ICArtProductPayLoad[]
+    totalItems : number
+    totalPrice : number
 }

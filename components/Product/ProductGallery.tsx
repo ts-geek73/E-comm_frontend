@@ -3,10 +3,10 @@
 import Image from 'next/image';
 import { useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import type { IImageUrl } from '@/types/product'; 
+import type { IImageUrl } from '@/types/product';
 
-export const ProductImageGallery: React.FC<{ images: IImageUrl[];}> = ({ images }) => {
-  
+export const ProductImageGallery: React.FC<{ images: IImageUrl[]; }> = ({ images }) => {
+
   const [selectedImage, setSelectedImage] = useState(0);
 
   if (images.length === 0) return null;
@@ -16,10 +16,11 @@ export const ProductImageGallery: React.FC<{ images: IImageUrl[];}> = ({ images 
       <div className="relative md:h-96 flex items-center justify-center mb-4">
         <Image
           src={images[selectedImage].url}
-          alt={images[selectedImage].name}
+          alt={images[selectedImage].name || 'Product image'}
           fill
           className="max-h-full max-w-full object-contain"
         />
+
 
         {images.length > 1 && (
           <>
@@ -50,9 +51,8 @@ export const ProductImageGallery: React.FC<{ images: IImageUrl[];}> = ({ images 
             <button
               key={idx}
               onClick={() => setSelectedImage(idx)}
-              className={`relative w-16 h-16 border-2 rounded overflow-hidden ${
-                selectedImage === idx ? 'border-blue-500' : 'border-gray-200'
-              }`}
+              className={`relative w-16 h-16 border-2 rounded overflow-hidden ${selectedImage === idx ? 'border-blue-500' : 'border-gray-200'
+                }`}
             >
               <Image
                 fill

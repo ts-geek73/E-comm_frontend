@@ -8,14 +8,15 @@ import {
     CarouselNext,
     CarouselPrevious,
 } from "@/components/ui/carousel";
-import useProductFetch from "@/hooks/useProductFetch";
+import { useProductFetch } from "@/hooks";
 import { IProductData } from "@/types/product";
 import Image from "next/image";
+import { useState } from "react";
 
 export default function EcommerceCarousel({ products }: { products?: IProductData[] }) {
     const shouldFetch = !products;
     const { products: fetchedProducts, error, isLoading } = useProductFetch(1, 5);
-  
+
     const displayProducts = products ?? fetchedProducts;
 
     if (error) return <div className="text-center text-red-500 py-6">Error loading products.</div>;
@@ -27,7 +28,7 @@ export default function EcommerceCarousel({ products }: { products?: IProductDat
             <h2 className="text-3xl font-semibold text-center py-8">Featured Products</h2>
             <Carousel className="w-3/4 h-[400px] mx-auto relative">
                 <CarouselContent>
-                    {displayProducts.map((product) => (
+                    {displayProducts.map((product: IProductData) => (
                         <CarouselItem key={product._id}>
                             <div className="p-4 flex justify-center">
                                 <Card className="shadow-lg w-full md:w-5/6 lg:w-4/5 transition-transform duration-300 hover:scale-105">
@@ -41,8 +42,9 @@ export default function EcommerceCarousel({ products }: { products?: IProductDat
                                                 height={250}
                                                 className="object-contain aspect-square"
                                             />
+
                                         </div>
-                                        
+
                                         <CardContent className="md:w-1/2 flex flex-col justify-center p-6">
                                             <CardTitle className="text-xl font-semibold mb-2">
                                                 {product.name}

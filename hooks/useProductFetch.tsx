@@ -25,7 +25,7 @@ const useProductFetch = (
     
     const fetchProducts = async () => {
       setIsLoading(true);
-      setError(null); // Reset error state before new fetch
+      setError(null); 
       
       try {
         console.log(`Fetching products from: /product/custome with start=${start}&length=${productPerPage}&brand=${filters.brand}&category=${filters.category}&pricemin=${filters.pricemin}&pricemax=${filters.pricemax}&sort=${filters.sort}&search=${filters.search}`);
@@ -40,12 +40,14 @@ const useProductFetch = (
         console.log("Use Fetchn ", data);
         
         
-        if (data && Array.isArray(data.data)) {
+        if (data &&
+          typeof data.length === "number" &&
+          Array.isArray(data.data)
+        ) {
           setProducts(data.data);
           setTotalLength(data.length || 0);
-          // console.log(`Loaded ${data.datas.length} products, total: ${data.length}`);
         } else {
-          console.error("Invalid data format:", data);
+          console.log("Invalid data format:", data);
           setError("Invalid data format from API.");
           setProducts([]);
           setTotalLength(0);
@@ -53,7 +55,7 @@ const useProductFetch = (
       } catch (error: unknown) {
         if (error instanceof AxiosError) {
       
-        console.error("Error fetching products:", error);
+        console.log("Error fetching products:", error);
         setError(error.message || "Failed to fetch products.");
         setProducts([]);
         setTotalLength(0);

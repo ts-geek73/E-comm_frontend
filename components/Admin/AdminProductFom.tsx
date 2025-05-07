@@ -31,7 +31,7 @@ import { cn } from "@/lib/utils";
 
 import MyEditor from "@/components/Editor";
 import { Textarea } from '@/components/ui/textarea';
-import { AdminFormProps, ProductFormProps } from "@/types/components";
+import { AdminFormProps } from "@/types/components";
 import { BrandCategory, FormValues, IBrand, ICategory } from "@/types/product";
 import Image from 'next/image';
 import React, { useEffect, useRef, useState } from 'react';
@@ -82,7 +82,7 @@ const ProductForm: React.FC<AdminFormProps> = ({
         setCategories(categories)
         setBrands(brands)
       } catch (error) {
-        console.error("Failed to fetch brands and categories", error);
+        console.log("Failed to fetch brands and categories", error);
       } finally {
         setIsLoading(false);
       }
@@ -243,7 +243,7 @@ const ProductForm: React.FC<AdminFormProps> = ({
                 toast.error('Failed to upload product');
             }
         } catch (error) {
-            console.error('Error submitting product:', error);
+            console.log('Error submitting product:', error);
             toast.error('An unexpected error occurred');
         } finally {
             setIsLoading(false);

@@ -1,61 +1,74 @@
-import { Camera, Pencil, Trash2, User } from "lucide-react";
-import ConfirmDelete from "../Header/ConfirmDelete";
-import { Button } from "../ui/button";
 import { ReviewImageGrid } from "@/components/Review/ReviewImageGrid";
-import RatingStars from "../Header/Ratings";
 import { ReviewCardProps } from "@/types/components";
+import { Camera, MessageSquare, Pencil, Trash2, User } from "lucide-react";
+import ConfirmDelete from "../Header/ConfirmDelete";
+import RatingStars from "../Header/Ratings";
+import { Button } from "../ui/button";
 
-const ReviewCard : React.FC<ReviewCardProps> = ({
+const ReviewCard: React.FC<ReviewCardProps> = ({
   review,
   onEdit,
   onDelete,
   showActions = true
 }) => {
+
+    
   return (
-    <div className="flex flex-col border border-gray-100 rounded-xl shadow-sm p-6 gap-4 bg-white transition-all hover:shadow-md"
-    >
-      <div className="flex justify-between items-center border-b pb-4">
-        <div className="flex items-center gap-3">
-          <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-full p-2 text-white">
-            <User className="w-5 h-5" />
+    <div className="flex flex-col border border-gray-200 rounded-lg shadow-sm p-4 gap-3 bg-white transition-all hover:shadow-md">
+      {/* Header with user info and rating */}
+      <div className="flex justify-between items-center pb-3">
+        <div className="flex items-center gap-2">
+          <div className="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full p-1.5 text-white flex-shrink-0">
+            <User className="w-4 h-4" />
           </div>
-          <div>
-            <h3 className="font-medium text-gray-800">{review.email}</h3>
+          <div className="overflow-hidden">
+            <h3 className="font-medium text-gray-800 text-sm truncate">
+              {review.email}
+            </h3>
           </div>
         </div>
 
         <div className="flex flex-col items-end">
-          <div className="flex items-center gap-2">
-            <RatingStars rating={review.rate} />
-            <span className="text-lg font-bold text-blue-600">{review.rate}/5</span>
+          <div className="flex items-center gap-1.5">
+            <RatingStars rating={review.rate} showValue size={14} />
+            {/* <span className="font-semibold text-blue-600 text-sm">{review.rate}/5</span> */}
           </div>
         </div>
       </div>
 
-      <div className="bg-gray-50 p-4 rounded-lg">
-        <p className="text-gray-700 leading-relaxed">{review.description}</p>
+      {/* Review content */}
+      <div className="bg-gray-50 p-3 rounded-md text-sm">
+        <div className="flex gap-1.5 items-start">
+          <MessageSquare className="w-3.5 h-3.5 text-gray-400 mt-0.5 flex-shrink-0" />
+          <p className="text-gray-700 leading-relaxed line-clamp-3">
+            {review.description}
+          </p>
+        </div>
       </div>
 
+      {/* Review images */}
       {review.images && review.images.length > 0 && (
-        <div className="space-y-3">
-          <div className="flex items-center gap-2">
-            <Camera className="w-4 h-4 text-gray-500" />
-            <h4 className="font-medium text-gray-700">Photos from this review</h4>
+        <div className="space-y-2">
+          <div className="flex items-center gap-1.5">
+            <Camera className="w-3.5 h-3.5 text-gray-500" />
+            <h4 className="font-medium text-xs text-gray-600">
+              {review.images.length} {review.images.length === 1 ? 'Photo' : 'Photos'}
+            </h4>
           </div>
-          <ReviewImageGrid images={review.images} />
+          <ReviewImageGrid images={review.images}  />
         </div>
       )}
 
       {/* Action buttons */}
       {showActions && onEdit && onDelete && (
-        <div className="flex gap-3 mt-2 pt-2 border-t">
+        <div className="flex justify-end gap-2 mt-1 pt-2 border-t border-gray-100">
           <Button
             variant="outline"
             size="sm"
             onClick={onEdit}
-            className="flex items-center gap-2 hover:bg-blue-50 border-blue-200 text-blue-700"
+            className="flex items-center gap-1.5 hover:bg-blue-50 border-blue-200 text-blue-700 h-8 px-2.5 rounded-md"
           >
-            <Pencil className="w-4 h-4" />
+            <Pencil className="w-3.5 h-3.5" />
           </Button>
           
           <ConfirmDelete
@@ -66,9 +79,9 @@ const ReviewCard : React.FC<ReviewCardProps> = ({
               <Button
                 variant="outline"
                 size="sm"
-                className="flex items-center gap-2 hover:bg-red-50 border-red-200 text-red-600"
+                className="flex items-center gap-1.5 hover:bg-red-50 border-red-200 text-red-600 h-8 px-2.5 rounded-md"
               >
-                <Trash2 className="w-4 h-4" />
+                <Trash2 className="w-3.5 h-3.5" />
               </Button>
             }
           />
@@ -78,4 +91,4 @@ const ReviewCard : React.FC<ReviewCardProps> = ({
   );
 };
 
-export default ReviewCard
+export default ReviewCard;

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import CreateProduceComp from "@/components/Admin/createProduce";
 import UpdateProduceComp from "@/components/Admin/updateProduct/page";
+import { ToastContainer } from "react-toastify";
 
 const ProductCreatePage = () => {
   const [activeComponent, setActiveComponent] = useState("updateProduce");
@@ -49,6 +50,8 @@ const ProductCreatePage = () => {
           {activeComponent === "updateProduce" && <UpdateProduceComp />}
         </div>
       </main>
+
+      <ToastContainer />
     </div>
   );
 };

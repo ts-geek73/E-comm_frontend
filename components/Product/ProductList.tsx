@@ -1,13 +1,13 @@
 'use client';
 
-import useProductFetch from '@/hooks/useProductFetch';
-import { defaultFilters, ProductListProps ,  } from '@/types/components';
+import { useProductFetch } from '@/hooks';
+import { defaultFilters, ProductListProps, } from '@/types/components';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Pagination from './PaginationComp';
 import ProductCard from './ProductCard';
 
-const ProductList: React.FC<ProductListProps> = ({ filters = defaultFilters , dataIndex = "4" }) => {
+const ProductList: React.FC<ProductListProps> = ({ filters = defaultFilters, dataIndex }) => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const productPerPage = 12;
   const router = useRouter();
@@ -19,7 +19,7 @@ const ProductList: React.FC<ProductListProps> = ({ filters = defaultFilters , da
   );
 
   useEffect(() => {
-    setCurrentPage(1); 
+    setCurrentPage(1);
   }, [filters.brand, filters.category, filters.pricemin, filters.pricemax, filters.sort]);
 
   if (error) {
@@ -53,7 +53,15 @@ const ProductList: React.FC<ProductListProps> = ({ filters = defaultFilters , da
         Our Products
       </h1>
 
-      <div className={`grid grid-cols-${dataIndex} gap-6`}>
+      <div className={`grid gap-6 ${
+        dataIndex === 1 ? 'grid-cols-1' :
+        dataIndex === 2 ? 'grid-cols-2' :
+        dataIndex === 3 ? 'grid-cols-3' :
+        dataIndex === 4 ? 'grid-cols-4' :
+        'grid-cols-4'
+        }`}>
+
+        {/* <div className={`grid 'grid-cols-3'   gap-6`}> */}
         {products.map((ele) => (
           <ProductCard
             key={ele._id}

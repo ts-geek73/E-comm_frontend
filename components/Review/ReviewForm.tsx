@@ -7,10 +7,11 @@ import { Camera } from 'lucide-react';
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import RatingStars from "../Header/Ratings";
+import { useClerk } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
 
 const ReviewForm: React.FC<ProductFormProps> = ({
   productId,
-  userId,
   selectedReview,
   setSelectedReview,
   setIsEditing,
@@ -18,7 +19,9 @@ const ReviewForm: React.FC<ProductFormProps> = ({
 }) => {
   const [updatedReview, setUpdatedReview] = useState({ rate: 0, description: '' });
   const [uploadedImages, setUploadedImages] = useState<IImageUrlWithFile[]>([]);
-  const [hoveredRating, setHoveredRating] = useState(0);
+  const { user } = useClerk();
+    const router = useRouter()
+  
 
   useEffect(() => {
     if (selectedReview) {
@@ -57,21 +60,28 @@ const ReviewForm: React.FC<ProductFormProps> = ({
     });
 
     try {
-      if (selectedReview) {
-        await apiServer.put(`/review/${productId}/user/${userId}`, formData, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
-        toast.success("Review updated");
-      } else {
-        await apiServer.post(`/review/${productId}/user/${userId}`, formData, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
-        toast.success("Review submitted");
+
+      if(!user?.id){
+        router.push(`/login`)
+      }
+      else{
+        if (selectedReview) {
+          await apiServer.put(`/review/${productId}/user/${user?.id}`, formData, {
+            headers: { "Content-Type": "multipart/form-data" },
+          });
+          toast.success("Review updated");
+        } else {
+          await apiServer.post(`/review/${productId}/user/${user?.id}`, formData, {
+            headers: { "Content-Type": "multipart/form-data" },
+          });
+          toast.success("Review submitted");
+        }
+  
+        setIsEditing(false);
+        setSelectedReview(null);
+        updateReviews();
       }
 
-      setIsEditing(false);
-      setSelectedReview(null);
-      updateReviews();
     } catch {
       toast.error("Failed to submit review");
     }

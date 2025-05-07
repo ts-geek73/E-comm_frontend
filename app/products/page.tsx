@@ -26,7 +26,7 @@ const AllProductPage = () => {
 
         {/* Main Product Grid */}
         <main className="flex-1 transition-opacity duration-300">
-          <ProductList dataIndex="3" filters={filters} />
+          <ProductList dataIndex={3} filters={filters} />
         </main>
       </div>
     </div>

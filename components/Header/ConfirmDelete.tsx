@@ -26,7 +26,7 @@ const ConfirmDelete: React.FC<ConfirmDeleteProps> = ({
       setIsLoading(true);
       await onConfirm();
     } catch (error) {
-      console.error('Confirmation action failed:', error);
+      console.log('Confirmation action failed:', error);
     } finally {
       setIsLoading(false);
       setIsOpen(false);

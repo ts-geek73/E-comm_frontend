@@ -19,8 +19,8 @@ const MyEditor = ({ value, onChange }) => {
         ],
         toolbar:
           'undo redo | formatselect | bold italic | alignleft aligncenter alignright | outdent indent | link image',
-        content_css: 'directionality: ltr;',
-      }}
+          content_style: 'body { direction: ltr; }',
+        }}
       onEditorChange={handleEditorChange}
     />
   );

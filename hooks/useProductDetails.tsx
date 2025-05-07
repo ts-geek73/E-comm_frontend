@@ -4,7 +4,7 @@ import { IProductData as IProduct } from '@/types/product';
 import { IResponse as ProductResponse } from '@/types/response'; 
 import { AxiosError } from 'axios';
 
-export const useProductDetail = (id: string | undefined) => {
+const useProductDetail = (id: string | undefined) => {
   const [product, setProduct] = useState<IProduct | null>(null);
   const [relatedProducts, setRelatedProducts] = useState<IProduct[]>([]);
   const [loading, setLoading] = useState(true);
@@ -23,10 +23,10 @@ export const useProductDetail = (id: string | undefined) => {
         setError(null);
       } catch (error: unknown) {
         if (error instanceof AxiosError) {
-          console.error('Error saving review:', error);
+          console.log('Error saving review:', error);
           setError(error?.message || 'Something went wrong');
         } else {
-          console.error('Unexpected error:', error);
+          console.log('Unexpected error:', error);
 
         }
             
@@ -41,3 +41,5 @@ export const useProductDetail = (id: string | undefined) => {
 
   return { product, relatedProducts, loading, error };
 };
+
+export default useProductDetail

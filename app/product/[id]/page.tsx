@@ -8,15 +8,16 @@ import {
 import { useParams, useRouter } from "next/navigation";
 import ProductCard from "@/components/Product/ProductCard";
 import { ProductImageGallery } from "@/components/Product/ProductGallery";
-import { useProductDetail } from "@/hooks/useProductDetails";
+import { useProductDetails } from "@/hooks";
 import MultiReviewProduct from "@/components/Review/MainReview";
+import AddToCartSection from "@/components/Product/AddToCart";
 
 
 const ProductDetails: React.FC = () => {
     const router = useRouter();
     const { id } = useParams() as { id: string };
 
-    const { product, relatedProducts, } = useProductDetail(id);
+    const { product, relatedProducts, } = useProductDetails(id);
 
     if (!product) {
         return (
@@ -62,13 +63,6 @@ const ProductDetails: React.FC = () => {
                             <div className="mt-2 mb-6">
                                 <p className="text-gray-600">{product?.short_description || product.description}</p>
                             </div>
-
-                            <div className="mb-6">
-                                <h3 className="font-medium text-gray-800 mb-2">Key Features:</h3>
-                                <ul className="grid grid-cols-2 gap-x-4 gap-y-2">
-                                    
-                                </ul>
-                            </div>
                             
                             <div className="mt-auto">
                                 <div className="flex items-baseline mb-4">
@@ -96,34 +90,7 @@ const ProductDetails: React.FC = () => {
                                 </div>
 
                                 {product && (
-                                    <div className="flex flex-wrap gap-4 items-center">
-                                        <div className="flex items-center border border-gray-300 rounded-lg">
-                                            <button 
-                                                // onClick={() => handleQuantityChange(-1)}
-                                                className="w-10 h-10 flex items-center justify-center text-gray-600 hover:bg-gray-100 rounded-l-lg"
-                                                // disabled={quantity <= 1}
-                                            >
-                                                -
-                                            </button>
-                                            <span 
-                                                className="w-16 text-center border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                            >{1}</span>
-                                            <button 
-                                                // onClick={() => handleQuantityChange(1)}
-                                                className="w-10 h-10 flex items-center justify-center text-gray-600 hover:bg-gray-100 rounded-r-lg"
-                                                // disabled={quantity >= product.stock}
-                                            >
-                                                +
-                                            </button>
-                                        </div>
-                                        
-                                        <button className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-5 rounded-lg flex items-center justify-center transition-colors">
-                                            <ShoppingCart size={20} className="mr-2" />
-                                            Add to Cart
-                                        </button>
-                                        
-
-                                    </div>
+                                    <AddToCartSection product={product}/>
                                 )}
                             </div>
                         </div>
@@ -131,7 +98,6 @@ const ProductDetails: React.FC = () => {
                     </div>
                 </div>
 
-                {/* Description Section */}
                 <div className="bg-white rounded-xl shadow-sm p-6 mb-12">
                     <h2 className="text-2xl font-bold text-gray-800 mb-4">Product Description</h2>
                     <div className="text-gray-600">
@@ -172,9 +138,7 @@ const ProductDetails: React.FC = () => {
                 {/* Review Section */}
                 <MultiReviewProduct 
                     productId={id} 
-                    showAllReviews={true} 
-                    maxReviews={5}
-                    />
+                />
 
             </div>
         </div>

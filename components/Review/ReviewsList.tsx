@@ -8,7 +8,6 @@ export const ReviewsList: React.FC<ReviewsListProps> = ({
   reviews,
   onEditReview,
   onDeleteReview,
-  showActions = true,
   emptyStateMessage = "No reviews available"
 }) => {
   const { user }= useClerk()
@@ -23,7 +22,7 @@ export const ReviewsList: React.FC<ReviewsListProps> = ({
 
 
   return (
-    <div className="space-y-6">
+    <div className="max-h-[420px] overflow-y-auto space-y-6 pr-2">
       {reviews.map((review: Review) => (
         <ReviewCard
           key={review._id || `review-${Math.random()}`}
@@ -33,7 +32,7 @@ export const ReviewsList: React.FC<ReviewsListProps> = ({
             id: review._id,
             user_id: review.user_id
           })}
-          showActions={review.email === user?.primaryEmailAddress?.emailAddress}
+          showActions={review.email === user?.primaryEmailAddress?.emailAddress }
           />
       ))}
     </div>

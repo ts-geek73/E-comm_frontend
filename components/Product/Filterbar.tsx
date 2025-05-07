@@ -42,7 +42,7 @@ const FilterBar = ({ onFilterChange, initialFilters }: FilterBarProps) => {
         const { brands, categories } = await getBrandsandCategories() as BrandCategory;
         setBrandCategoryObject({ brands, categories });
       } catch (error) {
-        console.error("Failed to fetch brands and categories", error);
+        console.log("Failed to fetch brands and categories", error);
       } finally {
         setIsLoading(false);
       }
@@ -114,11 +114,11 @@ const FilterBar = ({ onFilterChange, initialFilters }: FilterBarProps) => {
               ? brandCategoryObject.categories
               : brandCategoryObject.categories?.slice(0, maxVisibleCategories)
             )?.map((category) => (
-              <label key={category._id!} className="flex items-center gap-2 text-sm text-gray-700">
+              <label key={category._id as string} className="flex items-center gap-2 text-sm text-gray-700">
                 <input
                   type="checkbox"
-                  checked={filter.category?.includes(category._id) || false}
-                  onChange={() => toggleCategory(category._id)}
+                  checked={filter.category?.includes(category._id as string) || false}
+                  onChange={() => toggleCategory(category._id as string)}
                   className="accent-blue-600"
                 />
                 {category.name}

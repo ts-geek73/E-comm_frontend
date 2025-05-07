@@ -5,7 +5,7 @@ import { Webhook } from "svix";
 
 
 function handleError(message: string, status: number) {
-  console.error(message);
+  console.log(message);
   return new Response(message, { status });
 }
 
@@ -54,7 +54,7 @@ export async function POST(req: Request) {
           const clerkId = unsafe_metadata?.clerkId || ''; 
 
           if (typeof clerkId !== 'string') {
-            console.error("Invalid clerkId format, using fallback value.");
+            console.log("Invalid clerkId format, using fallback value.");
             return handleError("Invalid clerkId format", 400);
           }
 
@@ -87,7 +87,7 @@ export async function POST(req: Request) {
           console.log(`New user created with email: ${primaryEmail.email_address}`);
           return new Response("User created successfully", { status: 201 });
         } catch (dbError: unknown) {
-          console.error('Database error:', dbError);
+          console.log('Database error:', dbError);
         
           if (dbError instanceof Error) {
             return new Response(`Database error: ${dbError.message}`, { status: 500 });
@@ -121,7 +121,7 @@ export async function POST(req: Request) {
           console.log(`User with user ID ${id} deleted.`);
           return new Response("User deleted successfully", { status: 200 });
         } catch (dbError: unknown) {
-          console.error('Database error during user deletion:', dbError);
+          console.log('Database error during user deletion:', dbError);
         
           if (dbError instanceof Error) {
             return new Response(`Database error during user deletion: ${dbError.message}`, { status: 500 });
@@ -139,7 +139,7 @@ export async function POST(req: Request) {
 
     return new Response("Webhook received and processed", { status: 200 });
   } catch (error) {
-    console.error("Error in verifying webhook:", error);
+    console.log("Error in verifying webhook:", error);
     return new Response("Webhook verification failed", { status: 400 });
   }
 }

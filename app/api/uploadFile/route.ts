@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
             name: file.name,  
         });
     } catch (err : unknown) {
-        console.error('Error in file upload:', err);
+        console.log('Error in file upload:', err);
             if (err instanceof AxiosError) {
             return NextResponse.json({ status: 'fail', error: err.message }, { status: 500 });
         }

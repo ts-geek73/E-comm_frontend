@@ -1,7 +1,7 @@
 'use client'
 import ConfirmDelete from "@/components/Header/ConfirmDelete";
 import PaginationComp from "@/components/Product/PaginationComp";
-import useProductFetch from "@/hooks/useProductFetch";
+import { useProductFetch } from "@/hooks";
 import { Filters, IImageUrl, IProductData } from "@/types/product";
 import { useEffect, useState } from "react";
 import { LiaEdit } from "react-icons/lia";
@@ -101,34 +101,48 @@ const ProductTable: React.FC = () => {
         <div className="w-full max-h-screen overflow-auto space-y-8">
             <h1 className="text-4xl font-semibold text-center text-gray-900">Product Management</h1>
 
-            {loading && <p className="text-center text-blue-500">Loading products...</p>}
             {err && <p className="text-center text-red-600">{err}</p>}
 
             <div className="overflow-x-auto shadow-lg border border-gray-300 rounded-lg">
-                <table className="min-w-full table-auto">
-                    <thead className="bg-gradient-to-r from-blue-500 to-teal-500 text-white">
-                        <tr>
-                            <th className="py-4 px-6 text-left font-semibold text-sm tracking-wider"> </th>
-                            <th className="py-4 px-6 text-left font-semibold text-sm tracking-wider">Product Name</th>
-                            <th className="py-4 px-6 text-left font-semibold text-sm tracking-wider">Description</th>
-                            <th className="py-4 px-6 text-left font-semibold text-sm tracking-wider">Price</th>
-                            <th className="py-4 px-6 text-left font-semibold text-sm tracking-wider">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody className="bg-white">
-                        {!loading && productArras.length === 0 ? (
+
+                {loading ? (
+                    <tr >
+                        <td colSpan={5} className="py-10 text-center text-blue-500">
+                            Loading products...
+                        </td>
+                    </tr>
+                ) : productArras.length === 0 ? (
+                    <tr>
+                        <td colSpan={5} className="py-10 text-center text-gray-500">
+                            No products found
+                        </td>
+                    </tr>
+                ) : (
+                    <table className="min-w-full table-auto">
+                        <thead className="bg-gradient-to-r from-blue-500 to-teal-500 text-white">
                             <tr>
-                                <td colSpan={5} className="py-10 text-center text-gray-500">
-                                    No products found
-                                </td>
+                                <th className="py-4 px-6 text-left font-semibold text-sm tracking-wider"> </th>
+                                <th className="py-4 px-6 text-left font-semibold text-sm tracking-wider">Product Name</th>
+                                <th className="py-4 px-6 text-left font-semibold text-sm tracking-wider">Description</th>
+                                <th className="py-4 px-6 text-left font-semibold text-sm tracking-wider">Price</th>
+                                <th className="py-4 px-6 text-left font-semibold text-sm tracking-wider">Actions</th>
                             </tr>
-                        ) : (
-                            productArras.map((product, index) => (
-                                <tr key={product._id} className=" hover:bg-gray-50 transition">
-                                    <td className="py-3 px-6 text-sm text-gray-700">{(currentPage - 1) * productPerPage + index + 1}</td>
-                                    <td className="py-3 px-6 text-sm text-blue-600 font-medium">{product.name}</td>
-                                    <td className="py-3 px-6 text-sm text-gray-600 max-w-xs truncate">{product.short_description ?? product?.description}</td>
-                                    <td className="py-3 px-6 text-sm text-gray-800">{product.price?.toFixed(2)} Rs.</td>
+                        </thead>
+                        <tbody className="bg-white">
+                            {productArras.map((product, index) => (
+                                <tr key={product._id} className="hover:bg-gray-50 transition">
+                                    <td className="py-3 px-6 text-sm text-gray-700">
+                                        {(currentPage - 1) * productPerPage + index + 1}
+                                    </td>
+                                    <td className="py-3 px-6 text-sm text-blue-600 font-medium">
+                                        {product.name}
+                                    </td>
+                                    <td className="py-3 px-6 text-sm text-gray-600 max-w-xs truncate">
+                                        {product.short_description ?? product.description}
+                                    </td>
+                                    <td className="py-3 px-6 text-sm text-gray-800">
+                                        {product.price?.toFixed(2)} Rs.
+                                    </td>
                                     <td className="py-3 px-6 text-sm flex space-x-4">
                                         <button
                                             onClick={() => handleEditClick(product, setEditingProduct)}
@@ -146,21 +160,20 @@ const ProductTable: React.FC = () => {
                                                     <MdDeleteOutline size={20} />
                                                 </button>
                                             }
-
                                         />
                                     </td>
                                 </tr>
-                            ))
-                        )}
-                    </tbody>
-                </table>
+                            ))}
+                        </tbody>
+                    </table>
+
+                )}
             </div>
 
             {/* Edit Product Dialog */}
             {editingProduct && (
                 <ProductForm
-                    onSuccess={(msg) => handleSuccessFunction(msg, editingProduct, setProducts, setEditingProduct)}
-
+                    onSuccess={(msg: string) => handleSuccessFunction(msg, editingProduct, setProducts, setEditingProduct)}
                     productData={editingProduct}
                     formTitle="Update Product"
                     formSubtitle="Edit the details of your existing product"

@@ -20,13 +20,11 @@ export default function useSyncUser() {
 
   useEffect(() => {
     const processUser = async () => {
-        // console.log("User: ", user);
-        
       if (!isSignedIn || !user || !session || !clerkId) return;
 
       try {
         const token = await getToken();
-        if (!token) throw new Error('Missing token');
+        if (!token) return;
 
         const data: UserData = {
           sessionId: session.id,
@@ -34,24 +32,20 @@ export default function useSyncUser() {
           clerkId,
           name: user.firstName ?? user.username ?? " ",
           email: user.primaryEmailAddress?.emailAddress ?? " ",
-          // reoles_id: user.publicMetadata?.roles_id,
         };
 
-        console.log('Syncing user data:', data);
-        
-
-        const response = await api.put('/create', data);
-        console.log('User synced successfully:', response.status);
+        await api.put('/create', data);
       } catch (error: unknown) {
-        if (error instanceof AxiosError) {
-      
-        if (error.response) {
-          console.error('Sync error:', error.response.data.message);
-        } else {
-          console.error('Unexpected sync error:', error.message);
+        if (process.env.NODE_ENV !== 'production') {
+          if (error instanceof AxiosError && error.response) {
+            console.log('User sync failed:', error.response.data?.message || error.message);
+          } else if (error instanceof Error) {
+            console.log('Unexpected error:', error.message);
+          } else {
+            console.log('Unknown error during user sync.');
+          }
         }
       }
-    }
     };
 
     processUser();
