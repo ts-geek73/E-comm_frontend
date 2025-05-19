@@ -16,7 +16,7 @@ const HeaderComp = () => {
 
 
   return (
-    <div className="bg-white  shadow-md">
+    <div className="bg-white shadow-md">
       <div className="flex container items-center justify-between p-6 sm:p-8 mx-auto">
 
         <div className="flex gap-4 items-center">

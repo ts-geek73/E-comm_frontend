@@ -23,7 +23,7 @@ export default function EcommerceCarousel({ products }: { products?: IProductDat
     if (!displayProducts || displayProducts.length === 0) return <div className="text-center py-6">No products available.</div>;
 
     return (
-        <div className="mx-auto">
+        <div className="mx-auto container">
             <h2 className="text-3xl font-semibold text-center py-8">Featured Products</h2>
             <Carousel className="w-3/4 h-[400px] mx-auto relative">
                 <CarouselContent>

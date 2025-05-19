@@ -97,3 +97,22 @@ export interface RatingStarsProps {
   showValue?: boolean;
   size?: number; // optional custom size
 }
+
+
+export interface FormValues {
+    _id : string
+    firstName: String
+    email: String
+    address: String
+    city: String
+    state: String
+    zip: String
+    country: String
+    phone: String
+        isDefault?: boolean; // optional if not always present
+}
+
+export interface CheckoutFormProps {
+    onSubmit: (data: FormValues) => void;
+    savedAddresses?: FormValues[];
+}

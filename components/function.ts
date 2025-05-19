@@ -123,13 +123,25 @@ export function getLocalCart(): ICart {
 
 export const syncGuestCartOnLogin = async (user_id: string) => {
   const cart = getLocalCart();
+  console.log("Sync data", cart);
 
   if (cart.products.length === 0) return;
+  const payloadProducts = cart.products.map(item => ({
+    product_id:
+      typeof item.product === "object" && "_id" in item.product
+        ? item.product._id
+        : item.product, 
+    qty: item.qty,
+    notes: item.notes || ""
+  }));
+
+  console.log("Sync CAret Data:", payloadProducts);
+  
 
   try {
     const response = await api.put('cart', {
       user_id,
-      products: cart.products,
+      product: payloadProducts,
     });
 
     if (response.status === 200) {
@@ -143,7 +155,7 @@ export const syncGuestCartOnLogin = async (user_id: string) => {
 
 
 export const addToCart = async (
-  product: IProductData | ICArtProductPayLoad,  
+  product: IProductData | ICArtProductPayLoad,
   quantity: number,
   user_id: string
 ): Promise<boolean> => {
@@ -167,22 +179,10 @@ export const addToCart = async (
     return true;
   }
 
-  // Logged-in user: sync with backend and store only IDs
+  
   try {
-    const payloadProducts = cart.products.map(item => ({
-      product: typeof item.product === "object" && "_id" in item.product ? item.product._id : item.product,
-      qty: item.qty,
-    }));
+    await syncGuestCartOnLogin( user_id)
 
-    const response = await api.put("cart", {
-      user_id,
-      products: payloadProducts,
-    });
-
-    if (response.status === 200) {
-      localStorage.removeItem("cart");
-      return true;
-    }
   } catch (error) {
     console.error("Add to cart sync error:", error);
   }
@@ -190,26 +190,25 @@ export const addToCart = async (
   return true;
 };
 
-
-export const fetchcart = async( user_id: string)=>{
+export const fetchcart = async (user_id: string) => {
   try {
     if (user_id && user_id !== "") {
       await syncGuestCartOnLogin(user_id);
 
 
-      const response = await api.get("/cart", { 
-        params: { user_id }  
+      const response = await api.get("/cart", {
+        params: { user_id }
       });
-    if(response.status === 200){
-      return response.data.data
-    }
-    return { cart: [], totalItems: 0, totalPrice: 0 };
+      if (response.status === 200) {
+        return response.data.data
+      }
+      return { cart: [], totalItems: 0, totalPrice: 0 };
 
-  }
+    }
   } catch (error) {
     console.log("fetch Cart Prodcuct error", error);
 
-  } 
+  }
 }
 
 export const removeFromCart = async (
@@ -227,7 +226,7 @@ export const removeFromCart = async (
 
     if (user_id && user_id !== "") {
       await api.delete("cart/item", {
-        data : {
+        data: {
 
           user_id,
           product_id,
@@ -251,7 +250,7 @@ export const clearCart = async (user_id: string = ""): Promise<void> => {
 
     if (user_id && user_id.trim() !== "") {
       const response = await api.delete("cart", {
-        data :{  
+        data: {
           user_id,
         }
       });
@@ -262,5 +261,6 @@ export const clearCart = async (user_id: string = ""): Promise<void> => {
     }
 
   } catch (error) {
-    console.error("Error clearing cart:", error);  }
+    console.error("Error clearing cart:", error);
+  }
 };

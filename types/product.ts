@@ -1,38 +1,38 @@
 export interface IProductData {
-    _id: string;
-    name: string;
-    status?: boolean
-    description?: string;
-    short_description: string;
-    long_description: string;
-    price: number;
-    image?: IImageUrl
-    images?: IImageUrl[];
-    brands: IBrand[];
-    categories: ICategory[];
-  }
+  _id: string;
+  name: string;
+  status?: boolean
+  description?: string;
+  short_description: string;
+  long_description: string;
+  price: number;
+  image?: IImageUrl
+  images?: IImageUrl[];
+  brands: IBrand[];
+  categories: ICategory[];
+}
 
 export interface ICategory {
-    _id?: string;
-    name: string;
-    parentCategory_id?: string;
+  _id?: string;
+  name: string;
+  parentCategory_id?: string;
 }
 
 export interface IBrand {
-    _id?: string;
-    name: string;
-    url?: string;
+  _id?: string;
+  name: string;
+  url?: string;
 }
 
 export interface BrandCategory {
-    brands: IBrand[];
-    categories: ICategory[];
+  brands: IBrand[];
+  categories: ICategory[];
 }
 
 export interface IImageUrl {
-    _id?: string;
-    url: string;
-    name: string;
+  _id?: string;
+  url: string;
+  name: string;
 }
 
 export interface IImageUrlWithFile extends IImageUrl {
@@ -73,28 +73,28 @@ export interface IProductPayload {
   imageUrls: IImageUrl[];
 }
 
-export interface ICartProduct{
-  product : IProductData | ICArtProductPayLoad
-  qty : number,
-  notes ?: string
+export interface ICartProduct {
+  product: IProductData | ICArtProductPayLoad
+  qty: number,
+  notes?: string
 }
-export interface ICart{
-  products : ICartProduct[]
-  totalItems ?: number
-  totalAmount ?: number
+export interface ICart {
+  products: ICartProduct[]
+  totalItems?: number
+  totalAmount?: number
 }
 
-export interface ICArtProductPayLoad{
+export interface ICArtProductPayLoad {
   _id: string
   name: string,
   price: number,
-  image:{ url: string}
+  image: { url: string }
   qty: number,
-  notes:string
+  notes: string
 }
 
-export interface ICartresponce{
-  cart : ICArtProductPayLoad[]
-    totalItems : number
-    totalPrice : number
+export interface ICartresponce {
+  cart: ICArtProductPayLoad[]
+  totalItems: number
+  totalPrice: number
 }
