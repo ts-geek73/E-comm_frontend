@@ -46,8 +46,8 @@ export interface ReviewCardProps {
 
 export interface ProductFormProps {
   productId: string;
-  selectedReview: any; // Ideally, define a proper Review type
-  setSelectedReview: (review: any) => void;
+  selectedReview: Review; // Ideally, define a proper Review type
+  setSelectedReview: (review: Review | null) => void;
   setIsEditing: (isEditing: boolean) => void;
   updateReviews: () => void;
 }

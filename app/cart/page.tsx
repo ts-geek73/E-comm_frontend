@@ -1,33 +1,28 @@
 'use client'
 
-import { addToCart, fetchcart, getLocalCart, removeFromCart } from "@/components/function";
+import { addToCart, clearCart, fetchcart, removeFromCart } from "@/components/function";
+import ConfirmDelete from "@/components/Header/ConfirmDelete";
+import { Button } from "@/components/ui/button";
 import { ICartresponce } from "@/types/product";
 import { useUser } from "@clerk/nextjs";
 import { ArrowLeft, ShoppingBag, Trash2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { toast } from "react-toastify";
+import { useCallback, useEffect, useState } from "react";
+import { toast, ToastContainer } from "react-toastify";
 
 export default function CartPage() {
-  const [cartdata, setCartdata] = useState<ICartresponce>({ cart: [], totalItems: 0, totalPrice: 0 });
+  const [cartdata, setCartdata] = useState<ICartresponce | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const { user } = useUser();
   const user_id = user ? user.id : "";
 
-  useEffect(() => {
-    loadCart();
-  }, [user_id]);
-
-  const loadCart = async() => {
+  const loadCart = useCallback(async () => {
     setIsLoading(true);
     try {
-      // const cartData = getLocalCart();
-
-      if(user?.id){
-        const cartData = await fetchcart(user?.id)
+      if (user?.id) {
+        const cartData = await fetchcart(user.id);
         console.log("cart data", cartData);
-        
         setCartdata(cartData);
       }
     } catch (error) {
@@ -36,17 +31,20 @@ export default function CartPage() {
     } finally {
       setIsLoading(false);
     }
-  };
-
+  }, [user?.id]);
+  
+  useEffect(() => {
+    loadCart();
+  }, [loadCart]);
   const handleQuantityChange = async (productId: string, change: number) => {
-    const item = cartdata.cart.find((item) => item._id === productId);
+    const item = cartdata?.cart.find((item) => item._id === productId);
     if (!item) return;
 
     const newQuantity = item.qty + change;
     if (newQuantity < 1) return;
 
     try {
-      await addToCart(item._id, newQuantity, user_id);
+      await addToCart(item, newQuantity, user_id);
       loadCart(); 
       toast.success("Cart updated successfully");
     } catch (error) {
@@ -56,11 +54,9 @@ export default function CartPage() {
   };
 
   const handleRemoveItem = async (productId: string) => {
-    const item = cartdata.cart.find((item) => item._id === productId);
-    if (!item) return;
 
     try {
-      await removeFromCart(item._id, user_id);
+      await removeFromCart(productId, user_id);
       loadCart();
       toast.success("Item removed from cart");
     } catch (error) {
@@ -80,13 +76,13 @@ export default function CartPage() {
     );
   }
 
-  if (cartdata.cart.length === 0) {
+  if (cartdata?.cart.length === 0) {
     return (
       <div className="container mx-auto p-6 min-h-screen flex flex-col items-center justify-center">
         <div className="text-center max-w-md">
           <ShoppingBag size={64} className="mx-auto mb-6 text-gray-400" />
           <h2 className="text-2xl font-bold mb-2">Your cart is empty</h2>
-          <p className="text-gray-600 mb-6">Looks like you haven't added any products to your cart yet.</p>
+          <p className="text-gray-600 mb-6">Looks like you have not added any products to your cart yet.</p>
           <Link href="/products" className="inline-flex items-center bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-lg transition-colors">
             <ArrowLeft size={20} className="mr-2" />
             Continue Shopping
@@ -104,12 +100,23 @@ export default function CartPage() {
         {/* Cart Items List */}
         <div className="lg:w-2/3">
           <div className="bg-white rounded-lg shadow-md overflow-hidden">
-            <div className="p-4 bg-gray-50 border-b border-gray-200">
-              <h2 className="text-lg font-semibold">Cart Items ({cartdata.totalItems})</h2>
+            <div className="p-4 bg-gray-50 border-b border-gray-200 flex justify-between">
+              <h2 className="text-lg font-semibold">Cart Items ({cartdata?.totalItems})</h2>
+
+              <ConfirmDelete
+              title={"Clear Cart"}
+              description="Are you sure? Your Cart will be Empty." 
+              onConfirm={() => clearCart(user?.id)}
+              trigger={
+                <Button               
+                className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition-colors"
+                > Clear Cart </Button>
+              }
+              />
             </div>
             
             <div className="divide-y divide-gray-200">
-              {cartdata.cart.map((item) => (
+              {cartdata?.cart.map((item) => (
                 <div key={item._id} className="p-4 md:p-6 flex flex-col md:flex-row">
                   <div className="md:w-24 h-24 relative mb-4 md:mb-0">
                     <Image 
@@ -124,7 +131,6 @@ export default function CartPage() {
                     <div className="flex flex-col md:flex-row md:justify-between">
                       <div>
                         <h3 className="text-lg font-medium">{item.name}</h3>
-                        {/* <p className="text-gray-600 text-sm mt-1">Product ID: {item._id}</p> */}
                       </div>
                       <p className="text-lg font-semibold text-blue-600 mt-2 md:mt-0">
                         Rs. {item.price.toFixed(2)}
@@ -137,9 +143,10 @@ export default function CartPage() {
                           onClick={() => handleQuantityChange(item._id, -1)}
                           className="w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-gray-100"
                           disabled={item.qty <= 1}
-                        >
+                          >
+
                           -
-                        </button>
+                          </button>
                         <span className="w-12 text-center">{item.qty}</span>
                         <button
                           onClick={() => handleQuantityChange(item._id, 1)}
@@ -179,27 +186,20 @@ export default function CartPage() {
             <div className="space-y-3 mb-6">
               <div className="flex justify-between">
                 <span className="text-gray-600">Subtotal</span>
-                <span>Rs. {cartdata.totalPrice.toFixed(2)}</span>
+                <span>Rs. {cartdata?.totalPrice.toFixed(2)}</span>
               </div>
-              {/* <div className="flex justify-between">
-                <span className="text-gray-600">Shipping</span>
-                <span>Calculated at checkout</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Tax</span>
-                <span>Calculated at checkout</span>
-              </div> */}
+
               <div className="border-t border-gray-200 pt-3 mt-3 flex justify-between font-semibold">
                 <span>Total</span>
-                <span className="text-blue-600 text-xl">Rs. {cartdata.totalPrice.toFixed(2)}</span>
+                <span className="text-blue-600 text-xl">Rs. {cartdata?.totalPrice.toFixed(2)}</span>
               </div>
             </div>
             
             <button 
               className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition-colors"
               onClick={() => {
-                // Handle checkout logic
                 toast.info("Proceeding to checkout...");
+                
               }}
             >
               Proceed to Checkout
@@ -207,6 +207,7 @@ export default function CartPage() {
             
             
           </div>
+          <ToastContainer />
         </div>
       </div>
     </div>

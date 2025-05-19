@@ -6,6 +6,7 @@ import { Review, ReviewFecth } from '@/types/review';
 import { fetchReviews, handleDeleteReview } from '../function';
 import ReviewForm from './ReviewForm';
 import { ReviewsList } from './ReviewsList';
+import RatingStars from '../Header/Ratings';
 
 const MultiReviewProduct = ({ productId }: { productId: string }) => {
   const { user } = useClerk();
@@ -51,8 +52,10 @@ useEffect(() => {
 
 
             <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-6 rounded-xl text-center shadow-sm max-h-48 ">
-              <div className="text-5xl font-bold text-blue-600 mb-2">{Math.floor(avgRating)}</div>
+              <RatingStars rating={avgRating} size={8} />
+              <div className="text-2xl font-bold text-blue-600 my-2">{Math.floor(avgRating)}</div>
               <p className="text-sm text-gray-600 mt-1">out of 5</p>
+
               <p className="text-sm text-gray-600 mt-4 font-medium">Based on {reviewsObj.reviews.length} {reviewsObj.reviews.length === 1 ? 'review' : 'reviews'}</p>
 
             </div>
@@ -86,10 +89,10 @@ useEffect(() => {
 
               </>
             ) : (
-              // Show the Review Form on edit
+
               <ReviewForm
                 productId={productId}
-                selectedReview={selectedReview}
+                selectedReview={selectedReview as Review}
                 setSelectedReview={setSelectedReview}
                 setIsEditing={setIsEditing}
                 updateReviews={() => {

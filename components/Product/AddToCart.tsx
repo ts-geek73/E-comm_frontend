@@ -13,7 +13,7 @@ export default function AddToCartSection({ product }: { product: IProductData })
   useEffect(() => {
     const cart = getLocalCart();
     const qtnty = cart.products.find(
-      (item) => item.product_id.toString() === product._id.toString()
+      (item) => item.product._id.toString() === product._id.toString()
     );
     setQuantity(qtnty?.qty ?? 1);
   }, [product._id]);
@@ -31,7 +31,7 @@ export default function AddToCartSection({ product }: { product: IProductData })
   const handleAddToCart = async () => {
     console.log("Adding to cart:", { product_id: product._id, quantity });
     try {
-      const responce = await addToCart(product._id, quantity, user_id)
+      const responce = await addToCart(product, quantity, user_id)
 
       if (responce) {
         toast.success(`Product ${product.name} added in Cart`)

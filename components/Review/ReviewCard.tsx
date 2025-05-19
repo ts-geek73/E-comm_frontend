@@ -12,7 +12,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
   showActions = true
 }) => {
 
-    
+
   return (
     <div className="flex flex-col border border-gray-200 rounded-lg shadow-sm p-4 gap-3 bg-white transition-all hover:shadow-md">
       {/* Header with user info and rating */}
@@ -30,8 +30,34 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
 
         <div className="flex flex-col items-end">
           <div className="flex items-center gap-1.5">
-            <RatingStars rating={review.rate} showValue size={14} />
-            {/* <span className="font-semibold text-blue-600 text-sm">{review.rate}/5</span> */}
+            <RatingStars rating={review.rate} size={14} />
+            {showActions && onEdit && onDelete && (
+              <div className="flex justify-end gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={onEdit}
+                  className="flex items-center border-none gap-1.5 hover:bg-blue-50 hover:text-blue-400 shadow-none text-blue-700 h-8 px-2.5 "
+                >
+                  <Pencil className="w-3.5 h-3.5" />
+                </Button>
+
+                <ConfirmDelete
+                  title="Delete Review"
+                  description="Are you sure you want to delete this review? This action cannot be undone."
+                  onConfirm={onDelete}
+                  trigger={
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex items-center gap-1.5 hover:bg-red-100 hover:text-red-400 border-none shadow-none text-red-600 h-8 px-2.5"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </Button>
+                  }
+                />
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -55,38 +81,12 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
               {review.images.length} {review.images.length === 1 ? 'Photo' : 'Photos'}
             </h4>
           </div>
-          <ReviewImageGrid images={review.images}  />
+          <ReviewImageGrid images={review.images} />
         </div>
       )}
 
       {/* Action buttons */}
-      {showActions && onEdit && onDelete && (
-        <div className="flex justify-end gap-2 mt-1 pt-2 border-t border-gray-100">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onEdit}
-            className="flex items-center gap-1.5 hover:bg-blue-50 border-blue-200 text-blue-700 h-8 px-2.5 rounded-md"
-          >
-            <Pencil className="w-3.5 h-3.5" />
-          </Button>
-          
-          <ConfirmDelete
-            title="Delete Review"
-            description="Are you sure you want to delete this review? This action cannot be undone."
-            onConfirm={onDelete}
-            trigger={
-              <Button
-                variant="outline"
-                size="sm"
-                className="flex items-center gap-1.5 hover:bg-red-50 border-red-200 text-red-600 h-8 px-2.5 rounded-md"
-              >
-                <Trash2 className="w-3.5 h-3.5" />
-              </Button>
-            }
-          />
-        </div>
-      )}
+
     </div>
   );
 };

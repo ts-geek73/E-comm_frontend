@@ -1,16 +1,16 @@
 'use client';
 
+import AddToCartSection from "@/components/Product/AddToCart";
+import ProductCard from "@/components/Product/ProductCard";
+import { ProductImageGallery } from "@/components/Product/ProductGallery";
+import MultiReviewProduct from "@/components/Review/MainReview";
+import { useProductDetails } from "@/hooks";
 import {
     Shield,
-    ShoppingCart,
     TruckIcon
 } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
-import ProductCard from "@/components/Product/ProductCard";
-import { ProductImageGallery } from "@/components/Product/ProductGallery";
-import { useProductDetails } from "@/hooks";
-import MultiReviewProduct from "@/components/Review/MainReview";
-import AddToCartSection from "@/components/Product/AddToCart";
+import { ToastContainer } from "react-toastify";
 
 
 const ProductDetails: React.FC = () => {
@@ -101,7 +101,6 @@ const ProductDetails: React.FC = () => {
                 <div className="bg-white rounded-xl shadow-sm p-6 mb-12">
                     <h2 className="text-2xl font-bold text-gray-800 mb-4">Product Description</h2>
                     <div className="text-gray-600">
-                        {/* <p className="mb-4">{product.long_description || product.description}</p> */}
                         <p className="mb-4" dangerouslySetInnerHTML={{ __html: product.long_description }}></p>
                         
                     </div>
@@ -139,7 +138,7 @@ const ProductDetails: React.FC = () => {
                 <MultiReviewProduct 
                     productId={id} 
                 />
-
+                <ToastContainer position="bottom-right" />
             </div>
         </div>
     );

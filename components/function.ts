@@ -1,5 +1,5 @@
 import api from "@/lib/axios";
-import { BrandCategory, ICart, IProductData } from "@/types/product";
+import { BrandCategory, ICart, ICArtProductPayLoad, IProductData } from "@/types/product";
 import { ReviewFecth } from "@/types/review";
 import { AxiosError } from "axios";
 import { toast } from "react-toastify";
@@ -121,49 +121,81 @@ export function getLocalCart(): ICart {
   return { products: [] };
 }
 
+export const syncGuestCartOnLogin = async (user_id: string) => {
+  const cart = getLocalCart();
+
+  if (cart.products.length === 0) return;
+
+  try {
+    const response = await api.put('cart', {
+      user_id,
+      products: cart.products,
+    });
+
+    if (response.status === 200) {
+      localStorage.removeItem('cart');
+      console.log("Guest cart synced to user cart.");
+    }
+  } catch (error) {
+    console.error("Cart sync failed:", error);
+  }
+};
+
+
 export const addToCart = async (
-  product_id: string,
+  product: IProductData | ICArtProductPayLoad,  
   quantity: number,
   user_id: string
 ): Promise<boolean> => {
   const cart = getLocalCart();
 
-  const index = cart.products.findIndex(item => item.product_id === product_id);
+  const index = cart.products.findIndex(item => item.product._id === product._id);
 
   if (index >= 0) {
     cart.products[index].qty += quantity;
   } else {
     cart.products.push({
-      product_id,
+      product,
       qty: quantity,
     });
   }
 
-  localStorage.setItem('cart', JSON.stringify(cart));
-  console.log('Updated Cart:', cart);
+  if (!user_id || user_id.trim() === "") {
+    // Guest: store full product in localStorage
+    localStorage.setItem("cart", JSON.stringify(cart));
+    console.log("Updated Guest Cart:", cart);
+    return true;
+  }
 
-  if (user_id && user_id.trim() !== "") {
-    try {
-      const response = await api.put('cart', {
-        user_id,
-        products: cart.products,
-      });
+  // Logged-in user: sync with backend and store only IDs
+  try {
+    const payloadProducts = cart.products.map(item => ({
+      product: typeof item.product === "object" && "_id" in item.product ? item.product._id : item.product,
+      qty: item.qty,
+    }));
 
-      if (response.status === 200) {
-        localStorage.removeItem('cart'); 
-        return true;
-      }
-    } catch (error) {
-      console.error("Add to cart sync error:", error);
+    const response = await api.put("cart", {
+      user_id,
+      products: payloadProducts,
+    });
+
+    if (response.status === 200) {
+      localStorage.removeItem("cart");
+      return true;
     }
+  } catch (error) {
+    console.error("Add to cart sync error:", error);
   }
 
   return true;
 };
 
+
 export const fetchcart = async( user_id: string)=>{
   try {
     if (user_id && user_id !== "") {
+      await syncGuestCartOnLogin(user_id);
+
 
       const response = await api.get("/cart", { 
         params: { user_id }  
@@ -175,7 +207,7 @@ export const fetchcart = async( user_id: string)=>{
 
   }
   } catch (error) {
-    console.log("fetch Cart Prodcuct error");
+    console.log("fetch Cart Prodcuct error", error);
 
   } 
 }
@@ -188,7 +220,7 @@ export const removeFromCart = async (
     const cart = getLocalCart();
 
     cart.products = cart.products.filter(
-      item => item.product_id.toString() !== product_id.toString()
+      item => item.product._id.toString() !== product_id.toString()
     );
 
     localStorage.setItem("cart", JSON.stringify(cart));
@@ -210,14 +242,13 @@ export const removeFromCart = async (
   }
 };
 
-export const clearCart = async (user_id: string = ""): Promise<boolean> => {
+export const clearCart = async (user_id: string = ""): Promise<void> => {
   try {
-    // Clear local cart
+
     const emptyCart = { products: [] };
     localStorage.setItem("cart", JSON.stringify(emptyCart));
     console.log("Local cart cleared");
 
-    // If user is logged in, sync the cleared cart to backend
     if (user_id && user_id.trim() !== "") {
       const response = await api.delete("cart", {
         data :{  
@@ -227,13 +258,9 @@ export const clearCart = async (user_id: string = ""): Promise<boolean> => {
 
       if (response.status !== 200) {
         console.warn("Server cart clear failed");
-        return false;
       }
     }
 
-    return true;
   } catch (error) {
-    console.error("Error clearing cart:", error);
-    return false;
-  }
+    console.error("Error clearing cart:", error);  }
 };

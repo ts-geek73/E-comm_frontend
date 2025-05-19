@@ -74,7 +74,7 @@ export interface IProductPayload {
 }
 
 export interface ICartProduct{
-  product_id : string
+  product : IProductData | ICArtProductPayLoad
   qty : number,
   notes ?: string
 }

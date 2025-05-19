@@ -11,7 +11,6 @@ import {
 import { useProductFetch } from "@/hooks";
 import { IProductData } from "@/types/product";
 import Image from "next/image";
-import { useState } from "react";
 
 export default function EcommerceCarousel({ products }: { products?: IProductData[] }) {
     const shouldFetch = !products;
