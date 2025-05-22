@@ -1,6 +1,7 @@
 import type { UserResource } from '@clerk/types';
 import { IImageUrlWithFile, IProductData } from './product';
 import { Review } from './review';
+import { FieldErrors, FormState, UseFormRegister, UseFormSetValue } from 'react-hook-form';
 
 export interface CustomMenuHook {
   isLoaded: boolean;
@@ -54,10 +55,10 @@ export interface ProductFormProps {
 
 export interface AdminFormProps {
   productData?: IProductData;
-  onSuccess: (msg : string) => void;
-  formTitle?: string; 
-  formSubtitle?: string; 
-  purpose?: 'Create' | 'Update'; 
+  onSuccess: (msg: string) => void;
+  formTitle?: string;
+  formSubtitle?: string;
+  purpose?: 'Create' | 'Update';
   isEdit?: boolean;
 }
 
@@ -71,9 +72,9 @@ export interface ReviewImageGridProps {
 export interface ReviewsListProps {
   reviews: Review[];
   onEditReview: (review: Review) => void;
-  onDeleteReview: (args: { id: string; user_id: string })  => void;
-  showActions ?: boolean
-  emptyStateMessage : string
+  onDeleteReview: (args: { id: string; user_id: string }) => void;
+  showActions?: boolean
+  emptyStateMessage: string
 }
 
 
@@ -100,19 +101,93 @@ export interface RatingStarsProps {
 
 
 export interface FormValues {
-    _id : string
-    firstName: String
-    email: String
-    address: String
-    city: String
-    state: String
-    zip: String
-    country: String
-    phone: String
-        isDefault?: boolean; // optional if not always present
+  _id?: string
+  email?: string
+  address_name: string
+  address: string
+  city: string
+  state: string
+  zip: string
+  country: string
+  phone: string
+}
+
+export interface ExtendedFormValues extends FormValues {
+  billing: FormValues
+  shipping: FormValues
+  sameAsBilling: boolean
 }
 
 export interface CheckoutFormProps {
-    onSubmit: (data: FormValues) => void;
-    savedAddresses?: FormValues[];
+  onSubmit: (data: ExtendedFormValues) => void
+  savedAddresses?: FormValues[]
+  onAddAddress?: (address: FormValues) => void;
+  refreshAddresses?: () => Promise<void>
+
+}
+
+export type AddressKey = 'billing' | 'shipping';
+
+export interface AddressFormProps {
+  register: UseFormRegister<ExtendedFormValues>
+  errors: FormState<ExtendedFormValues>["errors"]
+  setValue: UseFormSetValue<ExtendedFormValues>
+  savedAddresses: FormValues[]
+  selectedAddressId: string | null
+  setSelectedAddressId: (id: string | null) => void
+  showNewAddressForm: boolean
+  setShowNewAddressForm: (show: boolean) => void
+  addressType: keyof ExtendedFormValues
+   refreshAddresses?: () => Promise<void> 
+  fieldPrefix: keyof ExtendedFormValues
+  onAddAddress?: (address: FormValues) => void
+
+}
+
+export interface SavedAddress {
+  _id?: string;
+  address_name: string;
+  address: string;
+  city: string;
+  state: string;
+  zip: string;
+  country: string;
+  phone: string;
+}
+
+export interface SavedAddressListProps {
+  savedAddresses: SavedAddress[];
+  selectedAddressId: string | null;
+  setSelectedAddressId: (id: string) => void;
+  addressType: keyof ExtendedFormValues
+  onAddNewAddress: () => void;
+}
+
+export interface ContactInfoFieldsProps {
+  register: UseFormRegister<ExtendedFormValues>;
+  errors: FormState<ExtendedFormValues>["errors"]
+  fieldPrefix: string;
+  userEmail?: string;
+}
+
+export interface AddressFieldsProps {
+  register: UseFormRegister<ExtendedFormValues>;
+  setValue: UseFormSetValue<ExtendedFormValues>;
+  errors: FormState<ExtendedFormValues>["errors"]
+  fieldPrefix: keyof ExtendedFormValues;
+}
+
+export interface NewAddressFormProps {
+  register: UseFormRegister<ExtendedFormValues>;
+  setValue: UseFormSetValue<ExtendedFormValues>;
+  errors: FieldErrors<FormValues>;
+  fieldPrefix:  keyof ExtendedFormValues;
+  userEmail?: string;
+  onCancel: () => void;
+}
+
+export interface SavedAddressCardProps {
+  address: SavedAddress;
+  isSelected: boolean;
+  onSelect: (id: string) => void;
 }

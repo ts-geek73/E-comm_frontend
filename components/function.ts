@@ -1,4 +1,5 @@
 import api from "@/lib/axios";
+import { FormValues } from "@/types/components";
 import { BrandCategory, ICart, ICArtProductPayLoad, IProductData } from "@/types/product";
 import { ReviewFecth } from "@/types/review";
 import { AxiosError } from "axios";
@@ -123,20 +124,20 @@ export function getLocalCart(): ICart {
 
 export const syncGuestCartOnLogin = async (user_id: string) => {
   const cart = getLocalCart();
-  console.log("Sync data", cart);
+  // console.log("Sync data", cart);
 
   if (cart.products.length === 0) return;
   const payloadProducts = cart.products.map(item => ({
     product_id:
       typeof item.product === "object" && "_id" in item.product
         ? item.product._id
-        : item.product, 
+        : item.product,
     qty: item.qty,
     notes: item.notes || ""
   }));
 
   console.log("Sync CAret Data:", payloadProducts);
-  
+
 
   try {
     const response = await api.put('cart', {
@@ -179,9 +180,9 @@ export const addToCart = async (
     return true;
   }
 
-  
+
   try {
-    await syncGuestCartOnLogin( user_id)
+    await syncGuestCartOnLogin(user_id)
 
   } catch (error) {
     console.error("Add to cart sync error:", error);
@@ -262,5 +263,42 @@ export const clearCart = async (user_id: string = ""): Promise<void> => {
 
   } catch (error) {
     console.error("Error clearing cart:", error);
+  }
+};
+
+export const deleteAddress = async (email: string, address: FormValues) => {
+  try {
+    const response = await api.delete(`address`, {
+      params: { email },
+      data: { address },
+    });
+
+
+    return response.data.message as string;
+  } catch (error: any) {
+    console.error('Delete Address Error:', error.response.data);
+  }
+};
+
+export const saveAddresses = async (
+  email: string,
+  addresses: FormValues[]
+) => {
+  try {
+    const res = await api.post('/address', { email, addresses });
+    return res.data.data.addresses;
+  } catch (error: any) {
+    console.error('Save Address Error:', error.response?.data || error.message);
+  }
+};
+
+export const getAddresses = async (email: string) => {
+  try {
+    const res = await api.get(`address?email=${email}`);
+    // console.log("get Address", res.data);
+
+    return res.data.data;
+  } catch (error: any) {
+    console.error('Get Addresses Error:', error.response?.data || error.message);
   }
 };

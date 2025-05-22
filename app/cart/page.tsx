@@ -62,7 +62,6 @@ export default function CartPage() {
     const newQuantity = item.qty + change;
     if (newQuantity < 1) return;
 
-    // Set the item as being updated
     setItemsBeingUpdated(prev => {
       const updated = new Set(prev);
       updated.add(productId);
@@ -145,7 +144,7 @@ export default function CartPage() {
             <ShoppingCart size={64} className="text-blue-600" />
           </div>
           <h2 className="text-2xl font-bold mb-2 text-blue-600">Your cart is empty</h2>
-          <p className="text-gray-600 mb-6">Looks like you haven't added any products to your cart yet.</p>
+          <p className="text-gray-600 mb-6">Looks like you have not added any products to your cart yet.</p>
           <Link href="/products" className="inline-flex items-center bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-lg transition-colors duration-300 shadow-md hover:shadow-lg">
             <ArrowLeft size={20} className="mr-2" />
             Continue Shopping
@@ -334,7 +333,7 @@ export default function CartPage() {
         </div>
 
       </div>
-      <ToastContainer position="bottom-right" autoClose={3000} />
+      <ToastContainer autoClose={3000} />
     </div>
   );
 }

@@ -1,0 +1,68 @@
+import { AddressFormProps } from "@/types/components";
+import { useUser } from "@clerk/nextjs";
+import { NewAddressForm } from "./NewAddressForm";
+import { SavedAddressList } from "./SavedAddressList";
+
+export default function AddressForm({
+  register,
+  errors,
+  setValue,
+  savedAddresses = [],
+  selectedAddressId,
+  setSelectedAddressId,
+  showNewAddressForm,
+  setShowNewAddressForm,
+  addressType,
+  fieldPrefix,
+   refreshAddresses
+}: AddressFormProps) {
+  const { user } = useUser();
+
+  const handleAddNewAddress = () => {
+    setShowNewAddressForm(true);
+  };
+
+  const handleCancelNewAddress = () => {
+    setShowNewAddressForm(false);
+  };
+    const addressList = Array.isArray(savedAddresses) ? savedAddresses : [];
+    console.log("Address FOrm",savedAddresses);
+    
+
+  return (
+    <div className="space-y-6">
+      {addressList.length > 0 && !showNewAddressForm && (
+        <>
+          <SavedAddressList
+            savedAddresses={addressList}
+            selectedAddressId={selectedAddressId}
+            setSelectedAddressId={setSelectedAddressId}
+            addressType={addressType}
+            onAddNewAddress={handleAddNewAddress} 
+            userEmail={user?.emailAddresses[0].emailAddress!} 
+            refreshAddresses={ refreshAddresses!}
+            />
+
+          {showNewAddressForm && (
+            <div className="flex items-center mt-4">
+              <div className="flex-grow border-t border-gray-200"></div>
+              <span className="px-3 text-sm text-gray-500">Enter new address details</span>
+              <div className="flex-grow border-t border-gray-200"></div>
+            </div>
+          )}
+        </>
+      )}
+
+      {(addressList.length === 0 || showNewAddressForm) && (
+        <NewAddressForm
+          register={register}
+          setValue={setValue}
+          errors={errors}
+          fieldPrefix={fieldPrefix}
+          userEmail={user?.emailAddresses[0].emailAddress}
+          onCancel={handleCancelNewAddress}
+        />
+      )}
+    </div>
+  )
+}

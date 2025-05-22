@@ -1,39 +1,49 @@
 "use client"
 
-import { ShoppingBag, MapPin, Phone } from "lucide-react"
+import { ShoppingBag } from "lucide-react"
 import Image from "next/image"
 import { useCallback, useEffect, useState } from "react"
 
-import { fetchcart, getLocalCart } from "@/components/function"
+import { fetchcart, getAddresses, getLocalCart, saveAddresses } from "@/components/function"
+import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
+import { FormValues, ExtendedFormValues } from "@/types/components"
 import { ICartresponce } from "@/types/product"
 import { useUser } from "@clerk/nextjs"
 import { toast } from "react-toastify"
-import CheckoutForm from "../../components/CheckOut/CheckOutFOrm"
-import { FormValues } from "@/types/components"
+import CheckoutForm from "@/components/CheckOut/CheckOutFOrm"
 
 export default function CheckoutPage() {
     const [cartdata, setCartdata] = useState<ICartresponce | null>(null);
-    const { user } = useUser();
+    const { isSignedIn, user, isLoaded } = useUser();
     const [promoCode, setPromoCode] = useState("")
     const rupeeSymbol = "Rs."
     const [promoApplied, setPromoApplied] = useState(false)
-    const [savedAddresses] = useState<FormValues[]>([
-        {
-            _id: "1",
-            firstName: "John",
-            email: "john.doe@example.com",
-            address: "123 Main St",
-            city: "Surat",
-            state: "gujarat",
-            zip: "395007",
-            country: "india",
-            phone: "(123) 456-7890",
-            isDefault: true
+    const [savedAddresses, setSavedAddresses] = useState<FormValues[] | null>();
+
+    const fetchAddresses = async () => {
+        if (!user?.emailAddresses?.[0]?.emailAddress) {
+            console.log("No user email found");
+            return;
         }
-    ])
+
+        try {
+            const data = await getAddresses(user.emailAddresses[0].emailAddress);
+            console.log("Fetched addresses:", data);
+            setSavedAddresses(data?.addresses || []);
+        } catch (error) {
+            console.error("Failed to fetch addresses", error);
+        }
+    };
+    useEffect(() => {
+
+        fetchAddresses();
+    }, [user?.emailAddresses?.[0]?.emailAddress]);
+
+
+
+
 
     const loadCart = useCallback(async () => {
         try {
@@ -75,10 +85,45 @@ export default function CheckoutPage() {
         }
     }
 
-    const handleCheckoutSubmit = (data: any) => {
-        console.log("Form data:", data)
+    const handleCheckoutSubmit = (data: ExtendedFormValues) => {
+        console.log("Address data:=", data)
+        console.log("CArt Product:=", cartdata);
+        console.log("total Price:=", getTotalPrice());
+
+
         toast.success("Order placed successfully!")
     }
+
+const handleAddAddress = async (newAddress: FormValues) => {
+  if (!user?.emailAddresses?.[0]?.emailAddress) {
+    toast.error("User email not found. Cannot save address.");
+    return;
+  }
+
+  const email = user.emailAddresses[0].emailAddress;
+
+  // Optimistically update UI
+  setSavedAddresses(prev => {
+    const updatedAddresses = prev ? [...prev, newAddress] : [newAddress];
+    
+    // Send updated addresses to server
+    saveAddresses(email, updatedAddresses)
+      .then((savedAddresses) => {
+        if (savedAddresses) {
+          setSavedAddresses(savedAddresses); // Sync with server response
+          toast.success("Address saved successfully!");
+        } else {
+          toast.error("Failed to save address on server.");
+        }
+      })
+      .catch(() => {
+        toast.error("Error saving address.");
+      });
+
+    return updatedAddresses; // immediately update UI
+  });
+};
+    
 
     // Calculate the discounted price if promo is applied
     const getDiscountAmount = () => {
@@ -95,14 +140,26 @@ export default function CheckoutPage() {
         return 0
     }
 
+    if (!isLoaded) {
+        return <div>Loading...</div>;
+    }
+
+    if (!isSignedIn) {
+        return <div>Sign in to view this page</div>;
+    }
+
+
     return (
         <div className="container mx-auto px-4 py-8">
             <div className="flex flex-col-reverse lg:flex-row gap-8">
 
                 <div className="lg:w-2/3">
-                    <CheckoutForm 
-                        onSubmit={handleCheckoutSubmit} 
-                        savedAddresses={savedAddresses ?? []} 
+                    <CheckoutForm
+                        onSubmit={handleCheckoutSubmit}
+                        savedAddresses={savedAddresses ?? undefined}
+                        onAddAddress={handleAddAddress}
+                        refreshAddresses={fetchAddresses}
+
                     />
                 </div>
 
@@ -151,13 +208,13 @@ export default function CheckoutPage() {
                                         </Button>
                                     </div>
                                     {promoApplied && (
-                                        <p className="text-xs text-green-600">Promo code "DISCOUNT10" applied successfully!</p>
+                                        <p className="text-xs text-green-600">{`Promo code "DISCOUNT10" applied successfully!`}</p>
                                     )}
                                     {promoCode && !promoApplied && (
-                                        <p className="text-xs text-gray-500">Try "DISCOUNT10" for 10% off</p>
+                                        <p className="text-xs text-gray-500">{`Try "DISCOUNT10" for 10% off`}</p>
                                     )}
                                 </div>
-                                
+
                                 <div className="space-y-3 pt-2">
                                     <div className="flex items-center justify-between text-sm">
                                         <span className="text-gray-600">Subtotal</span>
