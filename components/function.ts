@@ -288,7 +288,7 @@ export const saveAddresses = async (
     const res = await api.post('/address', { email, addresses });
     return res.data.data.addresses;
   } catch (error: any) {
-    console.error('Save Address Error:', error.response?.data || error.message);
+    console.log('Save Address Error:', error.response?.data || error.message);
   }
 };
 

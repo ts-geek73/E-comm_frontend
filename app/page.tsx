@@ -18,7 +18,6 @@ export default function Home() {
         {/* <HeaderComp /> */}
         <Carousel />
         <ProductList  />
-        {/* <ToastContainer /> */}
       </div>
 </>
   );

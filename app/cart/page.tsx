@@ -9,6 +9,7 @@ import { useUser } from "@clerk/nextjs";
 import { ArrowLeft, ShoppingBag, Trash2, Loader2, Plus, Minus, ShoppingCart } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -16,6 +17,7 @@ import "react-toastify/dist/ReactToastify.css";
 export default function CartPage() {
   const [cartdata, setCartdata] = useState<ICartresponce | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const router = useRouter();
   const [itemsBeingUpdated, setItemsBeingUpdated] = useState<Set<string>>(new Set());
   const { user } = useUser();
   const user_id = user ? user.id : "";
@@ -121,9 +123,8 @@ export default function CartPage() {
   };
 
   const handleCheckout = () => {
-    // Redirect to checkout page
-    window.location.href = "/checkout";
-  };
+    router.push('/checkout')
+    };
 
   if (isLoading) {
     return (
@@ -333,7 +334,6 @@ export default function CartPage() {
         </div>
 
       </div>
-      <ToastContainer autoClose={3000} />
     </div>
   );
 }

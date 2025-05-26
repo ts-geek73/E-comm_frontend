@@ -181,9 +181,7 @@ const ProductTable: React.FC = () => {
                     isEdit={true}
                 />
             )}
-
-            <ToastContainer />
-
+            
             {totalProducts > 0 && (
                 <PaginationComp
                     length={totalProducts}

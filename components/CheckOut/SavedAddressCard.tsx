@@ -28,7 +28,6 @@ export function SavedAddressCard({ address, isSelected, onSelect }: SavedAddress
           <div className="text-sm text-gray-600 mt-2">{address.phone}</div>
         </div>
       </div>
-      <ToastContainer />
     </div>
   )
 }

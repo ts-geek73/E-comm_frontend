@@ -5,6 +5,7 @@ import "./globals.css";
 import {
   ClerkProvider
 } from '@clerk/nextjs'
+import { ToastContainer } from "react-toastify";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,24 +28,25 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider 
-    data-new-gr-c-s-check-loaded="14.1223.0"
-    data-gr-ext-installed="">
-     <html lang="en" suppressHydrationWarning>
-       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-           <HeadBar />
-         <header className="flex justify-end items-center">
-           {/* <SignedOut>
+    <ClerkProvider
+      data-new-gr-c-s-check-loaded="14.1223.0"
+      data-gr-ext-installed="">
+      <html lang="en" suppressHydrationWarning>
+        <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+          <HeadBar />
+          <header className="flex justify-end items-center">
+            {/* <SignedOut>
              <SignInButton />
              <SignUpButton />
            </SignedOut>
            <SignedIn>
              <UserButton />
            </SignedIn> */}
-         </header >
-         {children}
-       </body>
-     </html>
-   </ClerkProvider>
+          </header >
+          {children}
+          <ToastContainer />
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }

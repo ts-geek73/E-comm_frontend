@@ -138,7 +138,6 @@ const ProductDetails: React.FC = () => {
                 <MultiReviewProduct 
                     productId={id} 
                 />
-                <ToastContainer position="bottom-right" />
             </div>
         </div>
     );

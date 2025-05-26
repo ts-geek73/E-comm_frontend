@@ -1,7 +1,8 @@
 import type { UserResource } from '@clerk/types';
-import { IImageUrlWithFile, IProductData } from './product';
+import { ICartresponce, IImageUrlWithFile, IProductData } from './product';
 import { Review } from './review';
 import { FieldErrors, FormState, UseFormRegister, UseFormSetValue } from 'react-hook-form';
+import { Dispatch, SetStateAction } from 'react';
 
 export interface CustomMenuHook {
   isLoaded: boolean;
@@ -121,7 +122,6 @@ export interface ExtendedFormValues extends FormValues {
 export interface CheckoutFormProps {
   onSubmit: (data: ExtendedFormValues) => void
   savedAddresses?: FormValues[]
-  onAddAddress?: (address: FormValues) => void;
   refreshAddresses?: () => Promise<void>
 
 }
@@ -184,10 +184,19 @@ export interface NewAddressFormProps {
   fieldPrefix:  keyof ExtendedFormValues;
   userEmail?: string;
   onCancel: () => void;
+  onSave: (address: FormValues) => void;
 }
 
 export interface SavedAddressCardProps {
   address: SavedAddress;
   isSelected: boolean;
   onSelect: (id: string) => void;
+}
+
+export interface OrderSummaryProps {
+    cartdata: ICartresponce | null
+    promoCode: string
+    setPromoCode: Dispatch<SetStateAction<string>>
+    promoApplied: boolean
+    setPromoApplied: Dispatch<SetStateAction<boolean>>
 }

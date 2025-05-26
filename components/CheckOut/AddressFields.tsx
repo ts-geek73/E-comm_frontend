@@ -14,6 +14,7 @@ export function AddressFields({ register, setValue, errors, fieldPrefix }: Addre
         <Input
           id={`${fieldPrefix}-address_name`}
           placeholder="Home, Office"
+          required
           className="border-blue-200 focus:border-blue-500"
           {...register(`${fieldPrefix}.address_name` as keyof ExtendedFormValues, { required: "Name is required" })}
         />
@@ -27,6 +28,7 @@ export function AddressFields({ register, setValue, errors, fieldPrefix }: Addre
         <Input
           id={`${fieldPrefix}-address`}
           placeholder="123 Main St, Apt 4B"
+          required
           className="border-blue-200 focus:border-blue-500"
           {...register(`${fieldPrefix}.address` as keyof ExtendedFormValues, { required: "Address is required" })}
         />
@@ -40,6 +42,7 @@ export function AddressFields({ register, setValue, errors, fieldPrefix }: Addre
           <Label htmlFor={`${fieldPrefix}-city`} className="text-blue-800">City</Label>
           <Input
             id={`${fieldPrefix}-city`}
+            required
             placeholder="Surat"
             className="border-blue-200 focus:border-blue-500"
             {...register(`${fieldPrefix}.city` as keyof ExtendedFormValues, { required: "City is required" })}
@@ -50,7 +53,7 @@ export function AddressFields({ register, setValue, errors, fieldPrefix }: Addre
         </div>
         <div className="space-y-2">
           <Label htmlFor={`${fieldPrefix}-state`} className="text-blue-800">State</Label>
-          <Select onValueChange={value => setValue(`${fieldPrefix}.state` as keyof ExtendedFormValues, value)}>
+          <Select onValueChange={value => setValue(`${fieldPrefix}.state` as keyof ExtendedFormValues, value)} required>
             <SelectTrigger id={`${fieldPrefix}-state`} className="border-blue-200 focus:border-blue-500">
               <SelectValue placeholder="Select state" />
             </SelectTrigger>
@@ -73,6 +76,7 @@ export function AddressFields({ register, setValue, errors, fieldPrefix }: Addre
           <Label htmlFor={`${fieldPrefix}-zip`} className="text-blue-800">ZIP Code</Label>
           <Input
             id={`${fieldPrefix}-zip`}
+            required
             placeholder="395007"
             className="border-blue-200 focus:border-blue-500"
             {...register(`${fieldPrefix}.zip` as keyof ExtendedFormValues, {
@@ -89,7 +93,7 @@ export function AddressFields({ register, setValue, errors, fieldPrefix }: Addre
         </div>
         <div className="space-y-2">
           <Label htmlFor={`${fieldPrefix}-country`} className="text-blue-800">Country</Label>
-          <Select onValueChange={value => setValue(`${fieldPrefix}.country` as keyof ExtendedFormValues, value)} defaultValue="india">
+          <Select onValueChange={value => setValue(`${fieldPrefix}.country` as keyof ExtendedFormValues, value)} required>
             <SelectTrigger id={`${fieldPrefix}-country`} className="border-blue-200 focus:border-blue-500">
               <SelectValue placeholder="Select country" />
             </SelectTrigger>

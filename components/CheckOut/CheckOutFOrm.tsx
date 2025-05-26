@@ -9,15 +9,17 @@ import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import AddressForm from "./AddressForm"
 import { toast, ToastContainer } from "react-toastify"
+import { useUser } from "@clerk/nextjs"
+import { saveAddresses } from "../function"
 
-export default function CheckoutForm({ onSubmit, savedAddresses = [], onAddAddress, refreshAddresses }: CheckoutFormProps) {
+export default function CheckoutForm({ onSubmit, savedAddresses = [], refreshAddresses }: CheckoutFormProps) {
   const [selectedBillingId, setSelectedBillingId] = useState<string | null>(null)
   const [showNewBillingForm, setShowNewBillingForm] = useState(!savedAddresses.length)
   const [selectedShippingId, setSelectedShippingId] = useState<string | null>(null)
   const [showNewShippingForm, setShowNewShippingForm] = useState(!savedAddresses.length)
   const [sameAsBilling, setSameAsBilling] = useState(false)
+  const { user } = useUser();
 
-  console.log("CheckOut Formn", savedAddresses);
 
   useEffect(() => {
     setShowNewBillingForm(!savedAddresses.length)
@@ -29,12 +31,16 @@ export default function CheckoutForm({ onSubmit, savedAddresses = [], onAddAddre
     register,
     handleSubmit,
     setValue,
+    getValues,
     watch,
     formState: { errors },
     trigger
   } = useForm<ExtendedFormValues>()
 
   const billingData = watch("billing")
+  // console.log(billingData);
+  
+  const addressList = Array.isArray(savedAddresses) ? savedAddresses : [];
 
   useEffect(() => {
     if (sameAsBilling && billingData) {
@@ -44,28 +50,50 @@ export default function CheckoutForm({ onSubmit, savedAddresses = [], onAddAddre
     }
   }, [sameAsBilling, billingData, setValue])
 
-  const handleAddNewAddress = (address: FormValues, addressType: 'billing' | 'shipping') => {
+  const handleAddNewAddress = async (address: FormValues, addressType: 'billing' | 'shipping') => {
+    if (!user?.emailAddresses?.[0]?.emailAddress) {
+      toast.error("User email not found. Cannot save address.");
+      return;
+    }
+
+    const email = user.emailAddresses[0].emailAddress;
+
     const newAddress = {
       ...address,
       _id: `${addressType}_${Date.now()}`,
-      addressType: addressType,
+      addressType,
+    };
+
+    const updatedAddresses = [...savedAddresses, newAddress];
+    const cleanedAddresses = updatedAddresses.map(({ _id, ...rest }) => rest);
+
+
+    try {
+      console.log("before db :=", cleanedAddresses);
+      
+      const saved = await saveAddresses(email, cleanedAddresses);
+      if (saved) {
+        refreshAddresses?.();
+      } else {
+        toast.error("Failed to save address on server.");
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error("Error saving address.");
     }
 
-    if (onAddAddress) {
-      onAddAddress(newAddress)
-    }
-
-    // Set the newly added address as selected
-    if (addressType === 'billing') {
-      setSelectedBillingId(newAddress._id)
-      setShowNewBillingForm(false)
+    // Select this as the active address
+    if (addressType === "billing") {
+      setSelectedBillingId(newAddress._id);
+      setShowNewBillingForm(false);
     } else {
-      setSelectedShippingId(newAddress._id)
-      setShowNewShippingForm(false)
+      setSelectedShippingId(newAddress._id);
+      setShowNewShippingForm(false);
     }
 
-    toast.success(`${addressType === 'billing' ? 'Billing' : 'Shipping'} address saved successfully!`)
-  }
+    toast.success(`${addressType === "billing" ? "Billing" : "Shipping"} address saved successfully!`);
+  };
+
 
   const validateAddressSelection = () => {
     let isValid = true
@@ -152,7 +180,6 @@ export default function CheckoutForm({ onSubmit, savedAddresses = [], onAddAddre
     } as ExtendedFormValues)
   }
 
-  const addressList = Array.isArray(savedAddresses) ? savedAddresses : [];
 
 
   return (
@@ -186,6 +213,7 @@ export default function CheckoutForm({ onSubmit, savedAddresses = [], onAddAddre
                   register={register}
                   errors={errors}
                   setValue={setValue}
+                  getValues={getValues}
                   savedAddresses={addressList}
                   selectedAddressId={selectedBillingId}
                   setSelectedAddressId={setSelectedBillingId}
@@ -221,6 +249,7 @@ export default function CheckoutForm({ onSubmit, savedAddresses = [], onAddAddre
                       register={register}
                       errors={errors}
                       setValue={setValue}
+                      getValues={getValues}
                       savedAddresses={addressList}
                       selectedAddressId={selectedShippingId}
                       setSelectedAddressId={setSelectedShippingId}
@@ -299,7 +328,6 @@ export default function CheckoutForm({ onSubmit, savedAddresses = [], onAddAddre
           </div>
         </form>
       </CardContent>
-      <ToastContainer />
     </Card>
   )
 }

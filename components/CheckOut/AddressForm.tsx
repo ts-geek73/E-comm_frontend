@@ -1,7 +1,9 @@
-import { AddressFormProps } from "@/types/components";
+import { AddressFormProps, ExtendedFormValues, FormValues } from "@/types/components";
 import { useUser } from "@clerk/nextjs";
 import { NewAddressForm } from "./NewAddressForm";
 import { SavedAddressList } from "./SavedAddressList";
+import { useFormContext } from "react-hook-form";
+
 
 export default function AddressForm({
   register,
@@ -10,12 +12,14 @@ export default function AddressForm({
   savedAddresses = [],
   selectedAddressId,
   setSelectedAddressId,
+  getValues,
   showNewAddressForm,
   setShowNewAddressForm,
   addressType,
+  onAddAddress,
   fieldPrefix,
-   refreshAddresses
-}: AddressFormProps) {
+  refreshAddresses
+}: AddressFormProps & { getValues: () => FormValues }) {
   const { user } = useUser();
 
   const handleAddNewAddress = () => {
@@ -25,9 +29,7 @@ export default function AddressForm({
   const handleCancelNewAddress = () => {
     setShowNewAddressForm(false);
   };
-    const addressList = Array.isArray(savedAddresses) ? savedAddresses : [];
-    console.log("Address FOrm",savedAddresses);
-    
+  const addressList = Array.isArray(savedAddresses) ? savedAddresses : [];
 
   return (
     <div className="space-y-6">
@@ -38,10 +40,10 @@ export default function AddressForm({
             selectedAddressId={selectedAddressId}
             setSelectedAddressId={setSelectedAddressId}
             addressType={addressType}
-            onAddNewAddress={handleAddNewAddress} 
-            userEmail={user?.emailAddresses[0].emailAddress!} 
-            refreshAddresses={ refreshAddresses!}
-            />
+            onAddNewAddress={handleAddNewAddress}
+            userEmail={user?.emailAddresses[0].emailAddress!}
+            refreshAddresses={refreshAddresses!}
+          />
 
           {showNewAddressForm && (
             <div className="flex items-center mt-4">
@@ -61,6 +63,8 @@ export default function AddressForm({
           fieldPrefix={fieldPrefix}
           userEmail={user?.emailAddresses[0].emailAddress}
           onCancel={handleCancelNewAddress}
+          formValues={getValues() as ExtendedFormValues}
+          onSave={(values) => onAddAddress?.(values)}
         />
       )}
     </div>

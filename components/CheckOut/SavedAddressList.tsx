@@ -17,8 +17,6 @@ export function SavedAddressList({
   refreshAddresses,
 }: SavedAddressListProps & { userEmail: string, refreshAddresses: () => Promise<void> }) {
 
-  console.log("Saved LIst:=", savedAddresses);
-
   const [addressToDelete, setAddressToDelete] = useState<SavedAddress | null>(null);
 
   const handleDeleteConfirm = async () => {
@@ -78,7 +76,6 @@ export function SavedAddressList({
       </div>
 
 
-      <ToastContainer />
     </div>
   )
 }

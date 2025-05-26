@@ -597,7 +597,6 @@ const ProductForm: React.FC<AdminFormProps> = ({
                     </Form>
                 </div>
             </div>
-            <ToastContainer />
         </>
     );
 };

@@ -18,8 +18,6 @@ const CreateProduceComp: React.FC = () => {
                 isEdit={false}
             />
             
-            <ToastContainer />
-
         </>
     );
 };

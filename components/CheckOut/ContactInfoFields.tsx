@@ -41,6 +41,7 @@ export function ContactInfoFields({ register, errors, fieldPrefix, userEmail }: 
         <Input
           id={`${fieldPrefix}-phone`}
           placeholder="(123) 456-7890"
+          required
           className="border-blue-200 focus:border-blue-500"
           {...register(`${fieldPrefix}.phone` as keyof ExtendedFormValues, {
             pattern: {
