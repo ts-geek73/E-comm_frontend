@@ -1,6 +1,5 @@
 import { SavedAddressCardProps } from "@/types/components";
 import { useUser } from "@clerk/nextjs";
-import { ToastContainer } from "react-toastify";
 
 export function SavedAddressCard({ address, isSelected, onSelect }: SavedAddressCardProps) {
   const { user } = useUser()

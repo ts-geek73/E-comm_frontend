@@ -199,4 +199,5 @@ export interface OrderSummaryProps {
     setPromoCode: Dispatch<SetStateAction<string>>
     promoApplied: boolean
     setPromoApplied: Dispatch<SetStateAction<boolean>>
+    setFinalAmount: (amount: number) => void;
 }

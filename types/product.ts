@@ -98,3 +98,18 @@ export interface ICartresponce {
   totalItems: number
   totalPrice: number
 }
+
+export interface PromoCode {
+    _id: string;
+    code: string;
+    type: 'flat' | 'percentage';
+    amount: number;
+    expiryDate: string;
+}
+
+export interface FetchParams {
+  page?: number;
+  limit?: number;
+  sortField?: string;
+  sortOrder?: 'asc' | 'desc';
+}

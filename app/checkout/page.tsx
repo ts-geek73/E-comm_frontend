@@ -2,7 +2,7 @@
 
 import CheckoutForm from "@/components/CheckOut/CheckOutFOrm"
 import OrderSummary from "@/components/CheckOut/OrderSummary"
-import { fetchcart, getAddresses, getLocalCart } from "@/components/function"
+import { fetchcart, getAddresses, getLocalCart, makePayMent } from "@/components/function"
 import { ExtendedFormValues, FormValues } from "@/types/components"
 import { ICartresponce } from "@/types/product"
 import { useUser } from "@clerk/nextjs"
@@ -11,6 +11,7 @@ import { toast } from "react-toastify"
 
 export default function CheckoutPage() {
     const [cartdata, setCartdata] = useState<ICartresponce | null>(null);
+    const [finalAmount, setFinalAmount] = useState<number>(0);
     const { isSignedIn, user, isLoaded } = useUser();
     const [promoCode, setPromoCode] = useState("")
     const [promoApplied, setPromoApplied] = useState(false)
@@ -66,20 +67,18 @@ export default function CheckoutPage() {
         loadCart();
     }, [loadCart]);
 
-    const handleCheckoutSubmit = (data: ExtendedFormValues) => {
+    const handleCheckoutSubmit = async (data: ExtendedFormValues) => {
         console.log("Address data:=", data)
         console.log("CArt Product:=", cartdata);
-        console.log("total Price:=", getTotalPrice());
-
-
-        toast.success("Order placed successfully!")
-    }
-
-    const getTotalPrice = () => {
-        if (cartdata) {
-            return promoApplied ? cartdata.totalPrice * 0.9 : cartdata.totalPrice
+        console.log("final price:=", finalAmount);
+        if (!finalAmount || !cartdata) {
+            toast.error("Something went wrong. Please try again.");
+            return;
         }
-        return 0
+
+        await makePayMent(cartdata!, finalAmount)
+
+        // toast.success("Order placed successfully!")
     }
 
     if (!isLoaded) {
@@ -112,6 +111,7 @@ export default function CheckoutPage() {
                             promoCode={promoCode}
                             setPromoCode={setPromoCode}
                             promoApplied={promoApplied}
+                            setFinalAmount={setFinalAmount}
                             setPromoApplied={setPromoApplied}
                         />
                     </div>

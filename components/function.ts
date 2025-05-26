@@ -1,8 +1,10 @@
 import api from "@/lib/axios";
+import getStripe from "@/lib/get-stripe";
 import { FormValues } from "@/types/components";
-import { BrandCategory, ICart, ICArtProductPayLoad, IProductData } from "@/types/product";
+import { BrandCategory, FetchParams, ICart, ICArtProductPayLoad, ICartresponce, IProductData, PromoCode } from "@/types/product";
 import { ReviewFecth } from "@/types/review";
 import { AxiosError } from "axios";
+
 import { toast } from "react-toastify";
 
 export const handleEditClick = (
@@ -300,5 +302,75 @@ export const getAddresses = async (email: string) => {
     return res.data.data;
   } catch (error: any) {
     console.error('Get Addresses Error:', error.response?.data || error.message);
+  }
+};
+
+export const fetchPromos = async ({ page = 1, limit = 12, sortField = 'createdAt', sortOrder = 'desc' }: FetchParams) => {
+  try {
+    const { data } = await api.get(`/promocode?page=${page}&limit=${limit}&sortField=${sortField}&sortOrder=${sortOrder}`);
+    return (data?.data);
+  } catch (err: any) {
+    return (err.message || 'Failed to fetch');
+  }
+};
+
+export const deletePromo = async (_id: string): Promise<void> => {
+  await api.delete(`/promocode/${_id}`);
+};
+
+export const savePromo = async (promo: PromoCode): Promise<void> => {
+  if (promo._id) {
+    await api.put(`/promocode/${promo._id}`, promo);
+  } else {
+    await api.post('/promocode', promo);
+  }
+};
+
+// components/function.ts
+export const validatePromo = async (code: string, amount: number) => {
+  try {
+    const response = await api.get(`/promocode?code=${code}&amount=${amount}`);
+    return response.data;
+  } catch (err: any) {
+    throw new Error(err.response?.data?.message || "Invalid promo code");
+  }
+};
+
+
+export const makePayMent = async (cartData: ICartresponce, totalPrice: number) => {
+  try {
+    console.log("enter");
+    
+    const stripe = await getStripe();
+    console.log("exit");
+    
+    if (!stripe) {
+      console.log("Stripe failed to load");
+      toast.error("Stripe failed to load");
+      return;
+    }
+    console.log("pass stripe 1");
+    
+    const body = {
+      products: cartData,
+      totalPrice,
+    };
+
+    console.log("Data for the Payment:=", body);
+    
+
+    const response = await api.post(`/payment/create-checkout-session`, { 
+      body
+    });
+
+    const sessionId = response.data.session.id;
+
+    const result = await stripe.redirectToCheckout({ sessionId });
+
+    if (result.error) {
+      console.error("Stripe checkout error:", result.error.message);
+    }
+  } catch (error) {
+    console.error("Payment initiation failed:", error);
   }
 };

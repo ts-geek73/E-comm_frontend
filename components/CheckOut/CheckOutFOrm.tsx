@@ -37,9 +37,7 @@ export default function CheckoutForm({ onSubmit, savedAddresses = [], refreshAdd
     trigger
   } = useForm<ExtendedFormValues>()
 
-  const billingData = watch("billing")
-  // console.log(billingData);
-  
+  const billingData = watch("billing")  
   const addressList = Array.isArray(savedAddresses) ? savedAddresses : [];
 
   useEffect(() => {

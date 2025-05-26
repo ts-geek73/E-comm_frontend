@@ -1,11 +1,11 @@
 import { SavedAddress, SavedAddressListProps } from "@/types/components";
-import { Button } from "../ui/button";
-import { SavedAddressCard } from "./SavedAddressCard";
 import { MapPin, Trash2 } from "lucide-react";
 import { useState } from "react";
+import { toast } from "react-toastify";
 import { deleteAddress } from "../function";
-import { toast, ToastContainer } from "react-toastify";
 import ConfirmDelete from "../Header/ConfirmDelete";
+import { Button } from "../ui/button";
+import { SavedAddressCard } from "./SavedAddressCard";
 
 export function SavedAddressList({
   savedAddresses,
