@@ -126,7 +126,7 @@ export function getLocalCart(): ICart {
 
 export const syncGuestCartOnLogin = async (user_id: string) => {
   const cart = getLocalCart();
-  // console.log("Sync data", cart);
+  console.log("Sync data", cart);
 
   if (cart.products.length === 0) return;
   const payloadProducts = cart.products.map(item => ({
@@ -175,9 +175,9 @@ export const addToCart = async (
     });
   }
 
+  localStorage.setItem("cart", JSON.stringify(cart));
   if (!user_id || user_id.trim() === "") {
     // Guest: store full product in localStorage
-    localStorage.setItem("cart", JSON.stringify(cart));
     console.log("Updated Guest Cart:", cart);
     return true;
   }
@@ -340,7 +340,7 @@ export const validatePromo = async (codes: string[], amount: number) => {
 };
 
 
-export const makePayMent = async (cartData: ICartresponce, finalPrice: number, coupons?: string[]) => {
+export const makePayMent = async (cartData: ICartresponce, email:string, finalPrice: number, coupons?: string[]) => {
   try {
     console.log("enter");
 
@@ -357,6 +357,7 @@ export const makePayMent = async (cartData: ICartresponce, finalPrice: number, c
     const body = {
       products: cartData,
       finalPrice,
+      email,
       coupons,
     };
 

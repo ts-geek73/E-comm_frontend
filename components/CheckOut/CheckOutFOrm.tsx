@@ -37,7 +37,7 @@ export default function CheckoutForm({ onSubmit, savedAddresses = [], refreshAdd
     trigger
   } = useForm<ExtendedFormValues>()
 
-  const billingData = watch("billing")  
+  const billingData = watch("billing")
   const addressList = Array.isArray(savedAddresses) ? savedAddresses : [];
 
   useEffect(() => {
@@ -68,7 +68,7 @@ export default function CheckoutForm({ onSubmit, savedAddresses = [], refreshAdd
 
     try {
       console.log("before db :=", cleanedAddresses);
-      
+
       const saved = await saveAddresses(email, cleanedAddresses);
       if (saved) {
         refreshAddresses?.();
@@ -321,7 +321,7 @@ export default function CheckoutForm({ onSubmit, savedAddresses = [], refreshAdd
               className="bg-blue-600 w-full hover:bg-blue-700 text-white font-medium py-6 rounded-lg transition-colors shadow-md hover:shadow-lg"
             >
               <ShoppingBag size={18} className="mr-2" />
-              Complete Purchase
+              Proceed with Payment
             </Button>
           </div>
         </form>

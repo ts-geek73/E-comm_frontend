@@ -14,7 +14,6 @@ export default function CheckoutPage() {
     const { isSignedIn, user, isLoaded } = useUser();
     const [coupons, setCoupons] = useState<string[] | null>(null)
     const [finalPrice, setFinalPrice] = useState<number>(0);
-
     const [savedAddresses, setSavedAddresses] = useState<FormValues[] | null>();
 
     const fetchAddresses = async () => {
@@ -79,9 +78,9 @@ export default function CheckoutPage() {
         }
 
         if(coupons && coupons.length > 0){
-            await makePayMent(cartdata, finalPrice, coupons)
+            await makePayMent(cartdata, user?.emailAddresses?.[0]?.emailAddress as string, finalPrice, coupons)
         }else{
-            await makePayMent(cartdata, finalPrice)
+            await makePayMent(cartdata, user?.emailAddresses?.[0]?.emailAddress as string, finalPrice)
         }
 
         // toast.success("Order placed successfully!")
