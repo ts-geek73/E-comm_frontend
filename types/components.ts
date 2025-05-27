@@ -195,9 +195,6 @@ export interface SavedAddressCardProps {
 
 export interface OrderSummaryProps {
     cartdata: ICartresponce | null
-    promoCode: string
-    setPromoCode: Dispatch<SetStateAction<string>>
-    promoApplied: boolean
-    setPromoApplied: Dispatch<SetStateAction<boolean>>
-    setFinalAmount: (amount: number) => void;
+    setFinalPrice: Dispatch<SetStateAction<number>>
+    setCoupons: Dispatch<SetStateAction<string[] | null>>
 }

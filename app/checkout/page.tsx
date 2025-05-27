@@ -11,10 +11,10 @@ import { toast } from "react-toastify"
 
 export default function CheckoutPage() {
     const [cartdata, setCartdata] = useState<ICartresponce | null>(null);
-    const [finalAmount, setFinalAmount] = useState<number>(0);
     const { isSignedIn, user, isLoaded } = useUser();
-    const [promoCode, setPromoCode] = useState("")
-    const [promoApplied, setPromoApplied] = useState(false)
+    const [coupons, setCoupons] = useState<string[] | null>(null)
+    const [finalPrice, setFinalPrice] = useState<number>(0);
+
     const [savedAddresses, setSavedAddresses] = useState<FormValues[] | null>();
 
     const fetchAddresses = async () => {
@@ -70,13 +70,19 @@ export default function CheckoutPage() {
     const handleCheckoutSubmit = async (data: ExtendedFormValues) => {
         console.log("Address data:=", data)
         console.log("CArt Product:=", cartdata);
-        console.log("final price:=", finalAmount);
-        if (!finalAmount || !cartdata) {
+        console.log("finalPrice:=", finalPrice);
+        console.log("coupons:=", coupons);
+        
+        if (!cartdata || finalPrice ===0) {
             toast.error("Something went wrong. Please try again.");
             return;
         }
 
-        await makePayMent(cartdata!, finalAmount)
+        if(coupons && coupons.length > 0){
+            await makePayMent(cartdata, finalPrice, coupons)
+        }else{
+            await makePayMent(cartdata, finalPrice)
+        }
 
         // toast.success("Order placed successfully!")
     }
@@ -108,11 +114,8 @@ export default function CheckoutPage() {
                     <div className="sticky top-8">
                         <OrderSummary
                             cartdata={cartdata}
-                            promoCode={promoCode}
-                            setPromoCode={setPromoCode}
-                            promoApplied={promoApplied}
-                            setFinalAmount={setFinalAmount}
-                            setPromoApplied={setPromoApplied}
+                            setCoupons={setCoupons}
+                            setFinalPrice={setFinalPrice}
                         />
                     </div>
                 </div>

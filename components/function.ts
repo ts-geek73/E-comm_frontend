@@ -327,9 +327,12 @@ export const savePromo = async (promo: PromoCode): Promise<void> => {
 };
 
 // components/function.ts
-export const validatePromo = async (code: string, amount: number) => {
+export const validatePromo = async (codes: string[], amount: number) => {
   try {
-    const response = await api.get(`/promocode?code=${code}&amount=${amount}`);
+    const codeParams = codes.map(code => `codes=${encodeURIComponent(code)}`).join('&');
+    const response = await api.get(`/promocode?amount=${amount}&${codeParams}`);
+    console.log("data:=", response.data);
+    
     return response.data;
   } catch (err: any) {
     throw new Error(err.response?.data?.message || "Invalid promo code");
@@ -337,29 +340,30 @@ export const validatePromo = async (code: string, amount: number) => {
 };
 
 
-export const makePayMent = async (cartData: ICartresponce, totalPrice: number) => {
+export const makePayMent = async (cartData: ICartresponce, finalPrice: number, coupons?: string[]) => {
   try {
     console.log("enter");
-    
+
     const stripe = await getStripe();
     console.log("exit");
-    
+
     if (!stripe) {
       console.log("Stripe failed to load");
       toast.error("Stripe failed to load");
       return;
     }
     console.log("pass stripe 1");
-    
+
     const body = {
       products: cartData,
-      totalPrice,
+      finalPrice,
+      coupons,
     };
 
     console.log("Data for the Payment:=", body);
-    
 
-    const response = await api.post(`/payment/create-checkout-session`, { 
+
+    const response = await api.post(`/payment/create-checkout-session`, {
       body
     });
 

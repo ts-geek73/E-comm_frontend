@@ -1,51 +1,131 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { validatePromo } from "@/components/function"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { OrderSummaryProps } from "@/types/components"
-import { ShoppingBag } from "lucide-react"
+import { Loader2, ShoppingBag, X } from "lucide-react"
 import Image from "next/image"
+import { useEffect, useState } from "react"
 import { toast } from "react-toastify"
-import { validatePromo } from "@/components/function"
 
 export default function OrderSummary({
   cartdata,
-  promoCode,
-  setPromoCode,
-  promoApplied,
-  setPromoApplied,
-  setFinalAmount
+  setFinalPrice,
+  setCoupons
 }: OrderSummaryProps) {
 
-  const rupeeSymbol = "Rs."
+  const [promoInput, setPromoInput] = useState("")
+  const [promoCodes, setPromoCodes] = useState<string[]>([])
+  const [promoApplied, setPromoApplied] = useState(false)
+  const [isApplying, setIsApplying] = useState(false)
+  const [invalidCodes, setInvalidCodes] = useState<{ code: string; reason: string }[]>([])
+  const [showInvalid, setShowInvalid] = useState(false)
+
   const [discountData, setDiscountData] = useState<{
     originalAmount: number
-    discount: number
+    discountData: { discount: number, code: string }[]
+    totalDiscount: number
     finalAmount: number
   } | null>(null)
 
-  const applyPromo = async () => {
-    if (!promoCode) return toast.warn("Please enter a promo code.")
-    try {
-      const result = await validatePromo(promoCode, cartdata?.totalPrice || 0)      
-      setDiscountData(result.data)
-      setPromoApplied(true)
-      setFinalAmount(result.data.finalAmount); 
-      toast.success("Promo code applied!")
-    } catch (error: any) {
-      toast.error(error.message || "Failed to apply promo code.")
-      setPromoApplied(false)
-      setDiscountData(null)
-    }
-  }
+  const rupeeSymbol = "Rs."
 
-useEffect(() => {
-  if (!promoApplied && cartdata?.totalPrice != null) {
-    setFinalAmount(cartdata.totalPrice);
-  }
-}, [cartdata, promoApplied]);
+  const handlePromoAction = async () => {
+    const trimmedCode = promoInput.trim().toUpperCase();
+
+    let updatedCodes = [...promoCodes];
+
+    if (trimmedCode) {
+      if (promoCodes.includes(trimmedCode)) {
+        toast.warn("Promo code already added");
+        return;
+      }
+      updatedCodes.push(trimmedCode);
+      setPromoInput("");
+    }
+
+    if (updatedCodes.length === 0) {
+      toast.warn("Please enter a promo code");
+      return;
+    }
+
+    setIsApplying(true);
+
+    try {
+      const result = await validatePromo(updatedCodes, cartdata?.totalPrice || 0);
+      const validDiscounts = result.data.discountData || [];
+      const validCodes = validDiscounts.map((d: { code: string }) => d.code);
+      const invalidCodes = result.data.invalidPromoCodes || [];
+
+      setPromoCodes(validCodes);
+      setDiscountData(result.data);
+      setPromoApplied(validDiscounts.length > 0);
+      setInvalidCodes(invalidCodes);
+      setShowInvalid(invalidCodes.length > 0);
+      setFinalPrice(result.data.finalAmount)
+      setCoupons(validDiscounts.map((d: { stripeId: string }) => d.stripeId))
+
+
+    } catch (error: any) {
+      toast.warn(error.message || "Failed to apply promo codes");
+      setPromoApplied(false);
+      setDiscountData(null);
+      setInvalidCodes([]);
+      setPromoCodes([]);
+    } finally {
+      setIsApplying(false);
+    }
+  };
+
+
+  const handleRemoveCode = async (codeToRemove: string) => {
+    const updatedCodes = promoCodes.filter(code => code !== codeToRemove);
+
+    if (updatedCodes.length === 0) {
+      setPromoCodes([]);
+      setPromoApplied(false);
+      setDiscountData(null);
+      setInvalidCodes([]);
+      return;
+    }
+
+    setIsApplying(true);
+
+    try {
+      const result = await validatePromo(updatedCodes, cartdata?.totalPrice || 0);
+      const validDiscounts = result.data.discountData || [];
+      const validCodes = validDiscounts.map((d: { code: string }) => d.code);
+      const invalidCodes = result.data.invalidPromoCodes || [];
+
+      setPromoCodes(validCodes);
+      setDiscountData(result.data);
+      setPromoApplied(validDiscounts.length > 0);
+      setInvalidCodes(invalidCodes);
+      setShowInvalid(invalidCodes.length > 0);
+      setFinalPrice(result.data.finalAmount)
+
+      console.log(validDiscounts.map((d: { stripeId: string }) => d.stripeId));
+
+      setCoupons(validDiscounts.map((d: { stripeId: string }) => d.stripeId))
+
+    } catch (error: any) {
+      toast.warn(error.message || "Failed to reapply promo codes");
+      setPromoApplied(false);
+      setDiscountData(null);
+      setInvalidCodes([]);
+      setPromoCodes([]);
+
+    } finally {
+      setIsApplying(false);
+    }
+  };
+
+  useEffect(()=>{
+    setFinalPrice(getTotalPrice())
+  },[cartdata,promoCodes])
+
 
   const getTotalPrice = () => {
     return discountData?.finalAmount || cartdata?.totalPrice || 0
@@ -82,25 +162,66 @@ useEffect(() => {
         <div className="space-y-2 pt-2">
           <div className="flex gap-2">
             <Input
-              placeholder="Promo code"
-              value={promoCode}
-              onChange={(e) => setPromoCode(e.target.value)}
+              placeholder="Enter promo code"
+              value={promoInput}
+              onChange={(e) => setPromoInput(e.target.value)}
               className="border-blue-200 focus:border-blue-500"
             />
             <Button
-              variant="outline"
-              onClick={applyPromo}
-              className="border-blue-300 text-blue-600 hover:bg-blue-50"
+              onClick={handlePromoAction}
+              disabled={isApplying}
+              className="bg-blue-600 text-white hover:bg-blue-700"
             >
-              Apply
+              {isApplying ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  Applying...
+                </>
+              ) : (
+                "Apply"
+              )}
             </Button>
+
           </div>
-          {promoApplied && discountData && (
-            <p className="text-xs text-green-600">{`Promo code "${promoCode}" applied: You saved ${rupeeSymbol}${discountData.discount}!`}</p>
+
+          {discountData && discountData?.discountData?.length > 0 && (
+            <div className="flex flex-wrap gap-2 pt-1">
+              {discountData?.discountData.map(({ code }: { code: string }) => (
+                <span key={code} className="bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded flex items-center">
+                  {code}
+                  <X
+                    className="ml-1 h-3 w-3 cursor-pointer"
+                    onClick={() => handleRemoveCode(code)}
+                  />
+                </span>
+              ))}
+            </div>
           )}
         </div>
 
-        {/* Price Summary */}
+        {(invalidCodes.length > 0 && showInvalid) && (
+          <div className="flex justify-between items-start bg-red-50 border border-red-300 text-red-700 rounded-md px-4 py-2 mt-2 relative">
+            <div className="space-y-1 text-sm">
+              <p className="font-medium">Invalid Promo Codes:</p>
+              <ul className="list-disc ml-5">
+                {invalidCodes.map((item, idx) => (
+                  <li key={idx}>
+                    {item.code} - {item.reason}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <button
+              onClick={() => setShowInvalid(false)}
+              className="text-red-500 hover:text-red-700 ml-4"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        )}
+
+
+
         <div className="space-y-3 pt-2">
           <div className="flex items-center justify-between text-sm">
             <span className="text-gray-600">Subtotal</span>
@@ -108,10 +229,18 @@ useEffect(() => {
           </div>
 
           {promoApplied && discountData && (
-            <div className="flex items-center justify-between text-green-600 text-sm">
-              <span>Discount</span>
-              <span>-{rupeeSymbol}{discountData.discount}</span>
-            </div>
+            <>
+              {discountData.discountData.map((d, index) => (
+                <div key={index} className="flex items-center justify-between text-green-600 text-sm">
+                  <span>{d.code}</span>
+                  <span>-{rupeeSymbol}{d.discount}</span>
+                </div>
+              ))}
+              {/* <div className="flex items-center justify-between text-green-600 text-sm">
+                  <span>Total Discount</span>
+                  <span>-{rupeeSymbol}{discountData.totalDiscount}</span>
+                </div> */}
+            </>
           )}
 
           <div className="border-t border-gray-200 pt-3 mt-2"></div>
