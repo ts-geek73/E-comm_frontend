@@ -6,12 +6,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { ICartresponce } from "@/types/product";
 import { useUser } from "@clerk/nextjs";
-import { ArrowLeft, ShoppingBag, Trash2, Loader2, Plus, Minus, ShoppingCart } from "lucide-react";
+import { ArrowLeft, Loader2, Minus, Plus, ShoppingBag, ShoppingCart, Trash2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 export default function CartPage() {
@@ -124,7 +124,7 @@ export default function CartPage() {
 
   const handleCheckout = () => {
     router.push('/checkout')
-    };
+  };
 
   if (isLoading) {
     return (
@@ -171,7 +171,7 @@ export default function CartPage() {
                   {cartdata?.totalItems} {cartdata?.totalItems === 1 ? 'item' : 'items'} in your shopping bag
                 </CardDescription>
               </div>
-              
+
               <ConfirmDelete
                 title="Clear Cart"
                 description="Are you sure you want to clear your cart? This action cannot be undone."
@@ -252,7 +252,7 @@ export default function CartPage() {
                           <span className="text-sm">Remove</span>
                         </button>
                       </div>
-                      
+
                       <div className="mt-3 text-sm text-gray-500">
                         Subtotal: <span className="font-medium text-blue-700">{rupeeSymbol} {(item.price * item.qty).toFixed(2)}</span>
                       </div>
@@ -261,7 +261,7 @@ export default function CartPage() {
                 ))}
               </div>
             </CardContent>
-            
+
             <CardFooter className="bg-blue-50 border-t border-blue-100 p-4">
               <div className="w-full flex justify-between items-center">
                 <span className="text-blue-700 font-medium">Total: {rupeeSymbol} {cartdata?.totalPrice.toFixed(2)}</span>
@@ -277,7 +277,7 @@ export default function CartPage() {
           </Card>
         </div>
 
-                {/* Order Summary - Now on the left */}
+        {/* Order Summary - Now on the left */}
         <div className="lg:w-1/3">
           <div className="sticky top-8">
             <Card className="border-blue-100 shadow-md">
@@ -288,7 +288,7 @@ export default function CartPage() {
                 </CardTitle>
                 <CardDescription>Review your items before checkout</CardDescription>
               </CardHeader>
-              
+
               <CardContent className="space-y-4 pt-4">
                 <div className="space-y-3">
                   <div className="flex justify-between">
@@ -300,17 +300,17 @@ export default function CartPage() {
                     <span className="text-gray-600">Shipping</span>
                     <span className="italic">Calculated at checkout</span>
                   </div>
-                  
+
                   <div className="border-t border-gray-200 pt-3 mt-2"></div>
-                  
+
                   <div className="flex items-center justify-between font-medium text-blue-700">
                     <span>Total</span>
                     <span className="text-xl">{rupeeSymbol} {cartdata?.totalPrice.toFixed(2)}</span>
                   </div>
-                  
+
                   <p className="text-gray-500 text-xs">Tax included where applicable</p>
                 </div>
-                
+
                 <Button
                   className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-6 rounded-lg transition-colors shadow-md hover:shadow-lg"
                   onClick={handleCheckout}
@@ -318,16 +318,6 @@ export default function CartPage() {
                   <ShoppingBag size={18} className="mr-2" />
                   Proceed to Checkout
                 </Button>
-                
-                <div className="text-center">
-                  <Link
-                    href="/products"
-                    className="inline-flex items-center text-blue-600 hover:text-blue-700 font-medium transition-colors hover:underline text-sm"
-                  >
-                    <ArrowLeft size={16} className="mr-1" />
-                    Continue Shopping
-                  </Link>
-                </div>
               </CardContent>
             </Card>
           </div>

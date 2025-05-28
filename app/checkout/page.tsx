@@ -39,6 +39,8 @@ export default function CheckoutPage() {
         try {
             if (user?.id) {
                 const cartData = await fetchcart(user.id);
+                console.log("cartdata", cartData);
+                
                 setCartdata(cartData);
             } else {
                 const cartdata = getLocalCart();
@@ -78,12 +80,11 @@ export default function CheckoutPage() {
         }
 
         if(coupons && coupons.length > 0){
-            await makePayMent(cartdata, user?.emailAddresses?.[0]?.emailAddress as string, finalPrice, coupons)
+            await makePayMent(cartdata, user?.emailAddresses?.[0]?.emailAddress as string, finalPrice,data, coupons)
         }else{
-            await makePayMent(cartdata, user?.emailAddresses?.[0]?.emailAddress as string, finalPrice)
+            await makePayMent(cartdata, user?.emailAddresses?.[0]?.emailAddress as string, finalPrice, data)
         }
 
-        // toast.success("Order placed successfully!")
     }
 
     if (!isLoaded) {

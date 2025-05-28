@@ -1,6 +1,6 @@
 import api from "@/lib/axios";
 import getStripe from "@/lib/get-stripe";
-import { FormValues } from "@/types/components";
+import { ExtendedFormValues, FormValues } from "@/types/components";
 import { BrandCategory, FetchParams, ICart, ICArtProductPayLoad, ICartresponce, IProductData, PromoCode } from "@/types/product";
 import { ReviewFecth } from "@/types/review";
 import { AxiosError } from "axios";
@@ -204,8 +204,9 @@ export const fetchcart = async (user_id: string) => {
       });
       if (response.status === 200) {
         return response.data.data
+      } else {
+        return { cart: [], totalItems: 0, totalPrice: 0 };
       }
-      return { cart: [], totalItems: 0, totalPrice: 0 };
 
     }
   } catch (error) {
@@ -332,7 +333,7 @@ export const validatePromo = async (codes: string[], amount: number) => {
     const codeParams = codes.map(code => `codes=${encodeURIComponent(code)}`).join('&');
     const response = await api.get(`/promocode?amount=${amount}&${codeParams}`);
     console.log("data:=", response.data);
-    
+
     return response.data;
   } catch (err: any) {
     throw new Error(err.response?.data?.message || "Invalid promo code");
@@ -340,7 +341,7 @@ export const validatePromo = async (codes: string[], amount: number) => {
 };
 
 
-export const makePayMent = async (cartData: ICartresponce, email:string, finalPrice: number, coupons?: string[]) => {
+export const makePayMent = async (cartData: ICartresponce, email: string, finalPrice: number, address: ExtendedFormValues, coupons?: string[]) => {
   try {
     console.log("enter");
 
@@ -358,6 +359,8 @@ export const makePayMent = async (cartData: ICartresponce, email:string, finalPr
       products: cartData,
       finalPrice,
       email,
+      billing: address.billing,
+      shipping: address.shipping,
       coupons,
     };
 

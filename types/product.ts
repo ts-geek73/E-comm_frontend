@@ -95,6 +95,7 @@ export interface ICArtProductPayLoad {
 
 export interface ICartresponce {
   cart: ICArtProductPayLoad[]
+  cartId ?: string
   totalItems: number
   totalPrice: number
 }
