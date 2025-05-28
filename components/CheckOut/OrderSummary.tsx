@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input"
 import { OrderSummaryProps } from "@/types/components"
 import { Loader2, ShoppingBag, X } from "lucide-react"
 import Image from "next/image"
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { toast } from "react-toastify"
 
 export default function OrderSummary({
@@ -35,7 +35,7 @@ export default function OrderSummary({
   const handlePromoAction = async () => {
     const trimmedCode = promoInput.trim().toUpperCase();
 
-    let updatedCodes = [...promoCodes];
+    const updatedCodes = [...promoCodes];
 
     if (trimmedCode) {
       if (promoCodes.includes(trimmedCode)) {
@@ -68,8 +68,9 @@ export default function OrderSummary({
       setCoupons(validDiscounts.map((d: { stripeId: string }) => d.stripeId))
 
 
-    } catch (error: any) {
-      toast.warn(error.message || "Failed to apply promo codes");
+    } catch (error) {
+      const err = error as Error;
+      toast.warn(err.message || "Failed to apply promo codes");
       setPromoApplied(false);
       setDiscountData(null);
       setInvalidCodes([]);
@@ -110,8 +111,9 @@ export default function OrderSummary({
 
       setCoupons(validDiscounts.map((d: { stripeId: string }) => d.stripeId))
 
-    } catch (error: any) {
-      toast.warn(error.message || "Failed to reapply promo codes");
+    } catch (error) {
+      const err = error as Error;
+      toast.warn(err.message || "Failed to apply promo codes");
       setPromoApplied(false);
       setDiscountData(null);
       setInvalidCodes([]);
@@ -122,14 +124,17 @@ export default function OrderSummary({
     }
   };
 
-  useEffect(()=>{
-    setFinalPrice(getTotalPrice())
-  },[cartdata,promoCodes])
+  
+  
+  
+  const getTotalPrice = useCallback(() => {
+    return discountData?.finalAmount || cartdata?.totalPrice || 0;
+  }, [discountData?.finalAmount, cartdata?.totalPrice]);
 
+  useEffect(() => {
+    setFinalPrice(getTotalPrice());
+  }, [getTotalPrice, setFinalPrice]);
 
-  const getTotalPrice = () => {
-    return discountData?.finalAmount || cartdata?.totalPrice || 0
-  }
 
   return (
     <Card className="border-blue-100 shadow-md">

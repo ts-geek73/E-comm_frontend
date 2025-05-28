@@ -15,32 +15,35 @@ export default function CheckoutPage() {
     const [coupons, setCoupons] = useState<string[] | null>(null)
     const [finalPrice, setFinalPrice] = useState<number>(0);
     const [savedAddresses, setSavedAddresses] = useState<FormValues[] | null>();
+    const email = user?.emailAddresses?.[0]?.emailAddress;
 
-    const fetchAddresses = async () => {
-        if (!user?.emailAddresses?.[0]?.emailAddress) {
+
+        const fetchAddresses = async () => {
+            try {
+                const data = await getAddresses(email as string);
+                console.log("Fetched addresses:", data);
+                setSavedAddresses(data?.addresses || []);
+            } catch (error) {
+                console.error("Failed to fetch addresses", error);
+            }
+        };
+
+    useEffect(() => {
+        if (!email) {
             console.log("No user email found");
             return;
         }
 
-        try {
-            const data = await getAddresses(user.emailAddresses[0].emailAddress);
-            console.log("Fetched addresses:", data);
-            setSavedAddresses(data?.addresses || []);
-        } catch (error) {
-            console.error("Failed to fetch addresses", error);
-        }
-    };
 
-    useEffect(() => {
         fetchAddresses();
-    }, [user?.emailAddresses?.[0]?.emailAddress]);
+    }, [user, email]); 
 
     const loadCart = useCallback(async () => {
         try {
             if (user?.id) {
                 const cartData = await fetchcart(user.id);
                 console.log("cartdata", cartData);
-                
+
                 setCartdata(cartData);
             } else {
                 const cartdata = getLocalCart();
@@ -73,15 +76,15 @@ export default function CheckoutPage() {
         console.log("CArt Product:=", cartdata);
         console.log("finalPrice:=", finalPrice);
         console.log("coupons:=", coupons);
-        
-        if (!cartdata || finalPrice ===0) {
+
+        if (!cartdata || finalPrice === 0) {
             toast.error("Something went wrong. Please try again.");
             return;
         }
 
-        if(coupons && coupons.length > 0){
-            await makePayMent(cartdata, user?.emailAddresses?.[0]?.emailAddress as string, finalPrice,data, coupons)
-        }else{
+        if (coupons && coupons.length > 0) {
+            await makePayMent(cartdata, user?.emailAddresses?.[0]?.emailAddress as string, finalPrice, data, coupons)
+        } else {
             await makePayMent(cartdata, user?.emailAddresses?.[0]?.emailAddress as string, finalPrice, data)
         }
 

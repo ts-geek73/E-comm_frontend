@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { toast, ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
 import ProductForm from './AdminProductFom';
 
 const CreateProduceComp: React.FC = () => {

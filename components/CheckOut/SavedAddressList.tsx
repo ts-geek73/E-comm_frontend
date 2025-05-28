@@ -28,6 +28,8 @@ export function SavedAddressList({
       setAddressToDelete(null);
       await refreshAddresses();  // refetch updated list
     } catch (error) {
+      console.log("fail to delete", error);
+      
       toast.error("Failed to delete address");
     }
   };

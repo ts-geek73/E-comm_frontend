@@ -36,7 +36,7 @@ import { BrandCategory, FormValues, IBrand, ICategory } from "@/types/product";
 import Image from 'next/image';
 import React, { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { toast, ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
 import apiServer from '../../lib/axios';
 import { getBrandsandCategories } from '../function';
 

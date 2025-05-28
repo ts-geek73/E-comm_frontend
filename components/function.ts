@@ -275,13 +275,16 @@ export const deleteAddress = async (email: string, address: FormValues) => {
       params: { email },
       data: { address },
     });
-
-
     return response.data.message as string;
-  } catch (error: any) {
-    console.error('Delete Address Error:', error.response.data);
+  } catch (error: unknown) {
+    if (error instanceof AxiosError) {
+      console.error('Delete Address Error:', error.response?.data);
+    } else {
+      console.error('Unknown Delete Address Error:', error);
+    }
   }
 };
+
 
 export const saveAddresses = async (
   email: string,
@@ -290,30 +293,43 @@ export const saveAddresses = async (
   try {
     const res = await api.post('/address', { email, addresses });
     return res.data.data.addresses;
-  } catch (error: any) {
-    console.log('Save Address Error:', error.response?.data || error.message);
+  } catch (error: unknown) {
+    if (error instanceof AxiosError) {
+      console.log('Save Address Error:', error.response?.data || error.message);
+    } else {
+      console.log('Unknown Save Address Error:', error);
+    }
   }
 };
+
 
 export const getAddresses = async (email: string) => {
   try {
     const res = await api.get(`address?email=${email}`);
-    // console.log("get Address", res.data);
-
     return res.data.data;
-  } catch (error: any) {
-    console.error('Get Addresses Error:', error.response?.data || error.message);
+  } catch (error: unknown) {
+    if (error instanceof AxiosError) {
+      console.error('Get Addresses Error:', error.response?.data || error.message);
+    } else {
+      console.error('Unknown Get Addresses Error:', error);
+    }
   }
 };
+
 
 export const fetchPromos = async ({ page = 1, limit = 12, sortField = 'createdAt', sortOrder = 'desc' }: FetchParams) => {
   try {
     const { data } = await api.get(`/promocode?page=${page}&limit=${limit}&sortField=${sortField}&sortOrder=${sortOrder}`);
-    return (data?.data);
-  } catch (err: any) {
-    return (err.message || 'Failed to fetch');
+    return data?.data;
+  } catch (error: unknown) {
+    if (error instanceof AxiosError) {
+      return error.message || 'Failed to fetch';
+    } else {
+      return 'Failed to fetch';
+    }
   }
 };
+
 
 export const deletePromo = async (_id: string): Promise<void> => {
   await api.delete(`/promocode/${_id}`);
@@ -332,13 +348,15 @@ export const validatePromo = async (codes: string[], amount: number) => {
   try {
     const codeParams = codes.map(code => `codes=${encodeURIComponent(code)}`).join('&');
     const response = await api.get(`/promocode?amount=${amount}&${codeParams}`);
-    console.log("data:=", response.data);
-
     return response.data;
-  } catch (err: any) {
-    throw new Error(err.response?.data?.message || "Invalid promo code");
+  } catch (error: unknown) {
+    if (error instanceof AxiosError) {
+      throw new Error(error.response?.data?.message || "Invalid promo code");
+    }
+    throw new Error("Invalid promo code");
   }
 };
+
 
 
 export const makePayMent = async (cartData: ICartresponce, email: string, finalPrice: number, address: ExtendedFormValues, coupons?: string[]) => {

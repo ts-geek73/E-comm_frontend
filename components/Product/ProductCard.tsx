@@ -4,16 +4,38 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { ProductCardProps } from '@/types/components';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
+import { FaHeart, FaRegHeart } from "react-icons/fa";
 
 const ProductCard = ({ data, onClick }: ProductCardProps) => {
-  const { image, name, price, categories, brands } = data;
-  const [isLoading, setLoading] = useState<boolean>(true);
+  const { _id, image, name, price, categories, brands } = data;
+  const [isLoading, setLoading] = useState(true);
   const [imageError, setImageError] = useState(false);
+  const [isWishlisted, setIsWishlisted] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => setLoading(false), 500);
     return () => clearTimeout(timer);
   }, [data]);
+
+  useEffect(() => {
+    const wishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
+    setIsWishlisted(wishlist.includes(_id));
+  }, [_id]);
+
+  const toggleWishlist = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent card click
+    const wishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
+    let updatedWishlist;
+
+    if (wishlist.includes(_id)) {
+      updatedWishlist = wishlist.filter((itemId: string) => itemId !== _id);
+    } else {
+      updatedWishlist = [...wishlist, _id];
+    }
+
+    localStorage.setItem('wishlist', JSON.stringify(updatedWishlist));
+    setIsWishlisted(!isWishlisted);
+  };
 
   const renderImage = () => {
     const imgSrc = !imageError && image?.url ? image.url : '/no-product.png';
@@ -38,7 +60,7 @@ const ProductCard = ({ data, onClick }: ProductCardProps) => {
       className="relative rounded-lg border shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out cursor-pointer"
       onClick={() => onClick(data)}
     >
-      <CardHeader>
+      <CardHeader className="relative">
         <div className="relative h-52 aspect-square">
           {isLoading ? (
             <Skeleton className="h-full w-full rounded-lg" />
@@ -46,6 +68,20 @@ const ProductCard = ({ data, onClick }: ProductCardProps) => {
             renderImage()
           )}
         </div>
+
+        {!isLoading && (
+          <button
+            onClick={toggleWishlist}
+            className="absolute top-2 right-2 z-10 p-1 bg-white rounded-full shadow hover:bg-gray-100 transition"
+          >
+            {isWishlisted ? (
+              <FaHeart className="text-red-600 w-5 h-5" />
+            ) : (
+              <FaRegHeart className="text-gray-500 w-5 h-5" />
+            )}
+
+          </button>
+        )}
       </CardHeader>
 
       <CardContent className="flex flex-col min-h-[200px] justify-between">

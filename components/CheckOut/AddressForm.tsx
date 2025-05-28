@@ -2,8 +2,6 @@ import { AddressFormProps, ExtendedFormValues, FormValues } from "@/types/compon
 import { useUser } from "@clerk/nextjs";
 import { NewAddressForm } from "./NewAddressForm";
 import { SavedAddressList } from "./SavedAddressList";
-import { useFormContext } from "react-hook-form";
-
 
 export default function AddressForm({
   register,
@@ -41,7 +39,7 @@ export default function AddressForm({
             setSelectedAddressId={setSelectedAddressId}
             addressType={addressType}
             onAddNewAddress={handleAddNewAddress}
-            userEmail={user?.emailAddresses[0].emailAddress!}
+            userEmail={user?.emailAddresses[0].emailAddress as string}
             refreshAddresses={refreshAddresses!}
           />
 

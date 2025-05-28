@@ -1,9 +1,8 @@
 import { SavedAddressCardProps } from "@/types/components";
-import { useUser } from "@clerk/nextjs";
 
 export function SavedAddressCard({ address, isSelected, onSelect }: SavedAddressCardProps) {
-  const { user } = useUser()
-  const email = user?.emailAddresses[0].emailAddress;
+  // const { user } = useUser()
+  // const email = user?.emailAddresses[0].emailAddress;
 
   return (
     <div

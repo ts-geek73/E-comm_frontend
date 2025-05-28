@@ -4,13 +4,13 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { CheckoutFormProps, ExtendedFormValues, FormValues } from "@/types/components"
+import { useUser } from "@clerk/nextjs"
 import { ShoppingBag } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
-import AddressForm from "./AddressForm"
-import { toast, ToastContainer } from "react-toastify"
-import { useUser } from "@clerk/nextjs"
+import { toast } from "react-toastify"
 import { saveAddresses } from "../function"
+import AddressForm from "./AddressForm"
 
 export default function CheckoutForm({ onSubmit, savedAddresses = [], refreshAddresses }: CheckoutFormProps) {
   const [selectedBillingId, setSelectedBillingId] = useState<string | null>(null)
@@ -63,13 +63,13 @@ export default function CheckoutForm({ onSubmit, savedAddresses = [], refreshAdd
     };
 
     const updatedAddresses = [...savedAddresses, newAddress];
-    const cleanedAddresses = updatedAddresses.map(({ _id, ...rest }) => rest);
+    // const cleanedAddresses = updatedAddresses.map(({ _id, ...rest }) => rest);
 
 
     try {
-      console.log("before db :=", cleanedAddresses);
+      // console.log("before db :=", cleanedAddresses);
 
-      const saved = await saveAddresses(email, cleanedAddresses);
+      const saved = await saveAddresses(email, updatedAddresses);
       if (saved) {
         refreshAddresses?.();
       } else {
@@ -95,7 +95,7 @@ export default function CheckoutForm({ onSubmit, savedAddresses = [], refreshAdd
 
   const validateAddressSelection = () => {
     let isValid = true
-    let errorMessages = []
+    const errorMessages = []
 
     // Validate billing address
     if (!selectedBillingId && !showNewBillingForm) {

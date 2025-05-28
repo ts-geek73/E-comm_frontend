@@ -4,6 +4,7 @@ import api from "@/lib/axios";
 import { Filters, IProductData } from "@/types/product";
 import { AxiosError } from "axios";
 import { useEffect, useState } from "react";
+import { useUser } from "@clerk/nextjs"; // Assuming Clerk is used
 
 const useProductFetch = (
   currentPage: number,
@@ -17,58 +18,73 @@ const useProductFetch = (
 } => {
   const [products, setProducts] = useState<IProductData[]>([]);
   const [totalLength, setTotalLength] = useState(0);
-  const [isLoading, setIsLoading] = useState(true); // Start with loading true
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const { user } = useUser();
 
   useEffect(() => {
     const start = (currentPage - 1) * productPerPage;
-    
+
     const fetchProducts = async () => {
       setIsLoading(true);
-      setError(null); 
-      
+      setError(null);
+
       try {
-        console.log(`Fetching products from: /product/custome with start=${start}&length=${productPerPage}&brand=${filters.brand}&category=${filters.category}&pricemin=${filters.pricemin}&pricemax=${filters.pricemax}&sort=${filters.sort}&search=${filters.search}`);
-        
         const response = await api.get(
           `/product?start=${start}&length=${productPerPage}&brand=${filters.brand}&category=${filters.category}&pricemin=${filters.pricemin}&pricemax=${filters.pricemax}&sort=${filters.sort}&search=${filters.search}`
         );
-        
 
         const data = response.data.data;
-        
-        console.log("Use Fetchn ", data);
-        
-        
-        if (data &&
+
+        if (
+          data &&
           typeof data.length === "number" &&
           Array.isArray(data.data)
         ) {
-          setProducts(data.data);
+          let wishlist: string[] = [];
+
+          if (user) {
+            // Get wishlist from backend
+            try {
+              // const wishlistRes = await api.get("/wishlist");
+              // wishlist = wishlistRes.data?.data?.map((item: any) => item.productId) || [];
+            } catch (err) {
+              console.error("Failed to fetch wishlist for user:", err);
+            }
+          } else {
+            // Get wishlist from localStorage
+            const localWishlist = localStorage.getItem("wishlist");
+            wishlist = localWishlist ? JSON.parse(localWishlist) : [];
+          }
+
+          // Add `isWishlisted` field
+          const updatedProducts = data.data.map((product: IProductData) => ({
+            ...product,
+            isWishlisted: wishlist.includes(product._id),
+          }));
+
+          setProducts(updatedProducts);
           setTotalLength(data.length || 0);
         } else {
-          console.log("Invalid data format:", data);
+          console.error("Invalid data format:", data);
           setError("Invalid data format from API.");
           setProducts([]);
           setTotalLength(0);
         }
       } catch (error: unknown) {
         if (error instanceof AxiosError) {
-      
-        console.log("Error fetching products:", error);
-        setError(error.message || "Failed to fetch products.");
+          console.error("Error fetching products:", error);
+          setError(error.message || "Failed to fetch products.");
+        }
         setProducts([]);
         setTotalLength(0);
-        }
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchProducts();
-
-    return () => {
-    };
   }, [
     currentPage,
     productPerPage,
@@ -77,6 +93,8 @@ const useProductFetch = (
     filters.pricemin,
     filters.pricemax,
     filters.sort,
+    filters.search,
+    user,
   ]);
 
   return { products, totalLength, isLoading, error };
