@@ -59,7 +59,7 @@ const ProductDetails: React.FC = () => {
                                 </div>
 
                                 <button
-                                    onClick={() => toggleWishlist(product._id)}
+                                    onClick={() => toggleWishlist()}
                                     className="ml-4 p-2 rounded-full bg-white shadow hover:bg-gray-100 transition"
                                     title={isWishlisted ? "Remove from Wishlist" : "Add to Wishlist"}
                                 >

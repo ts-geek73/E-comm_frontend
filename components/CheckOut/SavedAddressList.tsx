@@ -29,7 +29,6 @@ export function SavedAddressList({
       await refreshAddresses();  // refetch updated list
     } catch (error) {
       console.log("fail to delete", error);
-      
       toast.error("Failed to delete address");
     }
   };
@@ -76,8 +75,6 @@ export function SavedAddressList({
           + Add New {addressType === "billing" ? "Billing" : "Shipping"} Address
         </Button>
       </div>
-
-
     </div>
   )
 }

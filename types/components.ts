@@ -18,9 +18,10 @@ export interface PaginationProps {
 }
 
 export interface ProductCardProps {
-  data: IProductData;
+  data: IProductData & { isWishlisted ?: boolean };
   onClick: (product: IProductData) => void;
 }
+
 
 export interface ProductListProps {
   filters?: FilterValues;

@@ -1,22 +1,46 @@
 'use client';
-
+import { addToWishlist, removeFromWishlist } from '../function';
 import { useProductFetch } from '@/hooks';
 import { defaultFilters, ProductListProps, } from '@/types/components';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Pagination from './PaginationComp';
 import ProductCard from './ProductCard';
+import { IProductData } from '@/types/product';
+import { useUser } from "@clerk/nextjs"; 
 
 const ProductList: React.FC<ProductListProps> = ({ filters = defaultFilters, dataIndex }) => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const productPerPage = 12;
   const router = useRouter();
+  const { user} = useUser()
 
-  const { products, totalLength, isLoading, error } = useProductFetch(
+  const { products, totalLength, isLoading, error , refresh} = useProductFetch(
     currentPage,
     productPerPage,
     filters
   );
+
+    const handleWishlistToggle = async (product: IProductData, currentlyWishlisted: boolean) => {
+    const userId = user?.id ?? '';
+
+    if (currentlyWishlisted) {
+      // Remove from wishlist
+      if (userId) {
+        await removeFromWishlist(userId, undefined, product._id);
+      }
+      // Remove from localStorage as well
+      const localWishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
+      const updatedLocal = localWishlist.filter((p: any) => p._id !== product._id);
+      localStorage.setItem('wishlist', JSON.stringify(updatedLocal));
+    } else {
+      // Add to wishlist
+      await addToWishlist(userId, product);
+    }
+
+    // Refresh product list to update wishlist status UI
+    await refresh();
+  };
 
   useEffect(() => {
     setCurrentPage(1);
@@ -66,6 +90,7 @@ const ProductList: React.FC<ProductListProps> = ({ filters = defaultFilters, dat
           <ProductCard
             key={ele._id}
             data={ele}
+            onWishlistToggle={handleWishlistToggle}
             onClick={(product) => router.push(`/product/${product._id}`)}
           />
         ))}

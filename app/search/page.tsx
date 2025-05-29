@@ -28,8 +28,8 @@ const CheckoutSuccessContent = () => {
       setError(null);
 
       try {
-        const response = await apiServer.get(`product/search?search=${search}`);
-        const responseData = response.data as IResponse;
+        const response = await apiServer.get(`product?search=${search}`);
+        const responseData = response.data.data as IResponse;
         console.log('Search response:', responseData);
 
         if (responseData.data && responseData.data.length === 0) {

@@ -1,40 +1,37 @@
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Skeleton } from '@/components/ui/skeleton';
 import { ProductCardProps } from '@/types/components';
+import { IProductData } from '@/types/product';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { FaHeart, FaRegHeart } from "react-icons/fa";
+import { Button } from '../ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
+import { Skeleton } from '../ui/skeleton';
 
-const ProductCard = ({ data, onClick }: ProductCardProps) => {
-  const { _id, image, name, price, categories, brands } = data;
+const ProductCard = ({ data, onClick, onWishlistToggle }: ProductCardProps & { onWishlistToggle: (product: IProductData, isWishlisted: boolean) => Promise<void> }) => {
+  const { _id, image, name, price, categories, brands, isWishlisted } = data;
   const [isLoading, setLoading] = useState(true);
   const [imageError, setImageError] = useState(false);
-  const [isWishlisted, setIsWishlisted] = useState(false);
+  const [wishlisted, setWishlisted] = useState(isWishlisted);
+
+  useEffect(() => {
+    setWishlisted(isWishlisted);
+  }, [isWishlisted]);
 
   useEffect(() => {
     const timer = setTimeout(() => setLoading(false), 500);
     return () => clearTimeout(timer);
   }, [data]);
 
-  useEffect(() => {
-    const wishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
-    setIsWishlisted(wishlist.includes(_id));
-  }, [_id]);
+  const toggleWishlist = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setWishlisted(!wishlisted); // optimistic UI update
 
-  const toggleWishlist = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent card click
-    const wishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
-    let updatedWishlist;
-
-    if (wishlist.includes(_id)) {
-      updatedWishlist = wishlist.filter((itemId: string) => itemId !== _id);
-    } else {
-      updatedWishlist = [...wishlist, _id];
+    try {
+      await onWishlistToggle(data, wishlisted as boolean); // pass current state, so parent can add/remove accordingly
+    } catch (error) {
+      console.error("Wishlist toggle failed:", error);
+      setWishlisted(wishlisted); // revert UI state if error
     }
-
-    localStorage.setItem('wishlist', JSON.stringify(updatedWishlist));
-    setIsWishlisted(!isWishlisted);
   };
 
   const renderImage = () => {
@@ -74,12 +71,11 @@ const ProductCard = ({ data, onClick }: ProductCardProps) => {
             onClick={toggleWishlist}
             className="absolute top-2 right-2 z-10 p-1 bg-white rounded-full shadow hover:bg-gray-100 transition"
           >
-            {isWishlisted ? (
+            {wishlisted ? (
               <FaHeart className="text-red-600 w-5 h-5" />
             ) : (
               <FaRegHeart className="text-gray-500 w-5 h-5" />
             )}
-
           </button>
         )}
       </CardHeader>

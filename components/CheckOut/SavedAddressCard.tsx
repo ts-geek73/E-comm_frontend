@@ -1,15 +1,14 @@
 import { SavedAddressCardProps } from "@/types/components";
 
 export function SavedAddressCard({ address, isSelected, onSelect }: SavedAddressCardProps) {
-  // const { user } = useUser()
-  // const email = user?.emailAddresses[0].emailAddress;
 
   return (
     <div
-      className={`border rounded-lg p-4 relative cursor-pointer transition-all ${isSelected
-        ? 'border-blue-500 bg-blue-50 shadow-md'
-        : 'border-gray-200 hover:border-blue-300'
-        }`}
+      className={`border rounded-lg p-4 relative cursor-pointer transition-all 
+        ${isSelected ?
+          'border-blue-500 bg-blue-50 shadow-md' :
+          'border-gray-200 hover:border-blue-300'} 
+        flex flex-col justify-between min-h-[220px] mx-auto`}
       onClick={() => {
         if (address._id) {
           onSelect(address._id)
