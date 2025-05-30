@@ -22,7 +22,8 @@ function OrderDetailsFetcher() {
   const [redirectUrl, setRedirectUrl] = useState<string | null>(null);
   const [order, setOrder] = useState<OrderInfo | null>(null);
   const [error, setError] = useState<string | null>(null);
-
+  
+  console.log(redirectUrl);
   useEffect(() => {
     if (!orderId) {
       setError('Missing order ID');
@@ -32,9 +33,10 @@ function OrderDetailsFetcher() {
 
     const fetchOrderDetails = async () => {
       try {
-        const res = await apiServer.get(`/order/invoice/${orderId}`);
-        setRedirectUrl(res.data.receiptUrl);
-        setOrder(res.data.order);
+        const {data } = await apiServer.get(`/order/invoice?orderId=${orderId}`);
+        
+        setRedirectUrl(data.data.receiptUrl);
+        setOrder(data.data.order);
       } catch (err) {
         console.error(err);
         setError('Failed to fetch order details');
@@ -48,6 +50,8 @@ function OrderDetailsFetcher() {
 
   const handleViewInvoice = () => {
     if (redirectUrl) {
+      console.log(redirectUrl);
+      
       window.open(redirectUrl, '_blank');
     }
   };

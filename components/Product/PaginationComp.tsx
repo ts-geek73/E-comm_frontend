@@ -12,9 +12,9 @@ import {
 } from '@/components/ui/pagination';
 import { PaginationProps } from '@/types/components';
 
-const PaginationComp: React.FC<PaginationProps> = ({ length, currentPage, setCurrentPage }) => {
+const PaginationComp: React.FC<PaginationProps> = ({ length, currentPage, setCurrentPage, itemsPerPage = 12  }) => {
   const [items, setItems] = useState<number[]>([]);
-  const totalPages = Math.ceil(length / 12);
+  const totalPages = Math.ceil(length / itemsPerPage);
 
   useEffect(() => {
     const generateItems = () => {

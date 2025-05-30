@@ -58,19 +58,25 @@ const CustomMenu = () => {
             Profile
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
-            <Link href="/user-profile">View Profile</Link>
+            <Link href="/user/user-profile">View Profile</Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link href="/user/orders">My Orders</Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link href="/orders/invoice">My Orders Invoices</Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
             <Link href="/admin/product">Protected Page</Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
-            <Link href="/create-organization">Organization</Link>
+            <Link href="/user/create-organization">Organization</Link>
           </DropdownMenuItem>
         </DropdownMenuGroup>
 
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
-          <Link href="/help">Help</Link>
+          <Link href="/user/help">Help</Link>
         </DropdownMenuItem>
 
         <DropdownMenuSeparator />

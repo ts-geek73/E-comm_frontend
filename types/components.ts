@@ -15,10 +15,11 @@ export interface PaginationProps {
   length: number;
   currentPage: number;
   setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
+  itemsPerPage?: number;
 }
 
 export interface ProductCardProps {
-  data: IProductData & { isWishlisted ?: boolean };
+  data: IProductData & { isWishlisted?: boolean };
   onClick: (product: IProductData) => void;
 }
 
@@ -139,7 +140,7 @@ export interface AddressFormProps {
   showNewAddressForm: boolean
   setShowNewAddressForm: (show: boolean) => void
   addressType: keyof ExtendedFormValues
-   refreshAddresses?: () => Promise<void> 
+  refreshAddresses?: () => Promise<void>
   fieldPrefix: keyof ExtendedFormValues
   onAddAddress?: (address: FormValues) => void
 
@@ -182,7 +183,7 @@ export interface NewAddressFormProps {
   register: UseFormRegister<ExtendedFormValues>;
   setValue: UseFormSetValue<ExtendedFormValues>;
   errors: FieldErrors<FormValues>;
-  fieldPrefix:  keyof ExtendedFormValues;
+  fieldPrefix: keyof ExtendedFormValues;
   userEmail?: string;
   onCancel: () => void;
   onSave: (address: FormValues) => void;
@@ -195,7 +196,7 @@ export interface SavedAddressCardProps {
 }
 
 export interface OrderSummaryProps {
-    cartdata: ICartresponce | null
-    setFinalPrice: Dispatch<SetStateAction<number>>
-    setCoupons: Dispatch<SetStateAction<string[] | null>>
+  cartdata: ICartresponce | null
+  setFinalPrice: Dispatch<SetStateAction<number>>
+  setCoupons: Dispatch<SetStateAction<string[] | null>>
 }

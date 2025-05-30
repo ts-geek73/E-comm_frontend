@@ -39,7 +39,7 @@ const ProductList: React.FC<ProductListProps> = ({ filters = defaultFilters, dat
     }
 
     // Refresh product list to update wishlist status UI
-    await refresh();
+    // await refresh();
   };
 
   useEffect(() => {

@@ -484,7 +484,7 @@ export const syncGuestWishlistOnLogin = async (
 export const removeFromWishlist = async (
   user_id: string,
   productIds?: string[],
-  productId?:string 
+  productId?: string
 ) => {
   try {
     const response = await api.delete("users/whishlist", {
@@ -498,4 +498,30 @@ export const removeFromWishlist = async (
     return [];
   }
 };
+
+export const formatDate = (dateString: string | number | Date) => {
+  return new Date(dateString).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+};
+
+export const formatAmount = (amount: number) => {
+  return amount;
+};
+
+export const getStatusColor = (status: string) => {
+  switch (status) {
+    case 'complete':
+      return 'bg-green-100 text-green-800';
+    case 'pending':
+      return 'bg-yellow-100 text-yellow-800';
+    default:
+      return 'bg-gray-100 text-gray-800';
+  }
+};
+
 
