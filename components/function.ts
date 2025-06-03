@@ -525,3 +525,22 @@ export const getStatusColor = (status: string) => {
 };
 
 
+  export const handleWishlistToggle = async (product: IProductData, userId: string,currentlyWishlisted: boolean) => {
+
+    if (currentlyWishlisted) {
+      // Remove from wishlist
+      if (userId) {
+        await removeFromWishlist(userId, undefined, product._id);
+      }
+      // Remove from localStorage as well
+      const localWishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
+      const updatedLocal = localWishlist.filter((p: IProductData) => p._id !== product._id);
+      localStorage.setItem('wishlist', JSON.stringify(updatedLocal));
+    } else {
+      // Add to wishlist
+      await addToWishlist(userId, product);
+    }
+
+    // Refresh product list to update wishlist status UI
+    // await refresh();
+  };

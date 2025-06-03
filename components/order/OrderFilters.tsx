@@ -11,7 +11,7 @@ export const OrderFiltersComponent = ({
   clearOrderFilters,
 }: {
   orderFilters: OrderFilters;
-  handleOrderFilterChange: (key: string, value: any) => void;
+  handleOrderFilterChange: (key: string, value: string) => void;
   clearOrderFilters: () => void;
 }) => (
   <Card className="mb-6">

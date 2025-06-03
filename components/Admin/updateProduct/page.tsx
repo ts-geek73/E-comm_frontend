@@ -12,6 +12,24 @@ import {
     handleSuccessFunction
 } from "../../function";
 import ProductForm from "../AdminProductFom";
+import { Bar, Bubble, Doughnut, Line, Pie, PolarArea, Radar } from 'react-chartjs-2';
+import {
+    Chart as ChartJS,
+    BarElement,
+    CategoryScale,
+    LinearScale,
+    ArcElement,
+    PointElement,
+    Tooltip,
+    RadialLinearScale,
+    LineElement,
+    Filler,
+    Legend,
+} from 'chart.js';
+import ProductChartsSection from "./ProductCharts";
+import ProductTableView from "./ProductTableView";
+
+ChartJS.register(BarElement, CategoryScale, RadialLinearScale, PointElement, Filler, LineElement, ArcElement, LinearScale, Tooltip, Legend);
 
 
 const ProductTable: React.FC = () => {
@@ -22,6 +40,7 @@ const ProductTable: React.FC = () => {
     const [productPerPage] = useState(12);
     const [totalProducts, setTotalProducts] = useState<number>(0);
     const [editingProduct, setEditingProduct] = useState<IProductData | null>(null);
+
 
     // Create empty filters object
     const filters: Filters = {};
@@ -96,76 +115,30 @@ const ProductTable: React.FC = () => {
         }
     }, [editingProduct]);
 
+    const handleEditClickWrapper = (product: IProductData) => {
+        handleEditClick(product, setEditingProduct);
+    };
+
+    const handleDeleteWrapper = (productId: string) => {
+        handleDelete(productId, setProducts, setTotalProducts);
+    };
+
     return (
         <div className="w-full max-h-screen overflow-auto space-y-8">
             <h1 className="text-4xl font-semibold text-center text-gray-900">Product Management</h1>
 
             {err && <p className="text-center text-red-600">{err}</p>}
 
-            <table className="min-w-full table-auto overflow-x-auto shadow-lg border border-gray-300 rounded-lg">
-                <thead className="bg-gradient-to-r from-blue-500 to-teal-500 text-white">
-                    <tr>
-                        <th className="py-4 px-6 text-left font-semibold text-sm tracking-wider"> </th>
-                        <th className="py-4 px-6 text-left font-semibold text-sm tracking-wider">Product Name</th>
-                        <th className="py-4 px-6 text-left font-semibold text-sm tracking-wider">Description</th>
-                        <th className="py-4 px-6 text-left font-semibold text-sm tracking-wider">Price</th>
-                        <th className="py-4 px-6 text-left font-semibold text-sm tracking-wider">Actions</th>
-                    </tr>
-                </thead>
-                <tbody className="bg-white">
-                    {loading ? (
-                        <tr>
-                            <td colSpan={5} className="py-10 text-center text-blue-500">
-                                Loading products...
-                            </td>
-                        </tr>
-                    ) : productArras.length === 0 ? (
-                        <tr>
-                            <td colSpan={5} className="py-10 text-center text-gray-500">
-                                No products found
-                            </td>
-                        </tr>
-                    ) : (
-                        productArras.map((product, index) => (
-                            <tr key={product._id} className="hover:bg-gray-50 transition">
-                                <td className="py-3 px-6 text-sm text-gray-700">
-                                    {(currentPage - 1) * productPerPage + index + 1}
-                                </td>
-                                <td className="py-3 px-6 text-sm text-blue-600 font-medium">
-                                    {product.name}
-                                </td>
-                                <td className="py-3 px-6 text-sm text-gray-600 max-w-xs truncate">
-                                    {product.short_description ?? product.description}
-                                </td>
-                                <td className="py-3 px-6 text-sm text-gray-800">
-                                    {product.price?.toFixed(2)} Rs.
-                                </td>
-                                <td className="py-3 px-6 text-sm flex space-x-4">
-                                    <button
-                                        onClick={() => handleEditClick(product, setEditingProduct)}
-                                        className="text-blue-600 hover:text-blue-800 transition duration-200 ease-in-out transform hover:scale-105"
-                                    >
-                                        <LiaEdit size={20} />
-                                    </button>
+            <ProductChartsSection products={productArras} />
 
-                                    <ConfirmDelete
-                                        title="Confirm Deletion"
-                                        description="Are you sure you want to delete this product? This action cannot be undone."
-                                        onConfirm={() =>
-                                            handleDelete(product._id, setProducts, setTotalProducts)
-                                        }
-                                        trigger={
-                                            <button className="text-red-600 hover:text-red-800 transition duration-200 ease-in-out transform hover:scale-105">
-                                                <MdDeleteOutline size={20} />
-                                            </button>
-                                        }
-                                    />
-                                </td>
-                            </tr>
-                        ))
-                    )}
-                </tbody>
-            </table>
+            <ProductTableView
+                products={productArras}
+                loading={loading}
+                currentPage={currentPage}
+                productPerPage={productPerPage}
+                onEditClick={handleEditClickWrapper}
+                onDelete={handleDeleteWrapper}
+            />
 
             {editingProduct && (
                 <ProductForm

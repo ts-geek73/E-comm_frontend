@@ -3,12 +3,11 @@ import { IProductData } from '@/types/product';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { FaHeart, FaRegHeart } from "react-icons/fa";
-import { Button } from '../ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Skeleton } from '../ui/skeleton';
 
 const ProductCard = ({ data, onClick, onWishlistToggle }: ProductCardProps & { onWishlistToggle: (product: IProductData, isWishlisted: boolean) => Promise<void> }) => {
-  const { _id, image, name, price, categories, brands, isWishlisted } = data;
+  const { image, name, price, categories, brands, isWishlisted } = data;
   const [isLoading, setLoading] = useState(true);
   const [imageError, setImageError] = useState(false);
   const [wishlisted, setWishlisted] = useState(isWishlisted);
@@ -102,9 +101,9 @@ const ProductCard = ({ data, onClick, onWishlistToggle }: ProductCardProps & { o
               </div>
             </div>
 
-            <Button className="w-full mt-4 py-2 bg-blue-600 text-white hover:bg-blue-700 transition-colors duration-300">
+            {/* <Button className="w-full mt-4 py-2 bg-blue-600 text-white hover:bg-blue-700 transition-colors duration-300">
               Add to Cart
-            </Button>
+            </Button> */}
           </>
         )}
       </CardContent>

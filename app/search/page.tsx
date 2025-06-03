@@ -7,6 +7,8 @@ import apiServer from '@/lib/axios';
 import ProductCard from '@/components/Product/ProductCard';
 import { AxiosError } from 'axios';
 import { Loader2 } from 'lucide-react';
+import { useUser } from '@clerk/nextjs';
+import { handleWishlistToggle } from '@/components/function';
 
 interface IResponse {
   msg?: string;
@@ -21,6 +23,8 @@ const CheckoutSuccessContent = () => {
   const [productList, setProductList] = useState<IResponse | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const { user } = useUser();
+  const userId: string = user ? user?.id : " ";
 
   useEffect(() => {
     const fetchSearchProducts = async () => {
@@ -41,18 +45,18 @@ const CheckoutSuccessContent = () => {
           setProductList(responseData);
         }
       } catch (error) {
-  if ((error as AxiosError).isAxiosError) {
-    const axiosError = error as AxiosError;
+        if ((error as AxiosError).isAxiosError) {
+          const axiosError = error as AxiosError;
 
-    if (axiosError.response?.status === 404) {
-      setError('No products found for this search.');
-    } else {
-      setError('Failed to fetch products. Please try again.');
-    }
-  } else {
-    setError('An unexpected error occurred.');
-  }
-}
+          if (axiosError.response?.status === 404) {
+            setError('No products found for this search.');
+          } else {
+            setError('Failed to fetch products. Please try again.');
+          }
+        } else {
+          setError('An unexpected error occurred.');
+        }
+      }
       finally {
         setLoading(false);
       }
@@ -83,7 +87,13 @@ const CheckoutSuccessContent = () => {
           <h2 className="text-2xl font-semibold text-center text-gray-900 mt-12">Other Products</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {productList?.related?.slice(0, 6).map((relatedProduct) => (
-              <ProductCard key={relatedProduct._id} data={relatedProduct} onClick={handleProductClick} />
+              <ProductCard
+                key={relatedProduct._id}
+                data={relatedProduct}
+                onWishlistToggle={(product, isWishlisted) =>
+                  handleWishlistToggle(product, userId, isWishlisted)
+                }
+                onClick={handleProductClick} />
             ))}
           </div>
         </>
@@ -91,13 +101,21 @@ const CheckoutSuccessContent = () => {
         <>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {productList?.data?.map((product) => (
-              <ProductCard key={product._id} data={product} onClick={handleProductClick} />
+              <ProductCard key={product._id} data={product}
+                onWishlistToggle={(product, isWishlisted) =>
+                  handleWishlistToggle(product, userId, isWishlisted)
+                }
+                onClick={handleProductClick} />
             ))}
           </div>
           <h2 className="text-2xl font-semibold text-center text-gray-900 mt-12">Related Products</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {productList?.related?.slice(0, 9).map((relatedProduct) => (
-              <ProductCard key={relatedProduct._id} data={relatedProduct} onClick={handleProductClick} />
+              <ProductCard key={relatedProduct._id}
+                onWishlistToggle={(product, isWishlisted) =>
+                  handleWishlistToggle(product, userId, isWishlisted)
+                }
+                data={relatedProduct} onClick={handleProductClick} />
             ))}
           </div>
         </>

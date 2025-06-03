@@ -24,23 +24,21 @@ export const ProductImageGallery: React.FC<{ images: IImageUrl[]; }> = ({ images
 
         {images.length > 1 && (
           <>
-            {selectedImage > 0 && (
-              <button
-                onClick={() => setSelectedImage((prev) => prev - 1)}
-                className="absolute left-2 bg-white/80 hover:bg-white rounded-full p-1 shadow-md"
-              >
-                <ChevronLeft size={20} />
-              </button>
-            )}
+            <button
+              onClick={() => setSelectedImage((prev) => prev - 1)}
+              disabled={selectedImage <= 0}
+              className="absolute left-2 bg-white/80 hover:bg-white rounded-full p-1 shadow-md"
+            >
+              <ChevronLeft size={20} />
+            </button>
 
-            {selectedImage < images.length - 1 && (
-              <button
-                onClick={() => setSelectedImage((prev) => prev + 1)}
-                className="absolute right-2 bg-white/80 hover:bg-white rounded-full p-1 shadow-md"
-              >
-                <ChevronRight size={20} />
-              </button>
-            )}
+            <button
+              onClick={() => setSelectedImage((prev) => prev + 1)}
+              disabled={selectedImage >= images.length - 1}
+              className="absolute right-2 bg-white/80 hover:bg-white rounded-full p-1 shadow-md"
+            >
+              <ChevronRight size={20} />
+            </button>
           </>
         )}
       </div>

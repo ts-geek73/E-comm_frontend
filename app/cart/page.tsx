@@ -126,7 +126,7 @@ export default function CartPage() {
     router.push('/checkout')
   };
 
-  if (isLoading) {
+  if (!cartdata && isLoading) {
     return (
       <div className="container mx-auto p-6 min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -137,7 +137,7 @@ export default function CartPage() {
     );
   }
 
-  if (cartdata?.cart.length === 0) {
+  if (cartdata && cartdata?.cart.length === 0) {
     return (
       <div className="container mx-auto p-6 min-h-screen flex flex-col items-center justify-center">
         <div className="text-center max-w-md">

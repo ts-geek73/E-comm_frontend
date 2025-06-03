@@ -1,10 +1,12 @@
 'use client';
 
+import { handleWishlistToggle } from "@/components/function";
 import AddToCartSection from "@/components/Product/AddToCart";
 import ProductCard from "@/components/Product/ProductCard";
 import { ProductImageGallery } from "@/components/Product/ProductGallery";
 import MultiReviewProduct from "@/components/Review/MainReview";
 import { useProductDetails } from "@/hooks";
+import { useUser } from "@clerk/nextjs";
 import {
     Shield,
     TruckIcon
@@ -16,6 +18,8 @@ import { FaHeart, FaRegHeart } from "react-icons/fa";
 const ProductDetails: React.FC = () => {
     const router = useRouter();
     const { id } = useParams() as { id: string };
+    const { user } = useUser();
+    const userId: string = user ? user?.id : " ";
 
     const { product, relatedProducts, isWishlisted, toggleWishlist } = useProductDetails(id);
 
@@ -140,7 +144,9 @@ const ProductDetails: React.FC = () => {
                                     key={relatedProduct._id}
                                     data={relatedProduct}
                                     onClick={() => router.push(`/product/${relatedProduct._id}`)}
-                                />
+                                    onWishlistToggle={(product, isWishlisted) =>
+                                        handleWishlistToggle(product, userId, isWishlisted)
+                                    } />
                             ))}
                         </div>
                     </div>

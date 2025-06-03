@@ -1,18 +1,17 @@
 'use client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { InvoiceFilters } from '@/types/user';
-import { Filter, Search, SortAsc, SortDesc } from 'lucide-react';
+import { Filter, SortAsc, SortDesc } from 'lucide-react';
 
 export const InvoiceFiltersComponent = ({ invoiceFilters,
   handleInvoiceFilterChange,
   clearInvoiceFilters,
 }: {
   invoiceFilters: InvoiceFilters;
-  handleInvoiceFilterChange: (key: string, value: any) => void;
+  handleInvoiceFilterChange: (key: string, value: string) => void;
   clearInvoiceFilters: () => void;
 }) => (
   <Card className="mb-6">

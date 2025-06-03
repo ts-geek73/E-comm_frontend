@@ -132,12 +132,12 @@ const OrdersInvoicesPage: React.FC = () => {
     }
   };
 
-  const handleOrderFilterChange = (key: string, value: any) => {
+  const handleOrderFilterChange = (key: string, value: string) => {
     setOrderFilters((prev) => ({ ...prev, [key]: value }));
     fetchOrders(1, { ...orderFilters, [key]: value }); // Reset to page 1
     setOrderPage(1);
   };
-  const handleInvoiceFilterChange = (key: string, value: any) => {
+  const handleInvoiceFilterChange = (key: string, value: string) => {
     setInvoiceFilters((prev) => ({ ...prev, [key]: value }));
     fetchInvoices(1, { ...invoiceFilters, [key]: value }); // Reset to page 1
     setInvoicePage(1);

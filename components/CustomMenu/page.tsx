@@ -61,10 +61,7 @@ const CustomMenu = () => {
             <Link href="/user/user-profile">View Profile</Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
-            <Link href="/user/orders">My Orders</Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem asChild>
-            <Link href="/orders/invoice">My Orders Invoices</Link>
+            <Link href="/user/orders">My Orders and Invoise</Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
             <Link href="/admin/product">Protected Page</Link>
