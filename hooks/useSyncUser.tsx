@@ -24,6 +24,8 @@ export default function useSyncUser() {
 
       try {
         const token = await getToken();
+        console.log("Token:=", token);
+        
         if (!token) return;
 
         const data: UserData = {

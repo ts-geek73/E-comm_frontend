@@ -32,6 +32,10 @@ export default function RootLayout({
       data-new-gr-c-s-check-loaded="14.1223.0"
       data-gr-ext-installed="">
       <html lang="en" suppressHydrationWarning>
+        <head>
+          <title>Google Sign-In</title>
+          <script src="https://accounts.google.com/gsi/client" async defer></script>
+        </head>
         <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
           <HeadBar />
           <header className="flex justify-end items-center">
