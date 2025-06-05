@@ -3,7 +3,7 @@ import { useUser } from "@clerk/nextjs";
 import { ShoppingCart } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { addToCart, getLocalCart } from "../function";
+import { addToCart, getLocalCart } from "../Functions/function";
 
 export default function AddToCartSection({ product }: { product: IProductData }) {
   const [quantity, setQuantity] = useState<number>(1);

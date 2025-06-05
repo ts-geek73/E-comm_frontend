@@ -1,5 +1,6 @@
 'use client'
 import ConfirmDelete from "@/components/Header/ConfirmDelete";
+import { usePermission } from "@/hooks/usePermission";
 import { IProductData } from "@/types/product";
 import { LiaEdit } from "react-icons/lia";
 import { MdDeleteOutline } from "react-icons/md";
@@ -21,6 +22,9 @@ const ProductTableView: React.FC<ProductTableViewProps> = ({
     onEditClick,
     onDelete
 }) => {
+
+    const { hasPermission } = usePermission();
+
     return (
         <table className="min-w-full table-auto overflow-x-auto shadow-lg border border-gray-300 rounded-lg">
             <thead className="bg-gradient-to-r from-blue-500 to-teal-500 text-white">
@@ -61,23 +65,26 @@ const ProductTableView: React.FC<ProductTableViewProps> = ({
                                 {product.price?.toFixed(2)} Rs.
                             </td>
                             <td className="py-3 px-6 text-sm flex space-x-4">
-                                <button
-                                    onClick={() => onEditClick(product)}
-                                    className="text-blue-600 hover:text-blue-800 transition duration-200 ease-in-out transform hover:scale-105"
-                                >
-                                    <LiaEdit size={20} />
-                                </button>
-
-                                <ConfirmDelete
-                                    title="Confirm Deletion"
-                                    description="Are you sure you want to delete this product? This action cannot be undone."
-                                    onConfirm={() => onDelete(product._id)}
-                                    trigger={
-                                        <button className="text-red-600 hover:text-red-800 transition duration-200 ease-in-out transform hover:scale-105">
-                                            <MdDeleteOutline size={20} />
-                                        </button>
-                                    }
-                                />
+                                {hasPermission("product.update") &&
+                                    <button
+                                        onClick={() => onEditClick(product)}
+                                        className="text-blue-600 hover:text-blue-800 transition duration-200 ease-in-out transform hover:scale-105"
+                                    >
+                                        <LiaEdit size={20} />
+                                    </button>
+                                }
+                                {hasPermission("product.update") &&
+                                    <ConfirmDelete
+                                        title="Confirm Deletion"
+                                        description="Are you sure you want to delete this product? This action cannot be undone."
+                                        onConfirm={() => onDelete(product._id)}
+                                        trigger={
+                                            <button className="text-red-600 hover:text-red-800 transition duration-200 ease-in-out transform hover:scale-105">
+                                                <MdDeleteOutline size={20} />
+                                            </button>
+                                        }
+                                    />
+                                }
                             </td>
                         </tr>
                     ))

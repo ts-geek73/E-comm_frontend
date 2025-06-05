@@ -21,6 +21,13 @@ const CustomMenu = () => {
 
   if (!isLoaded || !user?.id) return null;
 
+  const onUserLogOut = async()=>{
+    localStorage.clear()
+    localStorage.removeItem("permissions");
+    localStorage.removeItem("user")
+    signOut()
+  }
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -82,7 +89,7 @@ const CustomMenu = () => {
             <SignInButton>Sign In</SignInButton>
           </SignedOut>
           <SignedIn>
-            <Button variant="ghost" onClick={() => signOut()}>
+            <Button variant="ghost" onClick={() => onUserLogOut()}>
               Sign Out
             </Button>
           </SignedIn>

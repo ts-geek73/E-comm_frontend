@@ -4,7 +4,7 @@ import { IProductData as IProduct } from '@/types/product';
 import { IResponse as ProductResponse } from '@/types/response';
 import { AxiosError } from 'axios';
 import { useUser } from '@clerk/nextjs';
-import { addToWishlist, getLocalWishlist, getWishlist, removeFromWishlist } from '@/components/function';
+import { addToWishlist, getLocalWishlist, getWishlist, removeFromWishlist } from '@/components/Functions/function';
 
 const useProductDetail = (id: string | undefined) => {
   const { user } = useUser();

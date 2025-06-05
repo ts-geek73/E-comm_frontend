@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { IOrder } from "@/types/user";
 import saveAs from 'file-saver';
-import { formatAmount, formatDate, getStatusColor } from "../function";
+import { formatAmount, formatDate, getStatusColor } from "../Functions/function";
 
 export const OrderCard: React.FC<{
     order: IOrder;

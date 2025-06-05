@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { FetchParams, PromoCode } from '@/types/product';
-import { deletePromo, fetchPromos, savePromo } from '@/components/function';
+import { deletePromo, fetchPromos, savePromo } from '@/components/Functions/function';
 
 const usePromoCodes = () => {
   const [promos, setPromos] = useState<PromoCode[]>([]);

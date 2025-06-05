@@ -1,31 +1,27 @@
 'use client'
-import ConfirmDelete from "@/components/Header/ConfirmDelete";
 import PaginationComp from "@/components/Product/PaginationComp";
 import { useProductFetch } from "@/hooks";
 import { Filters, IImageUrl, IProductData } from "@/types/product";
+import {
+    ArcElement,
+    BarElement,
+    CategoryScale,
+    Chart as ChartJS,
+    Filler,
+    Legend,
+    LinearScale,
+    LineElement,
+    PointElement,
+    RadialLinearScale,
+    Tooltip,
+} from 'chart.js';
 import { useEffect, useState } from "react";
-import { LiaEdit } from "react-icons/lia";
-import { MdDeleteOutline } from "react-icons/md";
 import {
     handleDelete,
     handleEditClick,
     handleSuccessFunction
-} from "../../function";
+} from "../../../Functions/function";
 import ProductForm from "../AdminProductFom";
-import { Bar, Bubble, Doughnut, Line, Pie, PolarArea, Radar } from 'react-chartjs-2';
-import {
-    Chart as ChartJS,
-    BarElement,
-    CategoryScale,
-    LinearScale,
-    ArcElement,
-    PointElement,
-    Tooltip,
-    RadialLinearScale,
-    LineElement,
-    Filler,
-    Legend,
-} from 'chart.js';
 import ProductChartsSection from "./ProductCharts";
 import ProductTableView from "./ProductTableView";
 
@@ -51,16 +47,6 @@ const ProductTable: React.FC = () => {
         productPerPage,
         filters
     );
-
-    // Monitor hook values via console log for debugging
-    useEffect(() => {
-        console.log("Hook values:", {
-            products: products?.length || 0,
-            totalLength,
-            isLoading,
-            error
-        });
-    }, [products, totalLength, isLoading, error]);
 
     useEffect(() => {
         if (products) {

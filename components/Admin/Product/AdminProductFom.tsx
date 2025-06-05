@@ -37,8 +37,8 @@ import Image from 'next/image';
 import React, { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
-import apiServer from '../../lib/axios';
-import { getBrandsandCategories } from '../function';
+import apiServer from '../../../lib/axios';
+import { getBrandsandCategories } from '../../Functions/function';
 
 
 

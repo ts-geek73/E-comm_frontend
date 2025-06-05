@@ -3,7 +3,7 @@ import { MessageSquare } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Review, ReviewFecth } from '@/types/review';
-import { fetchReviews, handleDeleteReview } from '../function';
+import { fetchReviews, handleDeleteReview } from '../Functions/function';
 import ReviewForm from './ReviewForm';
 import { ReviewsList } from './ReviewsList';
 import RatingStars from '../Header/Ratings';

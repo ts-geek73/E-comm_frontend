@@ -36,7 +36,7 @@ const ProductChartsSection: React.FC<{products: IProductData[]}> = ({ products }
     };
 
     const radarChartData = {
-        labels: radarFilteredProducts.map(product => ""),
+        labels: radarFilteredProducts,
         datasets: [
             {
                 label: 'Price',

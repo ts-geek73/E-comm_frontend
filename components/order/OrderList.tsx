@@ -1,5 +1,5 @@
 import React from 'react';
-import { formatAmount } from '@/components/function';
+import { formatAmount } from '@/components/Functions/function';
 import { IOrderItem } from '@/types/user';
 
 const OrderItemsList: React.FC<{items: IOrderItem[];}> = ({ items }) => (

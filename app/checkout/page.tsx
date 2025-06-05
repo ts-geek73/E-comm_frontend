@@ -2,7 +2,7 @@
 
 import CheckoutForm from "@/components/CheckOut/CheckOutFOrm"
 import OrderSummary from "@/components/CheckOut/OrderSummary"
-import { fetchcart, getAddresses, getLocalCart, makePayMent } from "@/components/function"
+import { fetchcart, getAddresses, getLocalCart, makePayMent } from "@/components/Functions/function"
 import { ExtendedFormValues, FormValues } from "@/types/components"
 import { ICartresponce } from "@/types/product"
 import { useUser } from "@clerk/nextjs"

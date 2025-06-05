@@ -1,6 +1,6 @@
 'use client';
 
-import { handleWishlistToggle } from "@/components/function";
+import { handleWishlistToggle } from "@/components/Functions/function";
 import AddToCartSection from "@/components/Product/AddToCart";
 import ProductCard from "@/components/Product/ProductCard";
 import { ProductImageGallery } from "@/components/Product/ProductGallery";

@@ -3,7 +3,7 @@ import { useProductFetch } from '@/hooks';
 import { defaultFilters, ProductListProps, } from '@/types/components';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { handleWishlistToggle } from '../function';
+import { handleWishlistToggle } from '../Functions/function';
 import Pagination from './PaginationComp';
 import ProductCard from './ProductCard';
 import { useUser } from '@clerk/nextjs';

@@ -9,7 +9,7 @@ import { ShoppingBag } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "react-toastify"
-import { saveAddresses } from "../function"
+import { saveAddresses } from "../Functions/function"
 import AddressForm from "./AddressForm"
 
 export default function CheckoutForm({ onSubmit, savedAddresses = [], refreshAddresses }: CheckoutFormProps) {

@@ -20,7 +20,9 @@ apiServer.interceptors.response.use(
     if (error.response) {
       const status = error.response.status;
       const message = error.response.data.message || 'An error occurred';
-      console.log('pass 1 ');
+      // console.log('pass 1 ');
+      console.log("axios Error:=", message," at status:=", status);
+      
 
       // switch (status) {
       //   case 401:

@@ -4,7 +4,7 @@ import { defaultFilters, FilterBarProps, FilterValues } from '@/types/components
 import { BrandCategory, IBrand, ICategory } from '@/types/product';
 import debounce from 'lodash/debounce';
 import { useEffect, useMemo, useState } from 'react';
-import { getBrandsandCategories } from '../function';
+import { getBrandsandCategories } from '../Functions/function';
 
 const FilterBar = ({ onFilterChange, initialFilters }: FilterBarProps) => {
   const [isFiltering, setIsFiltering] = useState(false);

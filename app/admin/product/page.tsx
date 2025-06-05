@@ -1,12 +1,16 @@
 "use client"
 
-import CreateProduceComp from "@/components/Admin/createProduce";
-import UpdateProduceComp from "@/components/Admin/updateProduct/page";
-import PromoCodeList from "@/components/Admin/PromoCodeList";
+import CreateProduceComp from "@/components/Admin/Product/createProduct";
+import UpdateProduceComp from "@/components/Admin/Product/updateProduct/page";
+import PromoCodeList from "@/components/Admin/Promocode/PromoCodeList";
+import RolePermissionManager from "@/components/Admin/RolePermission/page";
 import { useState } from "react";
+import { usePermission } from "@/hooks/usePermission";
 
 const ProductCreatePage = () => {
   const [activeComponent, setActiveComponent] = useState("updateProduce");
+  const { hasPermission } = usePermission();
+
 
   const handleSidebarClick = (component: string) => {
     setActiveComponent(component);
@@ -19,36 +23,45 @@ const ProductCreatePage = () => {
         <h2 className="text-xl font-semibold text-gray-800 mb-6">Admin Panel</h2>
         <nav className="space-y-2">
 
-        <button
+          <button
             onClick={() => handleSidebarClick("updateProduce")}
-            className={`block w-full text-left p-3 rounded-md transition-colors duration-200 ${
-              activeComponent === "updateProduce"
+            className={`block w-full text-left p-3 rounded-md transition-colors duration-200 ${activeComponent === "updateProduce"
                 ? "bg-blue-600 text-white"
                 : "hover:bg-gray-200 text-gray-700"
-            }`}
+              }`}
           >
             Product List
           </button>
 
-
           <button
-            onClick={() => handleSidebarClick("createProduce")}
-            className={`block w-full text-left p-3 rounded-md transition-colors duration-200 ${
-              activeComponent === "createProduce"
+            onClick={() => handleSidebarClick("rolePermission")}
+            className={`block w-full text-left p-3 rounded-md transition-colors duration-200 ${activeComponent === "rolePermission"
                 ? "bg-blue-600 text-white"
                 : "hover:bg-gray-200 text-gray-700"
-            }`}
+              }`}
           >
-            Create Product
+            Role Permission Manager
           </button>
 
+          { hasPermission('product.create') &&
+          <button
+          onClick={() => handleSidebarClick("createProduce")}
+          className={`block w-full text-left p-3 rounded-md transition-colors duration-200 ${activeComponent === "createProduce"
+            ? "bg-blue-600 text-white"
+            : "hover:bg-gray-200 text-gray-700"
+            }`}
+            >
+            Create Product
+          </button>
+          }
+
+          
           <button
             onClick={() => handleSidebarClick("promoCodeList")}
-            className={`block w-full text-left p-3 rounded-md transition-colors duration-200 ${
-              activeComponent === "promoCodeList"
+            className={`block w-full text-left p-3 rounded-md transition-colors duration-200 ${activeComponent === "promoCodeList"
                 ? "bg-blue-600 text-white"
                 : "hover:bg-gray-200 text-gray-700"
-            }`}
+              }`}
           >
             Promo Code
           </button>
@@ -60,6 +73,7 @@ const ProductCreatePage = () => {
           {activeComponent === "createProduce" && <CreateProduceComp />}
           {activeComponent === "updateProduce" && <UpdateProduceComp />}
           {activeComponent === "promoCodeList" && <PromoCodeList />}
+          {activeComponent === "rolePermission" && <RolePermissionManager />}
         </div>
       </main>
 

@@ -1,7 +1,7 @@
 'use client'
 
 import ConfirmDelete from "@/components/Header/ConfirmDelete";
-import { addToCart, clearCart, fetchcart, getLocalCart, removeFromCart } from "@/components/function";
+import { addToCart, clearCart, fetchcart, getLocalCart, removeFromCart } from "@/components/Functions/function";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { ICartresponce } from "@/types/product";

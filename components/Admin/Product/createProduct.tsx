@@ -5,9 +5,6 @@ import { toast } from 'react-toastify';
 import ProductForm from './AdminProductFom';
 
 const CreateProduceComp: React.FC = () => {
-
-
-
     return (
         <>
             <ProductForm
