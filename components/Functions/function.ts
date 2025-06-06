@@ -3,7 +3,7 @@ import getStripe from "@/lib/get-stripe";
 import { ExtendedFormValues, FormValues } from "@/types/components";
 import { BrandCategory, FetchParams, ICart, ICArtProductPayLoad, ICartresponce, IProductData, PromoCode } from "@/types/product";
 import { ReviewFecth } from "@/types/review";
-import { AxiosError } from "axios";
+import axios, { AxiosError } from "axios";
 
 import { toast } from "react-toastify";
 
@@ -546,3 +546,51 @@ export const handleWishlistToggle = async (product: IProductData, userId: string
 };
 
 
+export const sendOTPFunction = async (email: string,) => {
+  try {
+
+    if (email) {
+      const res = await api.get(`users/send-otp?email=${email}`);
+      const { data } = res.data;
+
+      if (res.data.success) {
+        toast.success("Otp send successfully")
+        return data.otp
+      }
+    }
+
+  } catch (error) {
+    console.log("Failed in OTP send", error);
+    toast.error("Failed in OTP send");
+
+  }
+}
+
+export const verifyOTPFUnction = async (email: string, otp: string) => {
+  try {
+
+    if (email && otp) {
+      const res = await api.post(`users/verify-otp`, {
+        email,
+        otp,
+      });
+      const { data } = res.data;
+      console.log("data:=", data);
+
+
+      if (data.verified) {
+        toast.success("Otp verify successfully")
+        return data.verified
+      }
+    }
+
+  } catch (error: unknown) {
+    console.log("Failed in OTP send", error);
+
+    if (axios.isAxiosError(error)) {
+      toast.error(error.response?.data?.details);
+    } else {
+      toast.error("An unexpected error occurred");
+    }
+  }
+}
