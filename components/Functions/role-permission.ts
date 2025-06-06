@@ -189,7 +189,7 @@ export const updatePermission = async (
 
 export const assignRolesToUser = async (userId: string, roleIds: string[]) => {
   try {
-    const res = await api.post(`/users/${userId}/roles`, { roleIds });
+    const res = await api.post(`role-permission/users/${userId}/roles`, { roleIds });
     toast.success(res.data.message || "Roles assigned successfully");
     return res.data.user;
   } catch (error) {
@@ -220,7 +220,7 @@ export const getUserAccessDetails = async (userId?: string) => {
 
 export const removeRoleFromUser = async (userId: string, roleId: string) => {
   try {
-    const res = await api.delete(`/users/${userId}/roles/${roleId}`);
+    const res = await api.delete(`role-permission/users/${userId}/roles/${roleId}`);
     toast.success(res.data.message || "Role removed from user");
     return res.data.user;
   } catch (error) {

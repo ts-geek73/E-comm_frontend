@@ -23,6 +23,7 @@ import {
 } from "@/components/Functions/role-permission";
 import UserList from "./UserList";
 import { usePermission } from "@/hooks/usePermission";
+import UserModel from "./UserModel";
 
 const RolePermissionManager = () => {
     const [roles, setRoles] = useState<Role[]>([]);
@@ -35,9 +36,11 @@ const RolePermissionManager = () => {
     const { reloadPermissions } = usePermission()
 
     const [showRoleModal, setShowRoleModal] = useState(false);
+    const [showUserModal, setShowUserModal] = useState(false);
     const [showPermissionModal, setShowPermissionModal] = useState(false);
 
     const [editingRole, setEditingRole] = useState<Role | null>(null);
+    const [editingUser, setEditingUser] = useState<User | null>(null);
     const [editingPermission, setEditingPermission] = useState<Permission | null>(null);
 
     // Fetch roles & permissions initially
@@ -54,39 +57,27 @@ const RolePermissionManager = () => {
         dataFetch();
     }, []);
 
-    // const handleAssignRoles = async () => {
-    //     if (selectedUser && selectedRole) {
-    //         await assignRolesToUser(selectedUser.userId, [selectedRole?._id]);
-    //     }
-    // };
 
-    // const handleRemoveRole = async (roleId: string) => {
-    //     if (selectedUser) {
-    //         await removeRoleFromUser(selectedUser.userId, roleId);
-    //     }
-    // };
 
+    const fetchAccess = async () => {
+        if (selectedUser && selectedUser.userId) {
+            // console.log(selectedUser.name);
+
+            const data = await getUserAccessDetails(selectedUser.userId);
+            console.log("User Data:=", data.data.user.roles);
+            setSelectedRole(data.data.user.roles[0] as Role)
+        } else {
+
+            // console.log("not selected USer");
+
+            const data = await getUserAccessDetails();
+            // console.log(data.data.users);
+
+            setUsers(data.data.users)
+            // setPermissions(data.permissions);
+        }
+    };
     useEffect(() => {
-        const fetchAccess = async () => {
-            if (selectedUser && selectedUser.userId) {
-                console.log(selectedUser.name);
-
-                const data = await getUserAccessDetails(selectedUser.userId);
-                console.log("User Data:=", data.data.user.roles);
-                setSelectedRole(data.data.user.roles[0] as Role)
-                // setPermissions(data.data.permissions);
-                // setPermissionKeys(data.permissionKeys);
-            } else {
-
-                console.log("not selected USer");
-
-                const data = await getUserAccessDetails();
-                console.log(data.data.users);
-
-                setUsers(data.data.users)
-                // setPermissions(data.permissions);
-            }
-        };
         fetchAccess();
     }, [selectedUser]);
 
@@ -132,6 +123,25 @@ const RolePermissionManager = () => {
         setEditingRole(null);
     };
 
+    const assignUserRole = async (user: User, roleId: string) => {
+        console.log(user, roleId);
+        if (user.userId && roleId !== 'none' && user.roles?.[0]?._id !== roleId) {
+            await assignRolesToUser(user.userId, [roleId]);
+
+            const data = await getUserAccessDetails(user.userId);
+            // console.log("User Data:=", data.data.user.roles);
+            setSelectedRole(data.data.user.roles[0] as Role)
+        }
+        if (roleId === 'none') {
+            await removeRoleFromUser(user.userId, user.roles?.[0]._id as string);
+            setSelectedRole(null)
+        }
+        const allUsersData = await getUserAccessDetails();
+        setUsers(allUsersData.data.users);
+        setSelectedUser(user)
+    }
+
+
     const hasChanges = () => {
 
         return checkedPermissions.size !== originalPermissions.size ||
@@ -175,6 +185,10 @@ const RolePermissionManager = () => {
                 users={users}
                 selectedUser={selectedUser ?? undefined}
                 onSelectUser={setSelectedUser}
+                onEditRole={(user: User) => {
+                    setEditingUser(user)
+                    setShowUserModal(true)
+                }}
             />
 
             <RoleList
@@ -214,6 +228,18 @@ const RolePermissionManager = () => {
                     editingRole={editingRole}
                 />
             )}
+
+            {showUserModal &&
+                <UserModel
+                    user={editingUser}
+                    roles={roles}
+                    onClose={() => {
+                        setShowUserModal(false)
+                        setEditingUser(null)
+                    }}
+                    onSubmit={assignUserRole}
+                />
+            }
 
             {showPermissionModal && (
                 <PermissionModal

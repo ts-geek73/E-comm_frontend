@@ -1,7 +1,7 @@
-import React from "react";
-import { Role } from "@/types/rolePermission";
 import { Button } from "@/components/ui/button";
-import { Edit2, Trash2, Plus, Users } from "lucide-react";
+import { Role } from "@/types/rolePermission";
+import { Edit2, Plus, ShieldUser, Trash2, Users } from "lucide-react";
+import React from "react";
 
 type Props = {
   roles: Role[];
@@ -25,7 +25,7 @@ const RoleList: React.FC<Props> = ({
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <div className="flex items-center gap-2">
-          <Users className="w-5 h-5 text-blue-600" />
+          <ShieldUser className="w-5 h-5 text-blue-600" />
           <h2 className="text-xl font-bold text-gray-800">Roles</h2>
         </div>
         <Button 
