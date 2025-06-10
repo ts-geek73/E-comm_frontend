@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Role, User } from "@/types/rolePermission";
-import { Edit2, RollerCoaster, Users } from "lucide-react";
+import { Edit2, Users } from "lucide-react";
 import React, { Dispatch, SetStateAction } from "react";
 
 type Props = {

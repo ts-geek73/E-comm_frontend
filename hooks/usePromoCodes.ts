@@ -1,12 +1,17 @@
 import { useState, useCallback } from 'react';
 import { FetchParams, PromoCode } from '@/types/product';
 import { deletePromo, fetchPromos, savePromo } from '@/components/Functions/function';
+import { useUser } from '@clerk/nextjs';
 
 const usePromoCodes = () => {
   const [promos, setPromos] = useState<PromoCode[]>([]);
   const [totalPromos, setTotalPromos] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // const userId: string = useUser()?.user?.id;
+  const { user } = useUser();
+  let userId: string | undefined;
+
 
   const loadPromos = useCallback(async (params: FetchParams) => {
     setLoading(true);
@@ -24,20 +29,25 @@ const usePromoCodes = () => {
   }, []);
 
   const removePromo = useCallback(async (_id: string) => {
-    await deletePromo(_id);
-    setPromos((prev) => prev.filter((p) => p._id !== _id));
-    setTotalPromos((prev) => prev - 1);
+    if (user && user.id) {
+      userId = user.id;
+
+      await deletePromo(_id, userId);
+      setPromos((prev) => prev.filter((p) => p._id !== _id));
+      setTotalPromos((prev) => prev - 1);
+    }
   }, []);
 
   const saveOrUpdatePromo = useCallback(
     async (promo: PromoCode, reloadParams?: FetchParams) => {
-      await savePromo(promo);
-      if (reloadParams) {
-        await loadPromos(reloadParams);
+      if (user && user.id) {
+        userId = user.id;
+        await savePromo(promo, userId);
+        if (reloadParams) {
+          await loadPromos(reloadParams);
+        }
       }
-    },
-    [loadPromos]
-  );
+    },[loadPromos]);
 
   return {
     promos,

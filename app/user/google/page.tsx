@@ -152,7 +152,6 @@ const GoogleLogin = () => {
       await sendOTPFunction(email);
       setCountdown(60);
       setOtp("");
-      toast.success("OTP resent successfully");
     } catch (error) {
       console.error("Error resending OTP:", error);
     } finally {
@@ -213,7 +212,7 @@ const GoogleLogin = () => {
                   <div className="space-y-2">
                     <h2 className="text-xl font-semibold">Verify OTP</h2>
                     <p className="text-sm text-gray-600">
-                      We've sent a 6-digit code to
+                      {`We've sent a 6-digit code to`}
                     </p>
                     <p className="text-sm font-medium text-gray-800">{email}</p>
                   </div>

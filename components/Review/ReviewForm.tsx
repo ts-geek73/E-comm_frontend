@@ -9,6 +9,7 @@ import { toast } from "react-toastify";
 import RatingStars from "../Header/Ratings";
 import { useClerk } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
+import { AxiosError } from "axios";
 
 const ReviewForm: React.FC<ProductFormProps> = ({
   productId,
@@ -82,8 +83,13 @@ const ReviewForm: React.FC<ProductFormProps> = ({
         updateReviews();
       }
 
-    } catch {
-      toast.error("Failed to submit review");
+    } catch(error) {
+      // toast.error("Failed to submit review");
+       if (error instanceof AxiosError) {
+        toast.error(error.response?.data?.message);
+    } else {
+        toast.error("Failed to submit review");
+    }
     }
   };
 

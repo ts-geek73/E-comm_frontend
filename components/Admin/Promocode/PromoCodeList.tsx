@@ -26,7 +26,7 @@ const PromoCodeList: React.FC = () => {
         saveOrUpdatePromo,
     } = usePromoCodes();
 
-    const { hasPermission } = usePermission();
+    // const { hasPermission } = usePermission();
 
     const columns = [
         { label: '', field: '', sortable: false },
@@ -97,30 +97,25 @@ const PromoCodeList: React.FC = () => {
                                 <td className="px-4 py-2">{promo.amount}</td>
                                 <td className="px-4 py-2">{new Date(promo.expiryDate).toLocaleDateString()}</td>
                                 <td className="px-4 py-2 flex space-x-3">
-                                    {hasPermission('promo.edit') &&
-                                        <button
-                                            onClick={() => {
-                                                setEditingPromo(promo);
-                                                setDialogOpen(true);
-                                            }}
-                                            className="text-blue-600 hover:text-blue-800"
-                                        >
-                                            <LiaEdit size={20} />
-                                        </button>
-                                    }
-
-                                    {hasPermission('promo.delete') &&
-                                        <ConfirmDelete
-                                            title="Delete Promo Code"
-                                            description="Are you sure you want to delete this promo code?"
-                                            onConfirm={() => handleDelete(promo._id)}
-                                            trigger={
-                                                <button className="text-red-600 hover:text-red-800">
-                                                    <MdDeleteOutline size={20} />
-                                                </button>
-                                            }
-                                        />
-                                    }
+                                    <button
+                                        onClick={() => {
+                                            setEditingPromo(promo);
+                                            setDialogOpen(true);
+                                        }}
+                                        className="text-blue-600 hover:text-blue-800"
+                                    >
+                                        <LiaEdit size={20} />
+                                    </button>
+                                    <ConfirmDelete
+                                        title="Delete Promo Code"
+                                        description="Are you sure you want to delete this promo code?"
+                                        onConfirm={() => handleDelete(promo._id)}
+                                        trigger={
+                                            <button className="text-red-600 hover:text-red-800">
+                                                <MdDeleteOutline size={20} />
+                                            </button>
+                                        }
+                                    />
                                 </td>
                             </tr>
                         ))}
@@ -128,18 +123,15 @@ const PromoCodeList: React.FC = () => {
                 </table>
             )}
 
-            {hasPermission('promo.delete') &&
-
-                <button
-                    onClick={() => {
-                        setEditingPromo({ _id: '', code: '', type: 'flat', amount: 0, expiryDate: '' });
-                        setDialogOpen(true);
-                    }}
-                    className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition"
-                >
-                    Create Promo Code
-                </button>
-            }
+            <button
+                onClick={() => {
+                    setEditingPromo({ _id: '', code: '', type: 'flat', amount: 0, expiryDate: '' });
+                    setDialogOpen(true);
+                }}
+                className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition"
+            >
+                Create Promo Code
+            </button>
 
             <PaginationComp
                 length={totalPromos}

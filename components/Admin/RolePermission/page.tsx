@@ -24,6 +24,8 @@ import {
 import UserList from "./UserList";
 import { usePermission } from "@/hooks/usePermission";
 import UserModel from "./UserModel";
+import { useUser } from "@clerk/nextjs";
+import { toast } from "react-toastify";
 
 const RolePermissionManager = () => {
     const [roles, setRoles] = useState<Role[]>([]);
@@ -34,6 +36,7 @@ const RolePermissionManager = () => {
     const [users, setUsers] = useState<User[]>([]);
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
     const { reloadPermissions } = usePermission()
+    const userId = useUser().user?.id;
 
     const [showRoleModal, setShowRoleModal] = useState(false);
     const [showUserModal, setShowUserModal] = useState(false);
@@ -86,7 +89,7 @@ const RolePermissionManager = () => {
     useEffect(() => {
         const roleSelectFun = async () => {
             if (selectedRole) {
-                let data = await getPermissionsOfRole(selectedRole._id);
+                const data = await getPermissionsOfRole(selectedRole._id);
                 const permIds = new Set<string>(data.map((perm: Permission) => perm._id));
                 setCheckedPermissions(permIds);
                 setOriginalPermissions(permIds);
@@ -112,10 +115,13 @@ const RolePermissionManager = () => {
 
     // Submit handler for Role add or update
     const handleRoleSubmit = async (name: string, desc: string, id?: string) => {
-        if (id) {
-            await handleUpdateRole(id, name, desc);
-        } else {
-            await handleAddRole(name, desc);
+        if (userId) {
+
+            if (id) {
+                await handleUpdateRole(id, name, desc, userId);
+            } else {
+                await handleAddRole(name, desc, userId);
+            }
         }
         const rolesData = await fetchRoles();
         setRoles(rolesData);
@@ -143,7 +149,6 @@ const RolePermissionManager = () => {
 
 
     const hasChanges = () => {
-
         return checkedPermissions.size !== originalPermissions.size ||
             [...checkedPermissions].some((id) => !originalPermissions.has(id));
     }
@@ -152,11 +157,20 @@ const RolePermissionManager = () => {
     // Submit handler for Permission add or update
     const handlePermissionSubmit = async (permission: Permission) => {
         const { _id, name, key, description } = permission;
-        if (_id) {
-            await updatePermission(_id, name, key, description);
-        } else {
-            await handleAddPermission(name, key, description);
+        if (userId) {
+            const isDuplicateKey = permissions.some((prms: Permission) => prms.key === key);
+            if (!key || isDuplicateKey) {
+                toast.error(isDuplicateKey ? "Sorry, this key is already taken. Use another." : "Key is required.");
+                return;
+            }
+
+            if (_id) {
+                await updatePermission(_id, name, key, description, userId);
+            } else {
+                await handleAddPermission(name, key, description, userId);
+            }
         }
+
         const permissionData = await fetchPermissions();
         reloadPermissions()
         setPermissions(permissionData);
@@ -166,17 +180,21 @@ const RolePermissionManager = () => {
 
     // Handle role delete
     const handleRoleDelete = async (roleId: string) => {
-        await handleDeleteRole(roleId);
-        const rolesData = await fetchRoles();
-        setRoles(rolesData);
-        if (selectedRole?._id === roleId) setSelectedRole(null);
+        if (userId) {
+            await handleDeleteRole(roleId, userId);
+            const rolesData = await fetchRoles();
+            setRoles(rolesData);
+            if (selectedRole?._id === roleId) setSelectedRole(null);
+        }
     };
 
     // Handle permission delete
     const handlePermissionDelete = async (id: string) => {
-        await deletePermission(id);
-        const permissionData = await fetchPermissions();
-        setPermissions(permissionData);
+        if (userId) {
+            deletePermission(id, userId);
+            const permissionData = await fetchPermissions();
+            setPermissions(permissionData);
+        }
     };
 
     return (
@@ -208,7 +226,7 @@ const RolePermissionManager = () => {
                 selectedRole={selectedRole}
                 checkedPermissions={checkedPermissions}
                 setCheckedPermissions={setCheckedPermissions}
-                onSave={() => selectedRole && handleSavePermissions(selectedRole._id, Array.from(checkedPermissions))}
+                onSave={() => (selectedRole && userId) && handleSavePermissions(selectedRole._id, Array.from(checkedPermissions), userId)}
                 onAddPermission={() => {
                     setEditingPermission(null);
                     setShowPermissionModal(true);

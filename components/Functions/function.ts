@@ -67,7 +67,7 @@ export const handleSuccessFunction = (
   setProducts: React.Dispatch<React.SetStateAction<IProductData[]>>,
   setEditingProduct: React.Dispatch<React.SetStateAction<IProductData | null>>
 ) => {
-  toast.success(message || "Product updated successfully");
+  // toast.success(message || "Product updated successfully");
 
   if (editingProduct) {
     setProducts((prev) =>
@@ -88,7 +88,8 @@ export const fetchReviews = async ({ productId, userId }: { productId: string; u
       ? `/review/${productId}/user/${userId}`
       : `/review/${productId}/user/id`;
 
-    const { data } = await api.get(url);
+    const response = await api.get(url);
+    const data = response.data;
 
     if (Array.isArray(data.reviews)) {
       const { reviews, otherReviews = [] } = data as ReviewFecth;
@@ -98,6 +99,11 @@ export const fetchReviews = async ({ productId, userId }: { productId: string; u
     }
   } catch (error) {
     console.error("Error fetching reviews:", error);
+      if (error instanceof AxiosError) {
+        toast.error(error.response?.data?.message );
+    } else {
+        toast.error("Failed to fetching reviews.");
+    }
     return { reviews: [], otherReviews: [] };
   }
 };
@@ -107,8 +113,12 @@ export const handleDeleteReview = async ({ id, user_id }: { id: string, user_id:
   try {
     await api.delete(`/review/${id}/user/${user_id}`);
     toast.success("Review deleted");
-  } catch {
-    toast.error("Failed to delete review");
+  } catch (error){
+     if (error instanceof AxiosError) {
+        toast.error(error.response?.data?.message);
+    } else {
+        toast.error("Failed to delete review");
+    }
   }
 };
 
@@ -273,7 +283,7 @@ export const deleteAddress = async (email: string, address: FormValues) => {
   try {
     const response = await api.delete(`address`, {
       params: { email },
-      data: { address },
+      data: { address , },
     });
     return response.data.message as string;
   } catch (error: unknown) {
@@ -331,15 +341,48 @@ export const fetchPromos = async ({ page = 1, limit = 12, sortField = 'createdAt
 };
 
 
-export const deletePromo = async (_id: string): Promise<void> => {
-  await api.delete(`/promocode/${_id}`);
+export const deletePromo = async (_id: string, userId: string): Promise<void> => {
+  if (userId && _id) {
+    try {
+      await api.delete(`/promocode/${_id}`, {
+        params: { user_id: userId },
+      });
+
+      toast.success("delete success")
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        toast.error(error.response?.data.message);
+      } else {
+        toast.error("Unexpected Error:");
+      }
+      throw error;
+    }
+  }
 };
 
-export const savePromo = async (promo: PromoCode): Promise<void> => {
-  if (promo._id) {
-    await api.put(`/promocode/${promo._id}`, promo);
-  } else {
-    await api.post('/promocode', promo);
+
+export const savePromo = async (promo: PromoCode, userId: string): Promise<void> => {
+  if (userId) {
+    try {
+      if (promo._id) {
+        const res = await api.put(`/promocode/${promo._id}`, promo , {
+          params: { user_id: userId },
+        });
+        toast.success("Promocode Update")
+      } else {
+        const res = await api.post('/promocode', promo , {
+          params: { user_id: userId },
+        });
+        toast.success("Promocode Create")
+      }
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        toast.error(error.response?.data.medssage);
+      } else {
+        toast.error("Unexpected Error:");
+      }
+      throw error;
+    }
   }
 };
 

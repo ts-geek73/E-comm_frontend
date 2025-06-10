@@ -5,11 +5,11 @@ import UpdateProduceComp from "@/components/Admin/Product/updateProduct/page";
 import PromoCodeList from "@/components/Admin/Promocode/PromoCodeList";
 import RolePermissionManager from "@/components/Admin/RolePermission/page";
 import { useState } from "react";
-import { usePermission } from "@/hooks/usePermission";
+// import { usePermission } from "@/hooks/usePermission";
 
 const ProductCreatePage = () => {
   const [activeComponent, setActiveComponent] = useState("updateProduce");
-  const { hasPermission } = usePermission();
+  // const { hasPermission } = usePermission();
 
 
   const handleSidebarClick = (component: string) => {
@@ -43,7 +43,6 @@ const ProductCreatePage = () => {
             Role Permission Manager
           </button>
 
-          { hasPermission('product.create') &&
           <button
           onClick={() => handleSidebarClick("createProduce")}
           className={`block w-full text-left p-3 rounded-md transition-colors duration-200 ${activeComponent === "createProduce"
@@ -53,7 +52,7 @@ const ProductCreatePage = () => {
             >
             Create Product
           </button>
-          }
+          
 
           
           <button

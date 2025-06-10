@@ -39,9 +39,7 @@ import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import apiServer from '../../../lib/axios';
 import { getBrandsandCategories } from '../../Functions/function';
-
-
-
+import { AxiosError } from 'axios';
 
 const ProductForm: React.FC<AdminFormProps> = ({
     productData,
@@ -51,7 +49,7 @@ const ProductForm: React.FC<AdminFormProps> = ({
     purpose = "Create",
     isEdit = false
 }) => {
-    
+
     const [isLoading, setIsLoading] = useState(false);
     const [categories, setCategories] = useState<ICategory[]>([]);
     const [brands, setBrands] = useState<IBrand[]>([]);
@@ -75,21 +73,21 @@ const ProductForm: React.FC<AdminFormProps> = ({
 
     const { control, setValue, reset, } = form;
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const { brands, categories } = await getBrandsandCategories() as BrandCategory;
-        setCategories(categories)
-        setBrands(brands)
-      } catch (error) {
-        console.log("Failed to fetch brands and categories", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const { brands, categories } = await getBrandsandCategories() as BrandCategory;
+                setCategories(categories)
+                setBrands(brands)
+            } catch (error) {
+                console.log("Failed to fetch brands and categories", error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
 
-    fetchData();
-  }, []);
+        fetchData();
+    }, []);
 
 
     useEffect(() => {
@@ -182,9 +180,9 @@ const ProductForm: React.FC<AdminFormProps> = ({
             formData.append('long_description', values.long_description);
             formData.append('price', values.price.toString());
             formData.append('status', values.status ? 'true' : 'false');
-            formData.append('brands', JSON.stringify([{ 
-                name: brands.find((b) => b._id === values.brand)?.name || values.brand, 
-                _id: values.brand 
+            formData.append('brands', JSON.stringify([{
+                name: brands.find((b) => b._id === values.brand)?.name || values.brand,
+                _id: values.brand
             }]));
             formData.append('categories', JSON.stringify(values.category_id));
 
@@ -194,13 +192,13 @@ const ProductForm: React.FC<AdminFormProps> = ({
                 });
             }
 
-            // console.log(formData.);
-            
-    
+            console.log(formData.getAll('imageFiles'));
+
+
             const apiUrl = isEdit && productData?._id
-                ? `/product/update/${productData._id}`  
-                : `/product/create`;  
-    
+                ? `/product/update/${productData._id}`
+                : `/product/create`;
+
             const response = isEdit && productData?._id
                 ? await apiServer.put(apiUrl, formData, {
                     headers: {
@@ -212,7 +210,7 @@ const ProductForm: React.FC<AdminFormProps> = ({
                         'Content-Type': 'multipart/form-data',  // Important for file uploads
                     }
                 });
-    
+
             if (response.status === 200) {
                 const successMessage = isEdit ? 'Product updated successfully!' : 'Product created successfully!';
                 toast.success(response.data?.message || successMessage);
@@ -239,17 +237,21 @@ const ProductForm: React.FC<AdminFormProps> = ({
                         });
                     }
                 }
-            } else {
-                toast.error('Failed to upload product');
             }
+
         } catch (error) {
             console.log('Error submitting product:', error);
-            toast.error('An unexpected error occurred');
+            if (error instanceof AxiosError) {
+                toast.error(error.response?.data?.message);
+            } else {
+                toast.error(`Failed to ${isEdit? "update" : "create"} product`);
+            }
+            // toast.error('An unexpected error occurred');
         } finally {
             setIsLoading(false);
         }
     };
-    
+
     return (
         <>
             <div className="pt-10 px-10 w-full flex justify-center">
@@ -289,7 +291,7 @@ const ProductForm: React.FC<AdminFormProps> = ({
                                                 <Switch
                                                     id="status-toggle"
                                                     checked={field.value}
-                                                    onCheckedChange={(checked : boolean ) => setValue("status", checked)}
+                                                    onCheckedChange={(checked: boolean) => setValue("status", checked)}
                                                     className="w-10 mr-2 bg-gray-200 rounded-full shadow-inner"
                                                 />
                                                 <span className="text-sm text-gray-500">
@@ -539,14 +541,14 @@ const ProductForm: React.FC<AdminFormProps> = ({
                                             {previewImages.map((img, index) => (
                                                 <div key={index} className="group relative rounded-lg overflow-hidden border border-gray-200">
                                                     <div className="aspect-square w-full overflow-hidden bg-gray-100">
-         
 
-                                                        <Image 
+
+                                                        <Image
                                                             src={img.url}
                                                             alt={`Product image ${index + 1}`}
                                                             fill
                                                             className="h-full w-full object-cover transition-all hover:scale-105"
-                                                            />
+                                                        />
                                                     </div>
                                                     <button
                                                         type="button"
