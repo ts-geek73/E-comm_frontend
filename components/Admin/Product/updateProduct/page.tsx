@@ -20,7 +20,7 @@ import {
     handleDelete,
     handleEditClick,
     handleSuccessFunction
-} from "../../../Functions/function";
+} from "../../../Functions/product";
 import ProductForm from "../AdminProductFom";
 import ProductChartsSection from "./ProductCharts";
 import ProductTableView from "./ProductTableView";
@@ -42,7 +42,7 @@ const ProductTable: React.FC = () => {
     const filters: Filters = {};
 
     // Use the hook with the proper filters object
-    const { products, totalLength, isLoading, error } = useProductFetch(
+    const { products, totalLength, isLoading, ordersData, error } = useProductFetch(
         currentPage,
         productPerPage,
         filters
@@ -101,13 +101,6 @@ const ProductTable: React.FC = () => {
         }
     }, [editingProduct]);
 
-    const handleEditClickWrapper = (product: IProductData) => {
-        handleEditClick(product, setEditingProduct);
-    };
-
-    const handleDeleteWrapper = (productId: string) => {
-        handleDelete(productId, setProducts, setTotalProducts);
-    };
 
     return (
         <div className="w-full max-h-screen overflow-auto space-y-8">
@@ -115,15 +108,15 @@ const ProductTable: React.FC = () => {
 
             {err && <p className="text-center text-red-600">{err}</p>}
 
-            <ProductChartsSection products={productArras} />
+            <ProductChartsSection products={productArras} orders={ordersData} />
 
             <ProductTableView
                 products={productArras}
                 loading={loading}
                 currentPage={currentPage}
                 productPerPage={productPerPage}
-                onEditClick={handleEditClickWrapper}
-                onDelete={handleDeleteWrapper}
+                onEditClick={(product: IProductData) => { handleEditClick(product, setEditingProduct) }}
+                onDelete={(productId: string) => { handleDelete(productId, setProducts, setTotalProducts) }}
             />
 
             {editingProduct && (

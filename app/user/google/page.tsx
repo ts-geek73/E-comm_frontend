@@ -1,18 +1,51 @@
 "use client";
 
-import { sendOTPFunction, verifyOTPFUnction } from "@/components/Functions/function";
-import { useState, useRef, useEffect } from "react";
+import { sendOTPFunction, verifyOTPFUnction } from "@/components/Functions/cart-address";
+import Image from "next/image";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 
 declare global {
   interface Window {
-    gapi: any;
-    google: any;
+    google: {
+      accounts: {
+        id: {
+          initialize: (options: {
+            client_id: string;
+            callback: (response: { credential: string }) => void;
+          }) => void;
+          renderButton: (
+            parent: HTMLElement,
+            options: {
+              theme: 'outline' | 'filled_blue' | 'filled_black';
+              size: 'small' | 'medium' | 'large';
+              shape?: 'rectangular' | 'pill' | 'circle' | 'square';
+              width?: number;
+            }
+          ) => void;
+          disableAutoSelect: () => void;
+          cancel: () => void;
+        };
+      };
+    };
   }
 }
 
+interface GoogleCredentialResponse {
+  credential: string;
+  select_by?: string;
+}
+
+export interface AuthUser {
+  email: string;
+  name?: string;
+  picture?: string;
+  verified?: boolean;
+  loginMethod?: 'google' | 'otp';
+}
+
 const GoogleLogin = () => {
-  const [user, setUser] = useState<any>(null);
+const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
@@ -57,7 +90,7 @@ const GoogleLogin = () => {
     return () => clearTimeout(timer);
   }, [countdown]);
 
-  const handleCredentialResponse = async (response: any) => {
+  const handleCredentialResponse = async (response: GoogleCredentialResponse) => {
     const token = response.credential;
     setLoading(true);
 
@@ -270,9 +303,11 @@ const GoogleLogin = () => {
             // User logged in state
             <div className="space-y-4">
               {user.picture ? (
-                <img
+                <Image
                   src={user.picture}
                   alt="User profile"
+                  fill
+                  loading="lazy" 
                   className="w-16 h-16 rounded-full mx-auto"
                 />
               ) : (

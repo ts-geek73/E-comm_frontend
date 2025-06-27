@@ -8,7 +8,7 @@ import ProductCard from '@/components/Product/ProductCard';
 import { AxiosError } from 'axios';
 import { Loader2 } from 'lucide-react';
 import { useUser } from '@clerk/nextjs';
-import { handleWishlistToggle } from '@/components/Functions/function';
+import { handleWishlistToggle } from '@/components/Functions/product';
 
 interface IResponse {
   msg?: string;

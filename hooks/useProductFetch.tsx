@@ -5,7 +5,9 @@ import { Filters, IProductData } from "@/types/product";
 import { AxiosError } from "axios";
 import { useEffect, useState } from "react";
 import { useUser } from "@clerk/nextjs"; // Assuming Clerk is used
-import { getWishlist } from "@/components/Functions/function";
+import { getWishlist } from "@/components/Functions/review-whishlist";
+
+export interface IOrderQty{productId:string, totalQty:number}
 
 const useProductFetch = (
   currentPage: number,
@@ -16,9 +18,11 @@ const useProductFetch = (
   totalLength: number;
   isLoading: boolean;
   error: string | null;
+  ordersData?: IOrderQty[]
   refresh : ()=>Promise<void>
 } => {
   const [products, setProducts] = useState<IProductData[]>([]);
+  const [ordersData, setOrdersData] = useState<IOrderQty[]>([]);
   const [totalLength, setTotalLength] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -35,12 +39,15 @@ const useProductFetch = (
         `/product?start=${start}&length=${productPerPage}&brand=${filters.brand}&category=${filters.category}&pricemin=${filters.pricemin}&pricemax=${filters.pricemax}&sort=${filters.sort}&search=${filters.search}`
       );
 
-      const data = response.data.data;
+      const {data , length, order} = response.data.data;
+      console.log("🚀 ~ fetchProducts ~ data:", data)
+      console.log("🚀 ~ fetchProducts ~ length:", length)
+      console.log("🚀 ~ fetchProducts ~ orders:", order)
 
       if (
         data &&
-        typeof data.length === "number" &&
-        Array.isArray(data.data)
+        typeof length === "number" &&
+        Array.isArray(data) && Array.isArray(order)
       ) {
         let wishlist: string[] = [];
 
@@ -55,10 +62,12 @@ const useProductFetch = (
           wishlist = localWishlist ? JSON.parse(localWishlist) : [];
         }
 
-        const updatedProducts = data.data.map((product: IProductData) => ({
+        const updatedProducts = data.map((product: IProductData) => ({
           ...product,
           isWishlisted: wishlist.includes(product._id),
         }));
+
+        setOrdersData(order);
 
         setProducts(updatedProducts);
         setTotalLength(data.length || 0);
@@ -94,7 +103,7 @@ const useProductFetch = (
     user,
   ]);
 
-  return { products, totalLength, isLoading, error, refresh:fetchProducts };
+  return { products, totalLength,  isLoading, ordersData, error, refresh:fetchProducts };
 };
 
 export default useProductFetch;

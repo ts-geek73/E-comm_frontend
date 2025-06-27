@@ -1,4 +1,5 @@
 'use client';
+import { fetchInvoices, fetchOrders, updateOrderStatus } from '@/components/Functions/order';
 import { InvoiceFiltersComponent } from '@/components/order/InvoiceFilters';
 import InvoicesTab from '@/components/order/InvoiceTabs';
 import OrderDetailsModal from '@/components/order/OrderDetailsModel';
@@ -9,7 +10,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import apiServer from '@/lib/axios';
 import { defaultInvoiceFilters, defaultOrderFilters, IInvoice, InvoiceFilters, IOrder, OrderFilters } from '@/types/user';
 import { useUser } from '@clerk/nextjs';
 import { Filter } from 'lucide-react';
@@ -27,131 +27,110 @@ const OrdersInvoicesPage: React.FC = () => {
   const [itemPerPage] = useState<number>(5)
   const [showFilters, setShowFilters] = useState(false);
   const { user } = useUser();
-  const userEmail = user?.primaryEmailAddress?.emailAddress;
+  const userEmail: string | undefined = user?.primaryEmailAddress?.emailAddress;
+  const userId: string | undefined = user?.id;
   const [totalOrderCount, setOrderTotalCount] = useState<number>(0)
   const [totalInvoiceTotalCount, setInvoiceTotalCount] = useState<number>(0)
   const [orderFilters, setOrderFilters] = useState<OrderFilters>(defaultOrderFilters);
   const [invoiceFilters, setInvoiceFilters] = useState<InvoiceFilters>(defaultInvoiceFilters);
 
-
   useEffect(() => {
-    if (userEmail) {
-      if (activeTab === 'orders') {
-        fetchOrders(1, orderFilters);
-      } else {
-        fetchInvoices(1, invoiceFilters);
+    const loadData = async () => {
+      if (!userEmail) return;
+      setLoading(true);
+
+      try {
+        if (activeTab === 'orders') {
+          const result = await fetchOrders(1, orderFilters, userEmail);
+          if (result) {
+            setOrders(result.orders || []);
+            setOrderTotalCount(result.TotalCount || 0);
+          }
+        } else {
+          const result = await fetchInvoices(1, invoiceFilters, userEmail);
+          if (result) {
+            setInvoices(result.invoices || []);
+            setInvoiceTotalCount(result.TotalCount || 0);
+          }
+        }
+      } catch (err) {
+        console.error("Error loading data:", err);
+      } finally {
+        setLoading(false);
       }
-    }
+    };
+
+    loadData();
   }, [userEmail, activeTab]);
 
   // Handle order page change
   useEffect(() => {
-    if (userEmail && activeTab === 'orders') {
-      fetchOrders(currentOrderPage, orderFilters);
-    }
+    const loadOrders = async () => {
+      if (!userEmail || activeTab !== 'orders') return;
+      const result = await fetchOrders(currentOrderPage, orderFilters, userEmail);
+      if (result) {
+        setOrders(result.orders || []);
+        setOrderTotalCount(result.TotalCount || 0);
+      }
+    };
+    loadOrders();
   }, [currentOrderPage]);
 
-  // Handle invoice page change
   useEffect(() => {
-    if (userEmail && activeTab === 'invoices') {
-      fetchInvoices(currentInvoicePage, invoiceFilters);
-    }
+    const loadInvoices = async () => {
+      if (!userEmail || activeTab !== 'invoices') return;
+      const result = await fetchInvoices(currentInvoicePage, invoiceFilters, userEmail);
+      if (result) {
+        setInvoices(result.invoices || []);
+        setInvoiceTotalCount(result.TotalCount || 0);
+      }
+    };
+    loadInvoices();
   }, [currentInvoicePage]);
 
-  const fetchOrders = async (page: number = currentOrderPage, filters = orderFilters) => {
-    if (!userEmail) return;
-
-    try {
-      setLoading(true);
-      const queryParams = new URLSearchParams({
-        email: userEmail,
-        page: page.toString(),
-        limit: filters.limit.toString(),
-        sortBy: filters.sortBy,
-        sortOrder: filters.sortOrder,
-        ...(filters.status !== 'all' && { status: filters.status }),
-        ...(filters.search && { search: filters.search }),
-        ...(filters.dateFrom && { dateFrom: filters.dateFrom }),
-        ...(filters.dateTo && { dateTo: filters.dateTo }),
-      });
-
-      // console.log(queryParams);
 
 
-      const response = await apiServer.get(`/order/invoice?${queryParams.toString()}`);
-      const data = response.data;
-      // console.log("fetchOrders:", data);
-
-
-      if (data.success) {
-        setOrders(data.data.items);
-        setOrderTotalCount(data.data.totalCount);
-      }
-    } catch (error) {
-      console.error('Error fetching orders:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Fetch invoices separately
-  const fetchInvoices = async (page: number = currentInvoicePage, filters = invoiceFilters) => {
-    if (!userEmail) return;
-
-    try {
-      setLoading(true);
-      const queryParams = new URLSearchParams({
-        email: userEmail,
-        invoices: 'true',
-        page: page.toString(),
-        limit: filters.limit.toString(),
-        sortBy: filters.sortBy,
-        sortOrder: filters.sortOrder,
-
-        ...(filters.search && { search: filters.search }),
-        ...(filters.dateFrom && { dateFrom: filters.dateFrom }),
-        ...(filters.dateTo && { dateTo: filters.dateTo }),
-      });
-
-      // console.log("queryParams", queryParams);
-
-
-      const response = await apiServer.get(`/order/invoice?${queryParams.toString()}`);
-      const data = response.data;
-      // console.log("fetchInvoices:", data);
-
-
-      if (data.success) {
-        setInvoices(data.data.items);
-        setInvoiceTotalCount(data.data.totalCount);
-      }
-    } catch (error) {
-      console.error('Error fetching invoices:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleOrderFilterChange = (key: string, value: string) => {
-    setOrderFilters((prev) => ({ ...prev, [key]: value }));
-    fetchOrders(1, { ...orderFilters, [key]: value }); // Reset to page 1
+  const handleOrderFilterChange = async (key: string, value: string) => {
+    const newFilters = { ...orderFilters, [key]: value };
+    setOrderFilters(newFilters);
     setOrderPage(1);
+    const result = await fetchOrders(1, newFilters, userEmail ?? '');
+    if (result) {
+      setOrders(result.orders || []);
+      setOrderTotalCount(result.TotalCount || 0);
+    }
   };
-  const handleInvoiceFilterChange = (key: string, value: string) => {
-    setInvoiceFilters((prev) => ({ ...prev, [key]: value }));
-    fetchInvoices(1, { ...invoiceFilters, [key]: value }); // Reset to page 1
+
+  const handleInvoiceFilterChange = async (key: string, value: string) => {
+    const newFilters = { ...invoiceFilters, [key]: value };
+    setInvoiceFilters(newFilters);
     setInvoicePage(1);
+    const result = await fetchInvoices(1, newFilters, userEmail ?? '');
+    if (result) {
+      setInvoices(result.invoices || []);
+      setInvoiceTotalCount(result.TotalCount || 0);
+    }
   };
 
-  const clearOrderFilters = () => {
+  const clearOrderFilters = async () => {
+    console.log("🚀 ~ clearOrderFilters ~ clearOrderFilters:")
     setOrderFilters(defaultOrderFilters);
-    fetchOrders(1, defaultOrderFilters);
+    const result = await fetchOrders(1, defaultOrderFilters, userEmail ?? " ");
+    if (result) {
+      setOrders(result.orders || []);
+      setOrderTotalCount(result.TotalCount || 0);
+    }
     setOrderPage(1);
   };
 
-  const clearInvoiceFilters = () => {
+  const clearInvoiceFilters = async () => {
     setInvoiceFilters(defaultInvoiceFilters);
-    fetchInvoices(1, defaultInvoiceFilters);
+    const result = await fetchInvoices(1, defaultInvoiceFilters, userEmail ?? " ");
+    if (result) {
+      setInvoices(result.invoices || []);
+      setInvoiceTotalCount(result.TotalCount || 0);
+    }
+    fetchInvoices(1, defaultInvoiceFilters, userEmail ?? " ");
     setInvoicePage(1);
   };
 
@@ -159,6 +138,21 @@ const OrdersInvoicesPage: React.FC = () => {
     setSelectedOrder(order);
     setIsModalOpen(true);
   };
+
+  const onCancelOrder = async(order: IOrder) => {
+    if (userId && userEmail) {
+      await updateOrderStatus("cancel", order, userId, userEmail)
+    }
+    clearOrderFilters()
+  };
+  
+  const onReturnOrder = async(order: IOrder) => {
+    if (userId && userEmail) {
+      await updateOrderStatus("return", order, userId, userEmail)
+    }
+    clearOrderFilters()
+  };
+
 
   const closeModal = () => {
     setIsModalOpen(false);
@@ -218,6 +212,9 @@ const OrdersInvoicesPage: React.FC = () => {
             <OrdersTab
               orders={orders}
               onViewOrder={openOrderModal}
+              onReturnOrder={onReturnOrder}
+              onCancelOrder={onCancelOrder}
+
             />
             <PaginationComp
               length={totalOrderCount}

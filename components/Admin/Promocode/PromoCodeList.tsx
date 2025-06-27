@@ -6,7 +6,6 @@ import { LiaEdit } from 'react-icons/lia';
 import { MdDeleteOutline } from 'react-icons/md';
 import PaginationComp from '../../Product/PaginationComp';
 import PromoCodeDialog from './promoDialogBox';
-import { usePermission } from '@/hooks/usePermission';
 
 const PromoCodeList: React.FC = () => {
     const [sortField, setSortField] = useState<string>('createdAt');

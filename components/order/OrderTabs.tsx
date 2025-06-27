@@ -5,8 +5,13 @@ import React from 'react';
 import { OrderCard } from './OrderCard';
 
 const OrdersTab:
-    React.FC<{ orders: IOrder[]; onViewOrder: (order: IOrder) => void; }> =
-    ({ orders, onViewOrder }) => {
+    React.FC<{ 
+        orders: IOrder[]; 
+        onViewOrder: (order: IOrder) => void;
+        onCancelOrder: (order: IOrder) => void;
+        onReturnOrder: (order: IOrder) => void;
+     }> =
+    ({ orders, onViewOrder, onCancelOrder,onReturnOrder  }) => {
 
         return (
             <div className="space-y-4">
@@ -18,6 +23,8 @@ const OrdersTab:
                                 order={order}
                                 titlePrefix="Order"
                                 onViewDetails={(order) => onViewOrder(order)}
+                                onCancelOrder={(order)=> onCancelOrder(order)}
+                                onReturnOrder={(order)=> onReturnOrder(order)}
                                 showItems={true}
                             />
 

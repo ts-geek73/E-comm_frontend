@@ -1,154 +1,144 @@
-'use client'
-import { Bar, Bubble, Doughnut, Line, Pie, PolarArea, Radar } from 'react-chartjs-2';
+"use client";
+
+import {
+    dualAxisOptions,
+    getCategoryData,
+    getOrderAnalysisData,
+    getPriceRangeData,
+    pieChartOptions,
+} from "@/components/Functions/charts";
+import { IOrderQty } from "@/hooks/useProductFetch";
 import { IProductData } from "@/types/product";
+import {
+    ArcElement,
+    BarElement,
+    CategoryScale,
+    Chart as ChartJS,
+    Filler,
+    Legend,
+    LinearScale,
+    LineElement,
+    PointElement,
+    Title,
+    Tooltip,
+} from "chart.js";
+import { Layers, Package, Store, Tag } from "lucide-react";
+import { JSX } from "react";
+import { Bar, Doughnut, Pie } from "react-chartjs-2";
+import CountUp from "react-countup";
 
-const ProductChartsSection: React.FC<{products: IProductData[]}> = ({ products }) => {
-    const filteredProducts = products.filter((product) => product.price < 5000 && product.price > 100);
-    const radarFilteredProducts = products.filter((product) => product.price < 5000 && product.price >= 500);
+ChartJS.register(
+    CategoryScale,
+    LinearScale,
+    BarElement,
+    Title,
+    Tooltip,
+    Legend,
+    ArcElement,
+    PointElement,
+    LineElement,
+    Filler
+);
 
-    const chartData = {
-        labels: filteredProducts.map(product => product.name),
-        datasets: [
-            {
-                label: 'Price',
-                data: filteredProducts.map(product => product.price),
-                backgroundColor: [
-                    '#60A5FA', '#34D399', '#F87171', '#FBBF24', '#A78BFA', '#F472B6',
-                    '#4ADE80', '#FCD34D', '#C084FC', '#38BDF8', '#FB923C', '#F472B6'
-                ],
-                borderWidth: 1,
-                fill: true
-            },
-        ],
-    };
+const ProductChartsSection: React.FC<{
+    products: IProductData[];
+    orders?: IOrderQty[];
+}> = ({ products, orders = [] }) => {
+    const priceRangeData = getPriceRangeData(products);
+    const categoryData = getCategoryData(products);
+    const orderAnalysisData = getOrderAnalysisData(products, orders);
 
-    const areaChartData = {
-        labels: filteredProducts.map(product => product.name),
-        datasets: [
-            {
-                label: 'Price',
-                data: filteredProducts.map(product => product.price),
-                backgroundColor: "rgba(34,34,192,0.4)",
-                borderWidth: 1,
-                fill: true
-            },
-        ],
-    };
-
-    const radarChartData = {
-        labels: radarFilteredProducts,
-        datasets: [
-            {
-                label: 'Price',
-                data: radarFilteredProducts.map(product => product.price),
-                backgroundColor: 'rgba(34, 197, 94, 0.3)',
-                borderColor: 'rgba(34, 197, 94, 1)',
-                pointBackgroundColor: 'rgba(34, 197, 94, 1)',
-                borderWidth: 1,
-                fill: true,
-            },
-        ],
-    };
-
-    const bubbleChartData = {
-        datasets: [
-            {
-                label: 'Product Bubble',
-                data: products.map((p, index) => ({
-                    x: index,
-                    y: p.price,
-                    r: Math.max(5, Math.min(p.price / 1000, 20)),
-                })),
-                backgroundColor: 'rgba(53, 162, 235, 0.5)',
-                borderColor: 'rgba(53, 162, 235, 1)',
-            },
-        ],
-    };
-
-    const chartOptions = {
-        responsive: true,
-        plugins: {
-            legend: {
-                display: false,
-            },
+    const chartList: { title: string, count: number, bg?: string, icon?: JSX.Element, trend?: string, prefix?: string }[] = [
+        {
+            title: "Active Products",
+            count: products.length,
+            bg: "from-blue-500 to-blue-600",
+            icon: <Package className="w-5 h-5" />,
+            trend: "+5%",
         },
-        scales: {
-            y: {
-                beginAtZero: true,
-            },
+        {
+            title: "Avg Price",
+            count: Math.round(products.reduce((sum, p) => sum + p.price, 0) / products.length) || 0,
+            bg: "from-green-500 to-green-600",
+            prefix: "₹",
+            icon: <Tag className="w-5 h-5" />,
+            trend: "-2%",
         },
-    };
-
-    const radarChartOptions = {
-        responsive: true,
-        plugins: {
-            legend: {
-                display: false,
-            },
+        {
+            title: "Categories",
+            count: new Set(products.flatMap(p => p.categories?.map(c => c.name) || [])).size,
+            bg: "from-purple-500 to-purple-600",
+            icon: <Layers className="w-5 h-5" />,
+            trend: "+1%",
         },
-        scales: {
-            r: {
-                angleLines: {
-                    color: '#ddd',
-                },
-                grid: {
-                    color: '#ccc',
-                },
-                pointLabels: {
-                    color: '#333',
-                },
-                ticks: {
-                    backdropColor: 'transparent',
-                    color: '#666',
-                },
-            },
+        {
+            title: "Brands",
+            count: new Set(products.flatMap(p => p.brands?.map(b => b.name) || [])).size,
+            bg: "from-orange-500 to-orange-600",
+            icon: <Store className="w-5 h-5" />,
+            trend: "+3%",
         },
-    };
-
-    const bubbleChartOptions = {
-        responsive: true,
-        plugins: {
-            title: {
-                display: true,
-                text: 'Bubble Chart - Product Price vs Index',
-            },
-        },
-        scales: {
-            x: {
-                title: { display: true, text: 'Product Index' },
-            },
-            y: {
-                title: { display: true, text: 'Price (Rs)' },
-            },
-        },
-    };
+    ]
 
     return (
-        <div className="space-y-6">
-            <h2 className="text-2xl font-semibold mb-4 text-center">Product Price Distribution</h2>
-            <div className="flex justify-center flex-wrap-reverse gap-6 my-6">
-                <div className="w-72 h-72">
-                    <Pie data={chartData} options={chartOptions} />
-                </div>
-                <div className="w-[500px] h-72">
-                    <Line data={areaChartData} options={chartOptions} />
-                </div>
-                <div className="w-[500px] h-72">
-                    <Bar data={chartData} options={chartOptions} />
-                </div>
-                <div className="w-[500px] h-72">
-                    <Radar data={radarChartData} options={radarChartOptions} />
-                </div>
-                <div className="w-[500px] h-72">
-                    <PolarArea data={chartData} options={chartOptions} />
-                </div>
-                <div className="w-[500px] h-72">
-                    <Bubble data={bubbleChartData} options={bubbleChartOptions} />
-                </div>
-                <div className="w-[500px] h-72">
-                    <Doughnut data={chartData} options={chartOptions} />
-                </div>
+        <div className="space-y-8 p-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {chartList.map(({ title, count, bg, prefix = "", icon, trend }, index) => (
+                    <div
+                        key={index}
+                        className={`relative group bg-gradient-to-bl ${bg} rounded-3xl p-6 backdrop-blur-xl border border-white/20 shadow-lg  transition-all duration-300  overflow-hidden`}
+                    >
+                        <div className="absolute top-5 right-6 p-3 rounded-2xl bg-white/20 backdrop-blur-md shadow-md flex items-center justify-center">
+                            {icon}
+                        </div>
+                        <div className="text-white font-semibold text-3xl">{title}</div>
+                        <div className="pt-10">
+                            {trend && (
+                                <div className="flex justify-butween w-full mb-2">
+                                    <div className="text-3xl font-extrabold text-white mb-2 tracking-tight">
+                                        {prefix}
+                                        <CountUp end={count} duration={1.5} separator="," />
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                ))}
             </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div className="bg-white p-6 rounded-xl shadow-lg">
+                    <h3 className="text-xl font-semibold mb-4 text-gray-700">
+                        Price Range Distribution
+                    </h3>
+                    <div className="h-80">
+                        <Doughnut data={priceRangeData} options={pieChartOptions} />
+                    </div>
+                </div>
+
+                <div className="bg-white p-6 rounded-xl shadow-lg">
+                    <h3 className="text-xl font-semibold mb-4 text-gray-700">
+                        Top Categories
+                    </h3>
+                    <div className="h-80">
+                        <Pie data={categoryData} options={pieChartOptions} />
+                    </div>
+                </div>
+
+                {orderAnalysisData && (
+                    <div className="bg-white p-6 rounded-xl shadow-lg lg:col-span-2">
+                        <h3 className="text-xl font-semibold mb-4 text-gray-700">
+                            Order Quantity vs Price Analysis
+                        </h3>
+                        <div className="h-80">
+                            <Bar data={orderAnalysisData} options={dualAxisOptions} />
+                        </div>
+                    </div>
+                )}
+            </div>
+
+
+
         </div>
     );
 };

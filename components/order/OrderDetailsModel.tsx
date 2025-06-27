@@ -3,7 +3,7 @@ import { IOrder } from '@/types/user';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { formatAmount, getStatusColor } from '../Functions/function';
+import { formatAmount, getStatusColor } from '../Functions/product';
 import OrderItemsList from './OrderList';
 
 const OrderDetailsModal: React.FC<{

@@ -100,6 +100,15 @@ export interface ICartresponce {
   totalPrice: number
 }
 
+export interface ComplementaryProductsProps {
+  products: IProductData[]
+  title?: string
+  onClose?: () => void
+  onAddToCart: (product: IProductData) => void
+  isVisible?: boolean
+  triggerProduct?: IProductData
+}
+
 export interface PromoCode {
     _id: string;
     code: string;

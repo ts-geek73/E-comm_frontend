@@ -4,7 +4,7 @@ import { defaultFilters, FilterBarProps, FilterValues } from '@/types/components
 import { BrandCategory, IBrand, ICategory } from '@/types/product';
 import debounce from 'lodash/debounce';
 import { useEffect, useMemo, useState } from 'react';
-import { getBrandsandCategories } from '../Functions/function';
+import { getBrandsandCategories } from '../Functions/product';
 
 const FilterBar = ({ onFilterChange, initialFilters }: FilterBarProps) => {
   const [isFiltering, setIsFiltering] = useState(false);
@@ -113,8 +113,8 @@ const FilterBar = ({ onFilterChange, initialFilters }: FilterBarProps) => {
             {(showAllCategories
               ? brandCategoryObject.categories
               : brandCategoryObject.categories?.slice(0, maxVisibleCategories)
-            )?.map((category) => (
-              <label key={category._id as string} className="flex items-center gap-2 text-sm text-gray-700">
+            )?.map((category, index) => (
+              <label key={index} className="flex items-center gap-2 text-sm text-gray-700">
                 <input
                   type="checkbox"
                   checked={filter.category?.includes(category._id as string) || false}

@@ -3,10 +3,10 @@ import { useProductFetch } from '@/hooks';
 import { defaultFilters, ProductListProps, } from '@/types/components';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { handleWishlistToggle } from '../Functions/function';
 import Pagination from './PaginationComp';
 import ProductCard from './ProductCard';
 import { useUser } from '@clerk/nextjs';
+import { handleWishlistToggle } from '../Functions/review-whishlist';
 
 const ProductList: React.FC<ProductListProps> = ({ filters = defaultFilters, dataIndex }) => {
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -20,8 +20,6 @@ const ProductList: React.FC<ProductListProps> = ({ filters = defaultFilters, dat
     productPerPage,
     filters
   );
-
-
 
   useEffect(() => {
     setCurrentPage(1);

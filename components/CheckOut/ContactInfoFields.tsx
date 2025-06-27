@@ -5,8 +5,6 @@ import { Label } from "../ui/label";
 import { FieldErrors } from "react-hook-form";
 
 export function ContactInfoFields({ register, errors, fieldPrefix, userEmail }: ContactInfoFieldsProps) {
-
-
   const currentErrors = errors[fieldPrefix as AddressKey] as FieldErrors<ExtendedFormValues>;
 
   return (

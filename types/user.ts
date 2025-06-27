@@ -29,7 +29,7 @@ export interface IOrder {
   date?: string;
   totalAmount?: number;
   invoiceUrl?: string;
-  status: string;
+status: 'pending' | 'paid' | 'failed' | 'shipped' |"return"| 'complete' | 'cancelled';
   items: IOrderItem[];
   email?: string;
   session_id?: string;

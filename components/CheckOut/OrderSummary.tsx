@@ -1,6 +1,5 @@
 "use client"
 
-import { validatePromo } from "@/components/Functions/function"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -9,6 +8,7 @@ import { Loader2, ShoppingBag, X } from "lucide-react"
 import Image from "next/image"
 import { useCallback, useEffect, useState } from "react"
 import { toast } from "react-toastify"
+import { validatePromo } from "../Functions/promocode"
 
 export default function OrderSummary({
   cartdata,

@@ -1,53 +1,28 @@
-import React from "react";
-import { Calendar, CreditCard, Eye, Package, Download } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { IOrder } from "@/types/user";
-import saveAs from 'file-saver';
-import { formatAmount, formatDate, getStatusColor } from "../Functions/function";
+import { Calendar, CreditCard, Download, Eye, Package } from "lucide-react";
+import React from "react";
+import { formatAmount, formatDate, getStatusColor } from "../Functions/product";
+import { triggerDownload } from "../Functions/cart-address";
 
 export const OrderCard: React.FC<{
     order: IOrder;
     titlePrefix?: string;
     onViewDetails?: (order: IOrder) => void;
+    onCancelOrder?: (order: IOrder) => void;
+    onReturnOrder?: (order: IOrder) => void;
     url?: string
     showItems?: boolean;
 }> = ({
     order,
     titlePrefix = "Order",
     onViewDetails,
+    onCancelOrder,
+    onReturnOrder,
     url,
     showItems = false,
 }) => {
-
-        const triggerDownload = (url: string, filename: string) => {
-            const a = document.createElement("a");
-            a.href = url;
-            a.target = "_blank"
-            a.download = filename;
-            a.style.display = "none";
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-
-            fetch(url)
-                .then(response => {
-                    console.log(response);
-                    
-                    if (!response.ok) throw new Error('Network response was not ok');
-                    return response.blob();
-                })
-                .then(blob => {
-                    saveAs(blob, filename);
-                })
-                .catch(error => {
-                    console.error('Download error:', error);
-                });
-
-
-
-        };
-
 
         return (
             <div className="grid grid-cols-[2fr_1fr] gap-4 mb-6">
@@ -97,13 +72,31 @@ export const OrderCard: React.FC<{
                             className="flex items-center space-x-2"
                         >
                             <Eye className="w-4 h-4" />
-                            <span>View Details</span>
+                            <span>View Details </span>
                         </Button>
                     )}
 
-                    {url && (
-                        // <a href={url} download target="_blank" rel="noopener noreferrer">
+                    {order.status == "pending" && onCancelOrder && (
+                        <Button
+                            variant="destructive"
+                            onClick={() => onCancelOrder(order)}
+                            className="flex items-center space-x-2 bg-red-600 text-white hover:bg-red-700"
+                        >
+                            Cancel
+                        </Button>
+                    )}
 
+                    {order.status == "complete" && onReturnOrder && (
+                        <Button
+                            onClick={() => onReturnOrder(order)}
+                            className="flex items-center space-x-2 bg-yellow-500 hover:bg-yellow-600"
+                        >
+                            Return
+                        </Button>
+                    )}
+
+
+                    {url && (
                         <Button
                             onClick={() => triggerDownload(url, 'invoice.pdf')}
 

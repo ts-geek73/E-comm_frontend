@@ -4,7 +4,7 @@ import { IProductData as IProduct } from '@/types/product';
 import { IResponse as ProductResponse } from '@/types/response';
 import { AxiosError } from 'axios';
 import { useUser } from '@clerk/nextjs';
-import { addToWishlist, getLocalWishlist, getWishlist, removeFromWishlist } from '@/components/Functions/function';
+import { getWishlist , addToWishlist, getLocalWishlist, removeFromWishlist} from '@/components/Functions/review-whishlist';
 
 const useProductDetail = (id: string | undefined) => {
   const { user } = useUser();
@@ -16,7 +16,6 @@ const useProductDetail = (id: string | undefined) => {
   const [error, setError] = useState<string | null>(null);
   const [isWishlisted, setIsWishlisted] = useState(false);
 
-  // Fetch product details
   useEffect(() => {
     if (!id) return;
 

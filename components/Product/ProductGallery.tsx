@@ -7,9 +7,9 @@ import type { IImageUrl } from '@/types/product';
 
 export const ProductImageGallery: React.FC<{ images: IImageUrl[]; }> = ({ images }) => {
 
-  const [selectedImage, setSelectedImage] = useState(0);
+  const [selectedImage, setSelectedImage] = useState<number>(0);
 
-  if (images.length === 0) return null;
+  if (images.length === 0) return <>NO Images</>;
 
   return (
     <div className="p-6 md:p-8 bg-gray-50">

@@ -16,6 +16,16 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
+        hostname: 'cdn.sanity.io',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'octodex.github.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
         hostname: 'plus.unsplash.com',
         pathname: '/**',
       },
@@ -156,6 +166,9 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  allowedDevOrigins: [
+    '6c77-2405-201-2023-33bc-14ec-3fa4-eb24-632c.ngrok-free.app',
+  ],
 };
 
 export default nextConfig;

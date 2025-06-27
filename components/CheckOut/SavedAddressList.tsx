@@ -2,7 +2,7 @@ import { SavedAddress, SavedAddressListProps } from "@/types/components";
 import { MapPin, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "react-toastify";
-import { deleteAddress } from "../Functions/function";
+import { deleteAddress } from "../Functions/cart-address";
 import ConfirmDelete from "../Header/ConfirmDelete";
 import { Button } from "../ui/button";
 import { SavedAddressCard } from "./SavedAddressCard";

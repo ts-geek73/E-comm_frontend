@@ -1,5 +1,6 @@
 "use client"
 
+import FileUpload from "@/components/Admin/CsvFileUpload/page";
 import CreateProduceComp from "@/components/Admin/Product/createProduct";
 import UpdateProduceComp from "@/components/Admin/Product/updateProduct/page";
 import PromoCodeList from "@/components/Admin/Promocode/PromoCodeList";
@@ -26,8 +27,8 @@ const ProductCreatePage = () => {
           <button
             onClick={() => handleSidebarClick("updateProduce")}
             className={`block w-full text-left p-3 rounded-md transition-colors duration-200 ${activeComponent === "updateProduce"
-                ? "bg-blue-600 text-white"
-                : "hover:bg-gray-200 text-gray-700"
+              ? "bg-blue-600 text-white"
+              : "hover:bg-gray-200 text-gray-700"
               }`}
           >
             Product List
@@ -36,30 +37,39 @@ const ProductCreatePage = () => {
           <button
             onClick={() => handleSidebarClick("rolePermission")}
             className={`block w-full text-left p-3 rounded-md transition-colors duration-200 ${activeComponent === "rolePermission"
-                ? "bg-blue-600 text-white"
-                : "hover:bg-gray-200 text-gray-700"
+              ? "bg-blue-600 text-white"
+              : "hover:bg-gray-200 text-gray-700"
               }`}
           >
             Role Permission Manager
           </button>
 
           <button
-          onClick={() => handleSidebarClick("createProduce")}
-          className={`block w-full text-left p-3 rounded-md transition-colors duration-200 ${activeComponent === "createProduce"
-            ? "bg-blue-600 text-white"
-            : "hover:bg-gray-200 text-gray-700"
-            }`}
-            >
+            onClick={() => handleSidebarClick("createProduce")}
+            className={`block w-full text-left p-3 rounded-md transition-colors duration-200 ${activeComponent === "createProduce"
+              ? "bg-blue-600 text-white"
+              : "hover:bg-gray-200 text-gray-700"
+              }`}
+          >
             Create Product
           </button>
-          
+          <button
+            onClick={() => handleSidebarClick("fileUpload")}
+            className={`block w-full text-left p-3 rounded-md transition-colors duration-200 ${activeComponent === "fileUpload"
+              ? "bg-blue-600 text-white"
+              : "hover:bg-gray-200 text-gray-700"
+              }`}
+          >
+            File Uploaing
+          </button>
 
-          
+
+
           <button
             onClick={() => handleSidebarClick("promoCodeList")}
             className={`block w-full text-left p-3 rounded-md transition-colors duration-200 ${activeComponent === "promoCodeList"
-                ? "bg-blue-600 text-white"
-                : "hover:bg-gray-200 text-gray-700"
+              ? "bg-blue-600 text-white"
+              : "hover:bg-gray-200 text-gray-700"
               }`}
           >
             Promo Code
@@ -73,6 +83,7 @@ const ProductCreatePage = () => {
           {activeComponent === "updateProduce" && <UpdateProduceComp />}
           {activeComponent === "promoCodeList" && <PromoCodeList />}
           {activeComponent === "rolePermission" && <RolePermissionManager />}
+          {activeComponent === "fileUpload" && <FileUpload />}
         </div>
       </main>
 

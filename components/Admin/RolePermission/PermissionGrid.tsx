@@ -29,7 +29,11 @@ const PermissionGrid: React.FC<Props> = ({
 
   const toggleCheck = (id: string) => {
     const updated = new Set(checkedPermissions);
-    updated.has(id) ? updated.delete(id) : updated.add(id);
+    if (updated.has(id)) {
+      updated.delete(id);
+    } else {
+      updated.add(id);
+    }
     setCheckedPermissions(updated);
   };
 
