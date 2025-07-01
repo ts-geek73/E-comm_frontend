@@ -1,3 +1,4 @@
+'use client'
 import ConfirmDelete from '@/components/Header/ConfirmDelete';
 import { usePromoCodes } from '@/hooks';
 import { PromoCode } from '@/types/product';

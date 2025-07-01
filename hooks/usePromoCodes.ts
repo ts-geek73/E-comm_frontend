@@ -1,3 +1,4 @@
+'use client'
 import { useState, useCallback } from 'react';
 import { FetchParams, PromoCode } from '@/types/product';
 import { useUser } from '@clerk/nextjs';

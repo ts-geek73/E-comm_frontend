@@ -6,6 +6,7 @@ import {
   ClerkProvider
 } from '@clerk/nextjs'
 import { ToastContainer } from "react-toastify";
+import { StrictMode } from "react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,26 +32,20 @@ export default function RootLayout({
     <ClerkProvider
       data-new-gr-c-s-check-loaded="14.1223.0"
       data-gr-ext-installed="">
-      <html lang="en" suppressHydrationWarning>
-        <head>
-          <title>Google Sign-In</title>
-          <script src="https://accounts.google.com/gsi/client" async defer></script>
-        </head>
-        <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-          <HeadBar />
-          <header className="flex justify-end items-center">
-            {/* <SignedOut>
-             <SignInButton />
-             <SignUpButton />
-           </SignedOut>
-           <SignedIn>
-             <UserButton />
-           </SignedIn> */}
-          </header >
-          {children}
-          <ToastContainer />
-        </body>
-      </html>
-    </ClerkProvider>
+      <StrictMode>
+        <html lang="en" suppressHydrationWarning>
+          <head>
+            <title>Google Sign-In</title>
+            <script src="https://accounts.google.com/gsi/client" async defer></script>
+          </head>
+          <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+            <HeadBar />
+            <header className="flex justify-end items-center"></header >
+            {children}
+            <ToastContainer />
+          </body>
+        </html>
+      </StrictMode>
+    </ClerkProvider >
   );
 }

@@ -103,7 +103,7 @@ const ProductTable: React.FC = () => {
 
 
     return (
-        <div className="w-full max-h-screen overflow-auto space-y-8">
+        <div className="w-full py-8 px-2 space-y-8">
             <h1 className="text-4xl font-semibold text-center text-gray-900">Product Management</h1>
 
             {err && <p className="text-center text-red-600">{err}</p>}

@@ -40,10 +40,7 @@ const useProductFetch = (
       );
 
       const {data , length, order} = response.data.data;
-      console.log("🚀 ~ fetchProducts ~ data:", data)
-      console.log("🚀 ~ fetchProducts ~ length:", length)
-      console.log("🚀 ~ fetchProducts ~ orders:", order)
-
+      
       if (
         data &&
         typeof length === "number" &&

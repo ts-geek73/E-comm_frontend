@@ -30,7 +30,11 @@ export default function CartPage() {
     try {
       if (user?.id) {
         const cartData = await fetchcart(user.id);
-        setCartdata(cartData);
+        setCartdata({
+          cart: [...cartData.inStock, ...cartData.outOfStock],
+          totalItems: cartData.totalItems,
+          totalPrice: cartData.totalPrice
+        });
       } else {
         const cartdata = getLocalCart();
         const localCartData: ICartresponce = {
@@ -58,11 +62,11 @@ export default function CartPage() {
   useEffect(() => {
     if (user === undefined) return;
 
-    user?.id ? loadCart() : loadCart();
+    loadCart();
   }, [user]);
 
   const handleQuantityChange = async (productId: string, change: number) => {
-    const item = cartdata?.cart.find((item) => item._id === productId);
+    const item = cartdata?.cart && cartdata?.cart.find((item) => item._id === productId);
     if (!item) return;
 
     const newQuantity = item.qty + change;
@@ -126,7 +130,7 @@ export default function CartPage() {
   const handleComplementaryAddToCart = async (product: IProductData) => {
     try {
       let newQuantity: number = 1;
-      const item = cartdata?.cart.find((item) => item._id === product._id);
+      const item = cartdata?.cart && cartdata?.cart.find((item) => item._id === product._id);
       if (item) {
         newQuantity = item.qty + 1;
       };
@@ -154,7 +158,7 @@ export default function CartPage() {
     );
   }
 
-  if (cartdata && cartdata?.cart.length === 0) {
+  if (cartdata && cartdata?.cart && cartdata?.cart.length === 0) {
     return (
       <div className="container mx-auto p-6 min-h-screen flex flex-col items-center justify-center">
         <div className="text-center max-w-md">
@@ -167,6 +171,13 @@ export default function CartPage() {
             <ArrowLeft size={20} className="mr-2" />
             Continue Shopping
           </Link>
+        </div>
+        <div className="overflow-hidden">
+          <ComplementaryProducts
+            products={products}
+            title="Product you might to be like"
+            onAddToCart={handleComplementaryAddToCart}
+          />
         </div>
       </div>
     );
@@ -205,7 +216,7 @@ export default function CartPage() {
 
             <CardContent className="p-0">
               <div className="divide-y divide-blue-100">
-                {cartdata?.cart.map((item, index) => (
+                {cartdata?.cart && cartdata?.cart.map((item, index) => (
                   <CartItemCard
                     key={item._id + index}
                     item={item}

@@ -1,167 +1,164 @@
-// "use client"
+"use client"
 
-// import { useState, useMemo } from "react"
-// import { Eye, Plus, Search } from "lucide-react"
-// import { Button } from "@/components/ui/button"
-// import { Input } from "@/components/ui/input"
-// import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-// import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-// import { Badge } from "@/components/ui/badge"
-// import { ProductCombobox } from "./product-combobox"
-// import { StockDetailsModal } from "./stock-details-modal"
-// import { useProductFetch } from "@/hooks/use-product-fetch"
-// import type { StockEntry, Filters } from "@/types"
+import { addStockEntry, fetchStockEntries, updateStockEntry, deleteStockEntry } from "@/components/Functions/stock"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { useProductFetch } from "@/hooks"
+import { IStockEntry } from "@/types/stock"
+import { useUser } from "@clerk/nextjs"
+import { Plus } from "lucide-react"
+import { memo, useEffect, useRef, useState } from "react"
+import StockDetailsModal from "./StockEntryModel"
+import StockTable from "./StockTable"
+import { toast } from "react-toastify"
 
-// export default function StockManagement() {
-//   const [currentPage, setCurrentPage] = useState(1)
-//   const [productPerPage] = useState(10)
-//   const [filters, setFilters] = useState<Filters>({})
-//   const [selectedProduct, setSelectedProduct] = useState("")
-//   const [searchTerm, setSearchTerm] = useState("")
-//   const [selectedStockEntry, setSelectedStockEntry] = useState<StockEntry | undefined>()
-//   const [isModalOpen, setIsModalOpen] = useState(false)
+const StockManagement: React.FC = () => {
 
-//   const { products, totalLength, isLoading, error, refresh } = useProductFetch(currentPage, productPerPage, filters)
+    const [selectedStockEntry, setSelectedStockEntry] = useState<IStockEntry | undefined>()
+    const [isModalOpen, setIsModalOpen] = useState(false)
+    const [stockEntries, setStockEntries] = useState<IStockEntry[] | null>(null)
+    const { products, isLoading, error } = useProductFetch(1, 120)
+    const { user } = useUser()
+    const hasLoaded = useRef<boolean>(false);
 
-// //   const filteredStockEntries = useMemo(() => {
-// //     return stockEntries.filter((entry) => {
-// //       const matchesProduct = !selectedProduct || entry.productId === selectedProduct
-// //       const matchesSearch =
-// //         !searchTerm ||
-// //         entry.productName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-// //         entry.reason.toLowerCase().includes(searchTerm.toLowerCase())
 
-// //       return matchesProduct && matchesSearch
-// //     })
-// //   }, [stockEntries, selectedProduct, searchTerm])
+    const loadStockEntries = async () => {
+        const data = await fetchStockEntries()
+        if (data) {
+            setStockEntries(data.stockEntries)
+        }
+    }
 
-//   const handleSearch = () => {
-//     setFilters({ search: searchTerm })
-//   }
+    useEffect(() => {
+        if (hasLoaded.current) return;
+        hasLoaded.current = true;
 
-//   const handleViewDetails = (stockEntry: StockEntry) => {
-//     setSelectedStockEntry(stockEntry)
-//     setIsModalOpen(true)
-//   }
+        loadStockEntries()
+    },)
 
-//   const handleNewEntry = () => {
-//     setSelectedStockEntry(undefined)
-//     setIsModalOpen(true)
-//   }
 
-//   const formatDate = (dateString: string) => {
-//     return new Date(dateString).toLocaleDateString("en-US", {
-//       year: "numeric",
-//       month: "short",
-//       day: "numeric",
-//       hour: "2-digit",
-//       minute: "2-digit",
-//     })
-//   }
+    const handleViewDetails = (stockEntry: IStockEntry) => {
+        setSelectedStockEntry(stockEntry)
+        setIsModalOpen(true)
+    }
 
-//   if (error) {
-//     return (
-//       <Card>
-//         <CardContent className="pt-6">
-//           <p className="text-destructive">Error: {error}</p>
-//         </CardContent>
-//       </Card>
-//     )
-//   }
+    const handleNewEntry = () => {
+        setSelectedStockEntry(undefined)
+        setIsModalOpen(true)
+    }
 
-//   return (
-//     <div className="space-y-6">
-//       <Card>
-//         <CardHeader>
-//           <CardTitle>Stock Management</CardTitle>
-//           <CardDescription>Manage your product stock entries and track inventory changes</CardDescription>
-//         </CardHeader>
-//         <CardContent>
-//           <div className="flex flex-col sm:flex-row gap-4 mb-6">
-//             <div className="flex-1">
-//               <div className="flex gap-2">
-//                 <Input
-//                   placeholder="Search stock entries..."
-//                   value={searchTerm}
-//                   onChange={(e) => setSearchTerm(e.target.value)}
-//                   className="flex-1"
-//                 />
-//                 <Button onClick={handleSearch} size="icon">
-//                   <Search className="h-4 w-4" />
-//                 </Button>
-//               </div>
-//             </div>
-//             <ProductCombobox
-//               products={products}
-//               value={selectedProduct}
-//               onValueChange={setSelectedProduct}
-//               placeholder="Filter by product..."
-//             />
-//             <Button onClick={handleNewEntry}>
-//               <Plus className="h-4 w-4 mr-2" />
-//               New Entry
-//             </Button>
-//           </div>
+    const handleDeleteEntry = async (entry: IStockEntry) => {
+        if (user) {
 
-//           {isLoading ? (
-//             <div className="text-center py-8">
-//               <p>Loading stock entries...</p>
-//             </div>
-//           ) : (
-//             <div className="rounded-md border">
-//               <Table>
-//                 <TableHeader>
-//                   <TableRow>
-//                     <TableHead>Product</TableHead>
-//                     <TableHead>Quantity</TableHead>
-//                     <TableHead>Type</TableHead>
-//                     <TableHead>Reason</TableHead>
-//                     <TableHead>Date</TableHead>
-//                     <TableHead>User</TableHead>
-//                     <TableHead className="text-right">Actions</TableHead>
-//                   </TableRow>
-//                 </TableHeader>
-//                 <TableBody>
-//                   {filteredStockEntries.length === 0 ? (
-//                     <TableRow>
-//                       <TableCell colSpan={7} className="text-center py-8">
-//                         No stock entries found
-//                       </TableCell>
-//                     </TableRow>
-//                   ) : (
-//                     filteredStockEntries.map((entry) => (
-//                       <TableRow key={entry.id}>
-//                         <TableCell className="font-medium">{entry.productName}</TableCell>
-//                         <TableCell>{entry.quantity}</TableCell>
-//                         <TableCell>
-//                           <Badge variant={entry.type === "IN" ? "default" : "secondary"}>
-//                             {entry.type === "IN" ? "Stock In" : "Stock Out"}
-//                           </Badge>
-//                         </TableCell>
-//                         <TableCell className="max-w-[200px] truncate">{entry.reason}</TableCell>
-//                         <TableCell>{formatDate(entry.createdAt)}</TableCell>
-//                         <TableCell>{entry.userEmail}</TableCell>
-//                         <TableCell className="text-right">
-//                           <Button variant="ghost" size="icon" onClick={() => handleViewDetails(entry)}>
-//                             <Eye className="h-4 w-4" />
-//                           </Button>
-//                         </TableCell>
-//                       </TableRow>
-//                     ))
-//                   )}
-//                 </TableBody>
-//               </Table>
-//             </div>
-//           )}
-//         </CardContent>
-//       </Card>
+            if (!user.emailAddresses?.[0]?.emailAddress || !user.id) {
+                console.log("🚀 ~ handleSaveEntry ~ user:", user.emailAddresses?.[0]?.emailAddress, user.id)
+                toast.error("User Not Found")
+                return
+            }
 
-//       <StockDetailsModal
-//         open={isModalOpen}
-//         onOpenChange={setIsModalOpen}
-//         stockEntry={selectedStockEntry}
-//         onSave={refresh}
-//       />
-//     </div>
-//   )
-// }
+            if (entry._id) {
+                await deleteStockEntry(entry._id)
+            }
+            loadStockEntries()
+        }
+    }
+
+    const handleSaveEntry = async (entry: IStockEntry) => {
+        if (user) {
+
+            if (!user.emailAddresses?.[0]?.emailAddress || !user.id) {
+                console.log("🚀 ~ handleSaveEntry ~ user:", user.emailAddresses?.[0]?.emailAddress, user.id)
+                toast.error("User Not Found")
+                return
+            }
+
+            if (entry._id) {
+                console.log("🚀 ~ handleSaveEntry ~ entry._id:", entry._id)
+                await updateStockEntry(
+                    entry._id,
+                    {
+                        added_by: user.emailAddresses[0].emailAddress,
+                        stock_name: entry.stock_name,
+                        description: entry.description || "",
+                        date: entry.date,
+                        products: entry.products,
+                    }
+                );
+            }
+            else {
+
+                await addStockEntry(
+                    {
+                        added_by: user.emailAddresses[0].emailAddress,
+                        stock_name: entry.stock_name,
+                        description: entry.description || "",
+                        date: entry.date,
+                        products: entry.products,
+                    },
+                    user.id,
+                )
+            }
+
+            setIsModalOpen(false)
+            loadStockEntries()
+        }
+    }
+
+
+    if (error) {
+        return (
+            <Card>
+                <CardContent className="pt-6">
+                    <p className="text-destructive">Error: {error}</p>
+                </CardContent>
+            </Card>
+        )
+    }
+
+    return (
+        <Card >
+            <CardHeader>
+                <div className="flex flex-col sm:flex-row justify-between gap-4 mb-6">
+                    <div className="grid">
+                        <CardTitle>Stock Management</CardTitle>
+                        <CardDescription>Manage your product stock entries and track inventory changes</CardDescription>
+                    </div>
+                    <Button onClick={handleNewEntry}>
+                        <Plus className="h-4 w-4 mr-2" />
+                        New Entry
+                    </Button>
+                </div>
+            </CardHeader>
+            <CardContent>
+
+                {(isLoading || stockEntries === null) ? (
+                    <div className="text-center py-8">
+                        <p>Loading stock entries...</p>
+                    </div>
+                ) : (
+                    <>
+                        <StockTable
+                            stockEntries={stockEntries}
+                            onView={handleViewDetails}
+                            onDelete={handleDeleteEntry}
+                        />
+
+                        {(user?.emailAddresses[0].emailAddress && isModalOpen === true) &&
+                            <StockDetailsModal
+                                open={isModalOpen}
+                                onOpenChange={setIsModalOpen}
+                                stockEntry={selectedStockEntry}
+                                products={products}
+                                email={user?.emailAddresses[0].emailAddress}
+                                onSave={handleSaveEntry}
+                            />
+                        }
+                    </>
+                )}
+            </CardContent>
+        </Card>
+
+    )
+}
+
+export default memo(StockManagement)

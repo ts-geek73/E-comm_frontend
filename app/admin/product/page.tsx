@@ -1,94 +1,79 @@
 "use client"
 
-import FileUpload from "@/components/Admin/CsvFileUpload/page";
-import CreateProduceComp from "@/components/Admin/Product/createProduct";
-import UpdateProduceComp from "@/components/Admin/Product/updateProduct/page";
-import PromoCodeList from "@/components/Admin/Promocode/PromoCodeList";
-import RolePermissionManager from "@/components/Admin/RolePermission/page";
-import { useState } from "react";
-// import { usePermission } from "@/hooks/usePermission";
+import { useEffect, useMemo, useState } from "react"
+import { useRouter, usePathname } from "next/navigation"
+
+import FileUpload from "@/components/Admin/CsvFileUpload/page"
+import CreateProduceComp from "@/components/Admin/Product/createProduct"
+import UpdateProduceComp from "@/components/Admin/Product/updateProduct/page"
+import PromoCodeList from "@/components/Admin/Promocode/PromoCodeList"
+import RolePermissionManager from "@/components/Admin/RolePermission/page"
+import StockManagement from "@/components/Admin/Stock/StockEntry"
 
 const ProductCreatePage = () => {
-  const [activeComponent, setActiveComponent] = useState("updateProduce");
-  // const { hasPermission } = usePermission();
+  const router = useRouter()
+  const pathname = usePathname()
 
+  const [activeComponent, setActiveComponent] = useState<string>()
 
-  const handleSidebarClick = (component: string) => {
-    setActiveComponent(component);
-  };
+  const sidebarItems = useMemo(() => [
+    { key: "updateProduce", label: "Product List" },
+    { key: "rolePermission", label: "Role Permission Manager" },
+    { key: "createProduce", label: "Create Product" },
+    { key: "fileUpload", label: "File Uploading" },
+    { key: "promoCodeList", label: "Promo Code" },
+    { key: "stockEntry", label: "Stock Entry" },
+  ], [])
+
+  const handleSidebarClick = (key: string) => {
+    setActiveComponent(key)
+    router.push(`${pathname}#${key}`)
+  }
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const hash = window.location.hash.replace("#", "")
+      const validKeys = sidebarItems.map((item) => item.key)
+      if (hash && validKeys.includes(hash)) {
+        setActiveComponent(hash)
+      }
+      else{
+        setActiveComponent("updateProduce")
+      }
+    }
+  }, [sidebarItems])
 
   return (
-    <div className="min-h-screen bg-gray-100 flex">
-
-      <aside className="w-64 bg-white  p-4 space-y-4">
+    <div className="bg-gray-100 grid grid-cols-[1fr_6fr] border">
+      <div className="bg-white p-4 space-y-4">
         <h2 className="text-xl font-semibold text-gray-800 mb-6">Admin Panel</h2>
-        <nav className="space-y-2">
-
-          <button
-            onClick={() => handleSidebarClick("updateProduce")}
-            className={`block w-full text-left p-3 rounded-md transition-colors duration-200 ${activeComponent === "updateProduce"
-              ? "bg-blue-600 text-white"
-              : "hover:bg-gray-200 text-gray-700"
+        <div className="space-y-2">
+          {sidebarItems.map((item) => (
+            <button
+              key={item.key}
+              onClick={() => handleSidebarClick(item.key)}
+              className={`block w-full text-left p-3 rounded-md transition-colors duration-200 ${
+                activeComponent === item.key
+                  ? "bg-blue-600 text-white"
+                  : "hover:bg-gray-200 text-gray-700"
               }`}
-          >
-            Product List
-          </button>
-
-          <button
-            onClick={() => handleSidebarClick("rolePermission")}
-            className={`block w-full text-left p-3 rounded-md transition-colors duration-200 ${activeComponent === "rolePermission"
-              ? "bg-blue-600 text-white"
-              : "hover:bg-gray-200 text-gray-700"
-              }`}
-          >
-            Role Permission Manager
-          </button>
-
-          <button
-            onClick={() => handleSidebarClick("createProduce")}
-            className={`block w-full text-left p-3 rounded-md transition-colors duration-200 ${activeComponent === "createProduce"
-              ? "bg-blue-600 text-white"
-              : "hover:bg-gray-200 text-gray-700"
-              }`}
-          >
-            Create Product
-          </button>
-          <button
-            onClick={() => handleSidebarClick("fileUpload")}
-            className={`block w-full text-left p-3 rounded-md transition-colors duration-200 ${activeComponent === "fileUpload"
-              ? "bg-blue-600 text-white"
-              : "hover:bg-gray-200 text-gray-700"
-              }`}
-          >
-            File Uploaing
-          </button>
-
-
-
-          <button
-            onClick={() => handleSidebarClick("promoCodeList")}
-            className={`block w-full text-left p-3 rounded-md transition-colors duration-200 ${activeComponent === "promoCodeList"
-              ? "bg-blue-600 text-white"
-              : "hover:bg-gray-200 text-gray-700"
-              }`}
-          >
-            Promo Code
-          </button>
-        </nav>
-      </aside>
-
-      <main className="flex-1">
-        <div className="bg-white rounded-lg h-screen ">
-          {activeComponent === "createProduce" && <CreateProduceComp />}
-          {activeComponent === "updateProduce" && <UpdateProduceComp />}
-          {activeComponent === "promoCodeList" && <PromoCodeList />}
-          {activeComponent === "rolePermission" && <RolePermissionManager />}
-          {activeComponent === "fileUpload" && <FileUpload />}
+            >
+              {item.label}
+            </button>
+          ))}
         </div>
-      </main>
+      </div>
 
+        <div className="rounded-lg min-h-[87vh] bg-white">
+          {activeComponent === "updateProduce" && <UpdateProduceComp />}
+          {activeComponent === "rolePermission" && <RolePermissionManager />}
+          {activeComponent === "createProduce" && <CreateProduceComp />}
+          {activeComponent === "fileUpload" && <FileUpload />}
+          {activeComponent === "promoCodeList" && <PromoCodeList />}
+          {activeComponent === "stockEntry" && <StockManagement />}
+        </div>
     </div>
-  );
-};
+  )
+}
 
-export default ProductCreatePage;
+export default ProductCreatePage

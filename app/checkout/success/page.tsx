@@ -91,7 +91,7 @@ function OrderDetailsFetcher() {
               <strong>Email:</strong> {order.email}
             </div>
             <div>
-              <strong>Amount Paid:</strong> ₹{(order.amount).toFixed(2)}
+              <strong>Amount Paid:</strong> ₹{(order.amount/100).toFixed(2)}
             </div>
           </div>
         )}

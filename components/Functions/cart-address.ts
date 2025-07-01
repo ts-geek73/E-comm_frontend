@@ -97,6 +97,7 @@ export const fetchcart = async (user_id: string) => {
       const response = await api.get("/cart", {
         params: { user_id }
       });
+      console.log("🚀 ~ fetchcart ~ response:", response)
       if (response.status === 200) {
         return response.data.data
       } else {
@@ -213,6 +214,11 @@ export const makePayMent = async (cartData: ICartresponce, email: string, finalP
   try {
     console.log("enter");
 
+    if (cartData.inStock && cartData.inStock?.length < 1) {
+      toast.error("Alteast One Item with Valid Stock should have.")
+      return
+    }
+
     const stripe = await getStripe();
     console.log("exit");
 
@@ -223,8 +229,12 @@ export const makePayMent = async (cartData: ICartresponce, email: string, finalP
     }
     console.log("pass stripe 1");
 
+
     const body = {
-      products: cartData,
+      products: {
+        ...cartData,
+        cart:cartData.inStock,
+      },
       finalPrice,
       email,
       billing: address.billing,
@@ -247,7 +257,12 @@ export const makePayMent = async (cartData: ICartresponce, email: string, finalP
       console.error("Stripe checkout error:", result.error.message);
     }
   } catch (error) {
-    console.error("Payment initiation failed:", error);
+    console.log("Payment initiation failed:", error);
+    if (error instanceof AxiosError) {
+      toast.error(error.response?.data);
+    } else {
+      toast.error('Unknown Payment Error:');
+    }
   }
 };
 

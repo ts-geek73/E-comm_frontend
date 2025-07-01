@@ -11,6 +11,7 @@ const CartItemCard:React.FC<{
     handleRemoveItem :(productId: string) => void
     handleQuantityChange: (productId: string, change: number)=> void 
     rupeeSymbol?: string }> = ({item , handleQuantityChange, handleRemoveItem, itemsBeingUpdated, rupeeSymbol = "Rs." }) => {
+    console.log("🚀 ~ item:", item)
     return (
         <div className="p-4 md:p-6 flex flex-col md:flex-row group hover:bg-blue-50 transition-colors duration-200">
             <div className="md:w-24 h-24 relative mb-4 md:mb-0 bg-white rounded-md overflow-hidden border border-blue-100">

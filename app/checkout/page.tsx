@@ -18,15 +18,15 @@ export default function CheckoutPage() {
     const email = user?.emailAddresses?.[0]?.emailAddress;
 
 
-        const fetchAddresses = async () => {
-            try {
-                const data = await getAddresses(email as string);
-                console.log("Fetched addresses:", data);
-                setSavedAddresses(data?.addresses || []);
-            } catch (error) {
-                console.error("Failed to fetch addresses", error);
-            }
-        };
+    const fetchAddresses = async () => {
+        try {
+            const data = await getAddresses(email as string);
+            console.log("Fetched addresses:", data);
+            setSavedAddresses(data?.addresses || []);
+        } catch (error) {
+            console.error("Failed to fetch addresses", error);
+        }
+    };
 
     useEffect(() => {
         if (!email) {
@@ -36,7 +36,7 @@ export default function CheckoutPage() {
 
 
         fetchAddresses();
-    }, [user, email]); 
+    }, [user, email]);
 
     const loadCart = useCallback(async () => {
         try {
@@ -71,24 +71,42 @@ export default function CheckoutPage() {
         loadCart();
     }, [loadCart]);
 
-    const handleCheckoutSubmit = async (data: ExtendedFormValues) => {
-        console.log("Address data:=", data)
-        console.log("CArt Product:=", cartdata);
-        console.log("finalPrice:=", finalPrice);
-        console.log("coupons:=", coupons);
+const handleCheckoutSubmit = async (data: ExtendedFormValues) => {
+    console.log("Address data:=", data);
+    console.log("Cart Product:=", cartdata);
+    console.log("finalPrice:=", finalPrice);
+    console.log("coupons:=", coupons);
 
-        if (!cartdata || finalPrice === 0) {
-            toast.error("Something went wrong. Please try again.");
-            return;
-        }
-
-        if (coupons && coupons.length > 0) {
-            await makePayMent(cartdata, user?.emailAddresses?.[0]?.emailAddress as string, finalPrice, data, coupons)
-        } else {
-            await makePayMent(cartdata, user?.emailAddresses?.[0]?.emailAddress as string, finalPrice, data)
-        }
-
+    if (
+        !cartdata || 
+        finalPrice === 0 || 
+        (cartdata.inStock && cartdata.inStock.length <= 0)
+    ) {
+        console.log("🚀 ~ handleCheckoutSubmit ~ finalPrice:", finalPrice);
+        console.log("🚀 ~ handleCheckoutSubmit ~ cartdata:", cartdata);
+        return;
     }
+
+    console.log("pass");
+
+    if (coupons && coupons.length > 0) {
+        await makePayMent(
+            cartdata, 
+            user?.emailAddresses?.[0]?.emailAddress as string, 
+            finalPrice, 
+            data, 
+            coupons
+        );
+    } else {
+        await makePayMent(
+            cartdata, 
+            user?.emailAddresses?.[0]?.emailAddress as string, 
+            finalPrice, 
+            data
+        );
+    }
+};
+
 
     if (!isLoaded) {
         return <div>Loading...</div>;
@@ -112,9 +130,8 @@ export default function CheckoutPage() {
                     />
                 </div>
 
-                {/* Order Summary */}
                 <div className="lg:w-1/3">
-                    <div className="sticky top-8">
+                    <div className="sticky h-fit top-8">
                         <OrderSummary
                             cartdata={cartdata}
                             setCoupons={setCoupons}

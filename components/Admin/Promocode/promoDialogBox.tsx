@@ -1,3 +1,4 @@
+'use client'
 import { useState } from 'react';
 import {
   Dialog,
@@ -17,7 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-interface PromoCodeDialogProps {
+export interface PromoCodeDialogProps {
   open: boolean;
   onClose: () => void;
   promo: PromoCode | null;

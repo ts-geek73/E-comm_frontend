@@ -1,10 +1,6 @@
-import { ChartOptions, TooltipItem, ChartDataset } from 'chart.js';
 import { IOrderQty } from "@/hooks/useProductFetch";
 import { IProductData } from "@/types/product";
-import { Layers, Package, Store, Tag } from "lucide-react";
-import { JSX } from "react";
-import { Bar, Doughnut, Pie } from "react-chartjs-2";
-import CountUp from "react-countup";
+import { ChartDataset, ChartOptions, TooltipItem } from 'chart.js';
 
 export const getPriceRangeData = (products: IProductData[]) => {
     const ranges: Record<string, number> = {
