@@ -25,6 +25,6 @@ export const GetCommonMetadata = ({
           alt: "Default Open Graph Image",
         },
       ],
-    keywords,
+    keywords: keywords?.map((k) => k.toLowerCase()),
   };
 };
