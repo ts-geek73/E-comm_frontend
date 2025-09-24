@@ -22,6 +22,11 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
+        hostname: 'img.freepik.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
         hostname: 'cdn.jsdelivr.net',
         pathname: '/**',
       },

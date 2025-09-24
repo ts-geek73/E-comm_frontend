@@ -52,10 +52,6 @@ export default function RootLayout({
           >
             <CustomeProvider>{children}</CustomeProvider>
           </body>
-          <script
-            src="//code.tidio.co/kvb5zfjgkwgo3r0zohvokid1pleujxzc.js"
-            async
-          ></script>
         </html>
       </StrictMode>
     </ClerkProvider>
