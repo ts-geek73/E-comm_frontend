@@ -15,15 +15,20 @@ export const checkUrl = async (urls: string[]): Promise<string | null> => {
   return null;
 };
 
-function useValidImage(urls: string[], placeholder: string) {
-  const [src, setSrc] = useState<string | null>(placeholder);
+function useValidImage(title:string, placeholder: string =  "/no-product.png") {
+  const formetTitle = title.replaceAll(/[ .]/g, "").toLowerCase();
+  
+  const urls: string[] = [
+    `https://cdn.jsdelivr.net/gh/devicons/devicon/icons/${formetTitle}/${formetTitle}-original.svg`,
+    `https://cdn.jsdelivr.net/gh/devicons/devicon/icons/${formetTitle}/${formetTitle}-plain.svg`,
+  ];
+
+  const [src, setSrc] = useState<string>(placeholder);
 
   useEffect(() => {
     let isMounted = true;
 
-    if (urls.length === 0) {
-      setSrc(placeholder);
-    } else {
+    if (!!title) {
       async function fetchImage() {
         const finalUrl = await checkUrl(urls);
         if (finalUrl && isMounted) {

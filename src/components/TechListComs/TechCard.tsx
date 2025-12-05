@@ -3,28 +3,17 @@ import Image from "next/image";
 import { ITech } from "./TechList";
 
 interface ITechCard extends ITech {
-  onHover: (rect: DOMRect) => void;
-  onLeave: () => void;
+  onHover?: (rect: DOMRect) => void;
+  onLeave?: () => void;
 }
 
 export const TechCard: React.FC<ITechCard> = ({ title, description, onHover, onLeave }) => {
-  const handleMouseEnter = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    onHover(rect);
-  };
-  const formetTitle = title.replaceAll(/[ .]/g, "").toLowerCase();
-  const urls: string[] = [
-    `https://cdn.jsdelivr.net/gh/devicons/devicon/icons/${formetTitle}/${formetTitle}-original.svg`,
-    `https://cdn.jsdelivr.net/gh/devicons/devicon/icons/${formetTitle}/${formetTitle}-plain.svg`,
-  ];
-  const placeholderImage = "/no-product.png";
-
-  const finalurl = useValidImage(urls, placeholderImage);
+  const finalurl = useValidImage(title);
 
   return (
     <div
       className="group relative block h-48 w-40 p-2 cursor-pointer"
-      onMouseEnter={handleMouseEnter}
+      onMouseEnter={(e) => onHover?.(e.currentTarget.getBoundingClientRect())}
       onMouseLeave={onLeave}
     >
       <div className="relative z-10 flex h-full flex-col items-center justify-center gap-3 rounded-xl bg-white dark:bg-gray-800 px-6 py-4 shadow-md">
